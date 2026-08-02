@@ -66,6 +66,18 @@ Para cambiar el teléfono o el nombre más adelante: bloque `CONFIG` arriba de
 `script.js`, y buscar/reemplazar en `index.html` y `clientes.html` (el WhatsApp y el
 email también están escritos ahí).
 
+## ⚠️ Al cambiar el CSS o el JS
+
+Los links en el HTML llevan `?v=2` (`styles.css?v=2`, `script.js?v=2`). **Subí ese
+número cada vez que edites `styles.css`, `script.js` o `clientes.js`**, en los dos
+archivos HTML. Si no lo hacés, los visitantes que ya entraron al sitio siguen viendo
+la versión vieja aunque el deploy haya salido bien.
+
+Pasó exactamente eso al publicar el Área Clientes: `vercel.json` marcaba el CSS como
+`immutable` por un año, así que los navegadores no volvían a pedirlo ni con F5. Ahora
+la cabecera es `max-age=0, must-revalidate`, que con el ETag de Vercel responde 304 y
+no vuelve a descargar nada si el archivo no cambió.
+
 ## Colores de marca
 
 Todos definidos en `styles.css` → `:root`. Cambiando `--green-800` y `--gold`
