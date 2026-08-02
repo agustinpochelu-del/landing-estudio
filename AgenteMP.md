@@ -6,6 +6,12 @@ Todo lo que este agente necesita saber antes de tocar un archivo está acá.
 > Si estás leyendo esto al empezar una sesión: leelo entero, es corto. Después
 > mirá `README.md` para el detalle técnico de cada archivo.
 
+**Dónde vive esto.** Tres archivos, tres funciones:
+`AgenteMP.md` (este) es la fuente de verdad · `CLAUDE.md` es el resumen que
+Claude Code carga solo al abrir la carpeta · `.claude/agents/agente-mp.md` es el
+subagente que se invoca por nombre (`@agente-mp`) para delegarle un trabajo
+completo. **Si cambiás una regla acá, revisá los otros dos.**
+
 ---
 
 ## 1. El sitio de un vistazo
@@ -164,6 +170,7 @@ Los cuatro puntos, siempre, antes de dar el trabajo por terminado:
       que el `mailto:` funcione y que las anclas de cada sección lleguen a destino.
 - [ ] **Actualizá el `README.md`** si cambió algo estructural, de datos, o si
       quedó algo pendiente.
+- [ ] **Anotá la intervención en la bitácora** del final de este documento.
 
 Para levantar el sitio:
 
@@ -238,4 +245,5 @@ Registro de intervenciones relevantes. Una línea por cambio, la más nueva arri
 
 | Fecha | Qué se hizo |
 |---|---|
+| 2026-08-02 | Se instala el subagente `.claude/agents/agente-mp.md` |
 | 2026-08-02 | Se crea este documento y el `CLAUDE.md` que lo referencia |

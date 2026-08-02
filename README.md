@@ -14,6 +14,7 @@ cliente o potencial cliente pueda contactarse y agendar una cita.
 | `clientes.js`   | Año, ver/ocultar clave y aviso al enviar el formulario       |
 | `AgenteMP.md`   | Reglas de mantenimiento del sitio (leerlo antes de editar)   |
 | `CLAUDE.md`     | Resumen de esas reglas, se carga solo en cada sesión de Claude |
+| `.claude/agents/agente-mp.md` | El agente de mantenimiento, se invoca con `@agente-mp` |
 
 `clientes.html` se sirve como `https://www.estudiopochelu.com/clientes` (Vercel tiene
 `cleanUrls` activado). Lleva `noindex`, así que no aparece en Google.

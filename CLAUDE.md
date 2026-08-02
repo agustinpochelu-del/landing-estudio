@@ -10,6 +10,9 @@ alcance, reglas rojas, zonas protegidas, tono de escritura, checklist de cierre 
 trampas conocidas del proyecto. `README.md` tiene el detalle operativo de cada
 archivo.
 
+Para delegar un trabajo completo de mantenimiento está el subagente
+`@agente-mp` (`.claude/agents/agente-mp.md`), que ya trae esas reglas cargadas.
+
 ## Lo mínimo indispensable
 
 - **No pushees.** Editá y commiteá; el push lo hace Agustín después de revisar.
