@@ -39,8 +39,7 @@ email `agustinpochelu@gmail.com` y dirección `Thomas 3042`.
    Son promesas, no estadísticas: asegurate de poder cumplirlas o cambialas.
 5. **Matrícula** — si querés, agregá tu número de matrícula y el Consejo
    Profesional donde estás inscripto (footer y barra de confianza).
-6. **Dominio** — `<link rel="canonical">` y `og:image` en el `<head>`.
-7. **Honorarios y FAQ** — repasá las respuestas de la sección de preguntas
+6. **Honorarios y FAQ** — repasá las respuestas de la sección de preguntas
    frecuentes: describen una forma de trabajo (abono mensual, primera consulta
    sin cargo). Ajustalas a la tuya.
 
@@ -54,5 +53,12 @@ cambia la identidad de toda la página.
 
 ## Publicar
 
-Al ser 100% estática funciona en cualquier hosting: Netlify, Vercel, Cloudflare
-Pages o GitHub Pages. Se sube la carpeta tal cual, sin compilar nada.
+Ya está publicada en **https://www.estudiopochelu.com** vía Vercel, conectada al
+repo `agustinpochelu-del/landing-estudio`. Cada `git push` a `main` redeploya solo:
+
+```bash
+git -C "C:/Users/agust/Documents/Claude/Landing" push
+```
+
+El apex `estudiopochelu.com` redirige (308) a `www`. Si preferís al revés,
+se cambia en Vercel → Settings → Domains marcando el dominio primario.
