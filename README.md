@@ -30,18 +30,22 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
 
 ## ⚠️ Qué falta
 
-1. **Foto real** — la foto de la sección "Quién te atiende" es de stock (Unsplash),
-   igual que la del hero. Lo ideal es una foto tuya y una de tu oficina: guardalas
-   en una carpeta `img/` y cambiá el `src`.
-2. **Testimonios** — la sección está **comentada** en `index.html` (buscá
+1. **Foto propia** — la sección "Quién te atiende" quedó **sin foto** a propósito.
+   Para reponerla: en `index.html` volvé a agregar el bloque `<div class="split-media">`
+   con la imagen y sacale la clase `split-solo` al contenedor `.split`.
+   La del hero es una foto de stock genérica de un escritorio, no un retrato.
+2. **Texto de "Organización administrativa"** — lo redacté a partir de una
+   descripción breve (circuitos administrativos, incorporación y formación de
+   personal). Revisá la tarjeta en `#servicios` y ajustá la redacción.
+3. **Testimonios** — la sección está **comentada** en `index.html` (buscá
    "TESTIMONIOS"). Descomentala cuando tengas testimonios reales de clientes.
    No la publiques con textos inventados.
-3. **Barra de confianza** — dice "Sin cargo / 24 h / 100% digital / Matriculado".
-   Son promesas, no estadísticas: asegurate de poder cumplirlas o cambialas.
-4. **Honorarios y FAQ** — repasá las respuestas de la sección de preguntas
-   frecuentes: describen una forma de trabajo (abono mensual, primera consulta
-   sin cargo). Ajustalas a la tuya.
-5. **DNS del correo** — `mail.estudiopochelu.com` es un alias del dominio raíz, que
+4. **Barra de confianza** — dice "+20 años / 24 h / 100% digital / Matriculado".
+   Las últimas tres son promesas, no estadísticas: asegurate de poder cumplirlas.
+5. **FAQ de honorarios** — la única mención al tema. No dice ningún precio, solo
+   que se definen por escrito antes de empezar. Si preferís sacarla del todo,
+   está en la sección `#faq`.
+6. **DNS del correo** — `mail.estudiopochelu.com` es un alias del dominio raíz, que
    ahora apunta a Vercel. El MX de prioridad 0 quedó apuntando a un servidor web.
    Hay que darle un registro A propio en el panel de hostmar (confirmar la IP con
    el soporte del hosting).
