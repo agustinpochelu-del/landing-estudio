@@ -13,6 +13,20 @@ archivo.
 Para delegar un trabajo completo de mantenimiento está el subagente
 `@agente-mp` (`.claude/agents/agente-mp.md`), que ya trae esas reglas cargadas.
 
+Leé también `Memoria.md` (privado, fuera de git): son las correcciones y el
+contexto que se fue acumulando sesión a sesión.
+
+## Memoria
+
+**Cuando Agustín te corrija, o aparezca contexto nuevo del negocio o del
+proyecto, escribilo en `Memoria.md` en el momento** — sin esperar a que te lo
+pida. Entrada arriba de todo, con fecha, etiqueta (`corrección` / `decisión` /
+`negocio` / `técnico`) y las líneas **Por qué** y **Cómo lo aplico**. El formato
+completo está explicado adentro del archivo.
+
+Si ya hay una entrada del mismo tema, actualizala en vez de duplicar. Si una nota
+se vuelve una regla permanente del sitio, mudala a `AgenteMP.md`.
+
 ## Lo mínimo indispensable
 
 - **No pushees.** Editá y commiteá; el push lo hace Agustín después de revisar.

@@ -2,3 +2,6 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Notas privadas de trabajo — no se publican
+Memoria.md

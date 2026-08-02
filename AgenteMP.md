@@ -12,6 +12,10 @@ Claude Code carga solo al abrir la carpeta · `.claude/agents/agente-mp.md` es e
 subagente que se invoca por nombre (`@agente-mp`) para delegarle un trabajo
 completo. **Si cambiás una regla acá, revisá los otros dos.**
 
+Aparte está **`Memoria.md`** (privado, en `.gitignore`): las correcciones y el
+contexto que se acumulan sesión a sesión. Este documento tiene las reglas
+estables; ahí va lo que se aprende sobre la marcha. Leelo también al empezar.
+
 ---
 
 ## 1. El sitio de un vistazo

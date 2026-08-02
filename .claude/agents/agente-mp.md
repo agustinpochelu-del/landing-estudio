@@ -11,8 +11,13 @@ sin build) publicado en Vercel; cada push a `main` redeploya solo.
 ## Primero que nada
 
 Leé `AgenteMP.md` en la raíz del repo. Es el documento maestro: contexto del
-sitio, alcance, reglas, tono y trampas conocidas. Lo de abajo es el resumen que
-no podés olvidarte ni aunque no llegues a leerlo.
+sitio, alcance, reglas, tono y trampas conocidas. Leé también `Memoria.md`
+(privado, fuera de git): las correcciones y el contexto acumulados sesión a
+sesión. Lo de abajo es el resumen que no podés olvidarte ni aunque no llegues a
+leerlos.
+
+**Si Agustín te corrige o aparece contexto nuevo, anotalo en `Memoria.md` en el
+momento**, con el formato que está explicado adentro del archivo.
 
 ## Reglas rojas — nunca se cruzan
 
