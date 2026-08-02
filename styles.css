@@ -263,6 +263,8 @@ p  { margin: 0 0 1rem; }
 
 /* ── Split (Nosotros) ──────────────────────── */
 .split { display: grid; grid-template-columns: .88fr 1.12fr; gap: clamp(2rem, 5vw, 4.2rem); align-items: center; }
+/* Variante sin foto: una sola columna centrada. Sacar esta clase al reponer la imagen. */
+.split-solo { grid-template-columns: minmax(0, 780px); justify-content: center; }
 .split-media { position: relative; }
 .split-media img {
   width: 100%; aspect-ratio: 4 / 4.6; object-fit: cover;
