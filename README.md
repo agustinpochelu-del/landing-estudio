@@ -12,6 +12,8 @@ cliente o potencial cliente pueda contactarse y agendar una cita.
 | `script.js`     | Menú, animaciones, validación y armado del link WhatsApp     |
 | `clientes.html` | Área Clientes — pantalla de acceso (**solo visual**, ver más abajo) |
 | `clientes.js`   | Año, ver/ocultar clave y aviso al enviar el formulario       |
+| `AgenteMP.md`   | Reglas de mantenimiento del sitio (leerlo antes de editar)   |
+| `CLAUDE.md`     | Resumen de esas reglas, se carga solo en cada sesión de Claude |
 
 `clientes.html` se sirve como `https://www.estudiopochelu.com/clientes` (Vercel tiene
 `cleanUrls` activado). Lleva `noindex`, así que no aparece en Google.
