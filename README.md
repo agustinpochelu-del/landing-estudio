@@ -5,11 +5,16 @@ cliente o potencial cliente pueda contactarse y agendar una cita.
 
 ## Archivos
 
-| Archivo      | Qué contiene                                              |
-|--------------|-----------------------------------------------------------|
-| `index.html` | Todo el contenido y los textos                            |
-| `styles.css` | Diseño (colores de marca en `:root`, arriba del todo)     |
-| `script.js`  | Menú, animaciones, validación y armado del link WhatsApp  |
+| Archivo         | Qué contiene                                                 |
+|-----------------|--------------------------------------------------------------|
+| `index.html`    | Todo el contenido y los textos de la landing                 |
+| `styles.css`    | Diseño (colores de marca en `:root`, arriba del todo)        |
+| `script.js`     | Menú, animaciones, validación y armado del link WhatsApp     |
+| `clientes.html` | Área Clientes — pantalla de acceso (**solo visual**, ver más abajo) |
+| `clientes.js`   | Año, ver/ocultar clave y aviso al enviar el formulario       |
+
+`clientes.html` se sirve como `https://www.estudiopochelu.com/clientes` (Vercel tiene
+`cleanUrls` activado). Lleva `noindex`, así que no aparece en Google.
 
 ## Cómo verla
 
@@ -49,9 +54,17 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    ahora apunta a Vercel. El MX de prioridad 0 quedó apuntando a un servidor web.
    Hay que darle un registro A propio en el panel de hostmar (confirmar la IP con
    el soporte del hosting).
+7. **Área Clientes** — `clientes.html` es **solo la maqueta visual**. El formulario no
+   valida nada: no hay usuarios ni claves en el repositorio y ninguna combinación
+   deja entrar a ningún lado. Por eso la pantalla avisa "Próximamente". Para que
+   funcione de verdad hace falta un backend (usuarios, claves hasheadas, sesiones,
+   los documentos a mostrar), lo que ya no es un sitio estático: se resuelve con
+   Vercel Functions + una base de datos, o con un servicio de portal de clientes.
+   **No pongas una clave en el JavaScript**: cualquiera la ve mirando el código.
 
 Para cambiar el teléfono o el nombre más adelante: bloque `CONFIG` arriba de
-`script.js`, y buscar/reemplazar en `index.html`.
+`script.js`, y buscar/reemplazar en `index.html` y `clientes.html` (el WhatsApp y el
+email también están escritos ahí).
 
 ## Colores de marca
 
