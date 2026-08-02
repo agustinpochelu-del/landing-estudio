@@ -13,7 +13,7 @@ const CONFIG = {
   estudio: 'Agustín Pochelú',
 
   // Email de contacto
-  email: 'agustinpochelu@gmail.com',
+  email: 'agustinpochelu@estudiopochelu.com',
 };
 
 /* ─────────────────────────────────────────────────────────────── */

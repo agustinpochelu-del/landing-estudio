@@ -19,29 +19,32 @@ python -m http.server 5173
 
 Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic.
 
-## Datos ya cargados
+## Datos cargados
 
-Nombre, teléfono (`+54 280 456-2145` → WhatsApp `5492804562145`),
-email `agustinpochelu@gmail.com` y dirección `Thomas 3042`.
+- Agustín Pochelú — Contador Público
+- Tel. `+54 280 456-2145` → WhatsApp `5492804562145`
+- `agustinpochelu@estudiopochelu.com`
+- Thomas 3042, Puerto Madryn, Chubut
+- Matrículas: CPCE Chubut T. I, F. 940 · CPCECABA T. 325, F. 242
+- X: [@PocheluAgustin](https://x.com/PocheluAgustin)
 
-## ⚠️ Qué falta / qué revisar antes de publicar
+## ⚠️ Qué falta
 
-1. **Ciudad y provincia** — la dirección figura solo como "Thomas 3042".
-   Buscá los `TODO` en `index.html` (sección `#agenda` y el JSON-LD del `<head>`).
-   Sin ciudad, Google no te ubica en las búsquedas locales.
-2. **Foto real** — la foto de la sección "Quién te atiende" es de stock (Unsplash),
+1. **Foto real** — la foto de la sección "Quién te atiende" es de stock (Unsplash),
    igual que la del hero. Lo ideal es una foto tuya y una de tu oficina: guardalas
    en una carpeta `img/` y cambiá el `src`.
-3. **Testimonios** — la sección está **comentada** en `index.html` (buscá
+2. **Testimonios** — la sección está **comentada** en `index.html` (buscá
    "TESTIMONIOS"). Descomentala cuando tengas testimonios reales de clientes.
    No la publiques con textos inventados.
-4. **Barra de confianza** — dice "Sin cargo / 24 h / 100% digital / Matriculado".
+3. **Barra de confianza** — dice "Sin cargo / 24 h / 100% digital / Matriculado".
    Son promesas, no estadísticas: asegurate de poder cumplirlas o cambialas.
-5. **Matrícula** — si querés, agregá tu número de matrícula y el Consejo
-   Profesional donde estás inscripto (footer y barra de confianza).
-6. **Honorarios y FAQ** — repasá las respuestas de la sección de preguntas
+4. **Honorarios y FAQ** — repasá las respuestas de la sección de preguntas
    frecuentes: describen una forma de trabajo (abono mensual, primera consulta
    sin cargo). Ajustalas a la tuya.
+5. **DNS del correo** — `mail.estudiopochelu.com` es un alias del dominio raíz, que
+   ahora apunta a Vercel. El MX de prioridad 0 quedó apuntando a un servidor web.
+   Hay que darle un registro A propio en el panel de hostmar (confirmar la IP con
+   el soporte del hosting).
 
 Para cambiar el teléfono o el nombre más adelante: bloque `CONFIG` arriba de
 `script.js`, y buscar/reemplazar en `index.html`.

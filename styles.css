@@ -274,6 +274,13 @@ p  { margin: 0 0 1rem; }
 }
 .split-copy p { color: var(--body); }
 
+.matriculas {
+  font-size: .84rem; color: var(--muted); margin: 1.1rem 0 0;
+  padding: .75rem 1rem; border-left: 3px solid var(--gold-soft);
+  background: rgba(27, 107, 92, .05); border-radius: 0 10px 10px 0;
+}
+.matriculas strong { color: var(--green-800); font-weight: 600; }
+
 .checklist { list-style: none; margin: 1.6rem 0 2rem; padding: 0; display: grid; gap: 1rem; }
 .checklist li { position: relative; padding-left: 2.1rem; font-size: .97rem; }
 .checklist li strong { color: var(--ink); font-weight: 600; }
@@ -446,6 +453,13 @@ p  { margin: 0 0 1rem; }
 .footer-grid a:hover { color: var(--gold-soft); }
 .footer-grid > div > a[href^="tel"], .footer-grid > div > a[href^="mailto"] { display: block; margin-bottom: .55rem; }
 .footer-desc { margin: 1rem 0 0; font-size: .89rem; line-height: 1.6; color: rgba(255, 255, 255, .5); }
+.footer-social {
+  display: inline-flex; align-items: center; gap: .5rem; margin-top: 1.1rem;
+  padding: .5rem .9rem; border-radius: 999px; font-size: .86rem; text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .68);
+  transition: border-color .18s ease, color .18s ease, background-color .18s ease;
+}
+.footer-social:hover { border-color: var(--gold-soft); color: var(--gold-soft); background: rgba(255, 255, 255, .04); }
 .footer-bottom {
   display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
   margin-top: 2.6rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, .12);
