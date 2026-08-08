@@ -67,10 +67,10 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    Vercel Functions + una base de datos, o con un servicio de portal de clientes.
    **No pongas una clave en el JavaScript**: cualquiera la ve mirando el código.
 
-8. **Área del Estudio** — falta pegar la dirección del Liquidador. En `estudio.html`
-   el botón "Abrir el liquidador" tiene `href="#"` con un comentario `TODO` al lado:
-   ahí va la URL de la app en Streamlit. Hasta que se complete, el botón no lleva a
-   ningún lado.
+8. **Área del Estudio** — el botón "Abrir el liquidador" apunta a
+   `https://calculo-de-intereses-a4qq6nxj4bea8eahdqne7x.streamlit.app`. Si alguna vez
+   renombrás ese subdominio (en Streamlit: Settings → App URL), acordate de actualizar
+   el link en `estudio.html`: la dirección vieja deja de funcionar.
 
    Esa página es **pública**, como todo el sitio: cualquiera que sepa la dirección ve
    la lista de herramientas. Lo que está protegido es cada herramienta, que pide su
