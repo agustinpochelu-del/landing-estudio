@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Área del Estudio — Agustín Pochelú, Estudio Contable</title>
+<meta name="description" content="Herramientas internas del estudio contable de Agustín Pochelú.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E3B34">
+<link rel="canonical" href="https://www.estudiopochelu.com/estudio">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E3B34'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23D9BC6A' text-anchor='middle'%3EAP%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+
+<a class="skip-link" href="#herramientas">Saltar a las herramientas</a>
+
+<!-- ══ HEADER REDUCIDO ══ -->
+<header class="site-header is-stuck">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Agustín Pochelú, estudio contable — inicio">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="38" height="38"><rect width="64" height="64" rx="14" fill="currentColor"/><text x="32" y="43" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#D9BC6A" text-anchor="middle">AP</text></svg>
+      </span>
+      <span class="brand-text">
+        <strong>Agustín Pochelú</strong>
+        <small>Estudio contable</small>
+      </span>
+    </a>
+
+    <a class="btn btn-sm btn-ghost" href="index.html">Volver al sitio</a>
+  </div>
+</header>
+
+<main class="auth-page" id="herramientas">
+  <div class="auth-inner auth-inner-ancho">
+
+    <header class="auth-head">
+      <p class="eyebrow"><span class="dot"></span> Uso interno</p>
+      <h1>Área del Estudio</h1>
+      <p class="auth-sub">Las herramientas que usamos para trabajar.</p>
+    </header>
+
+    <!-- ── Herramientas ──
+         Para sumar una nueva: copiá el bloque .tool entero y cambiale el
+         título, la descripción, las etiquetas y el link. -->
+    <article class="tool">
+      <span class="tool-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M7 7 4 14a3 3 0 0 0 6 0Z"/><path d="m17 7-3 7a3 3 0 0 0 6 0Z"/><path d="M9 21h6"/></svg>
+      </span>
+      <div class="tool-body">
+        <h2>Liquidador ARCA</h2>
+        <p>
+          Calcula intereses resarcitorios, punitorios y capitalizables para juicios de
+          ejecución fiscal. Los importes se verifican contra el detalle de cálculo que
+          emite ARCA.
+        </p>
+        <ul class="tool-meta">
+          <li>Ejecución fiscal</li>
+          <li>Carga y descarga en Excel</li>
+          <li>Acceso propio</li>
+        </ul>
+        <!-- TODO: reemplazar por la URL real de la app en Streamlit -->
+        <a class="btn btn-primary" href="#" target="_blank" rel="noopener">Abrir el liquidador</a>
+      </div>
+    </article>
+
+    <div class="tools-notice">
+      <span class="auth-notice-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+      </span>
+      <p>
+        Cada herramienta pide su propio acceso: esta página es solo la puerta de entrada,
+        no controla quién entra a cada una.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer auth-footer">
+  <div class="wrap footer-bottom">
+    <p>© <span id="anio">2026</span> Agustín Pochelú. Todos los derechos reservados.</p>
+    <p>Contador Público · CPCE Chubut T. I, F. 940 · CPCECABA T. 325, F. 242</p>
+  </div>
+</footer>
+
+<script>
+  /* Único script de la página: el año del pie. */
+  document.getElementById('anio').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
