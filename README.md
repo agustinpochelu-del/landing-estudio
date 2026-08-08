@@ -13,6 +13,7 @@ cliente o potencial cliente pueda contactarse y agendar una cita.
 | `clientes.html` | Área Clientes — pantalla de acceso (**solo visual**, ver más abajo) |
 | `clientes.js`   | Año, ver/ocultar clave y aviso al enviar el formulario       |
 | `estudio.html`  | Área del Estudio — escritorio de herramientas internas       |
+| `middleware.js` | Pide usuario y clave antes de servir `/estudio` (corre en Vercel) |
 | `AgenteMP.md`   | Reglas de mantenimiento del sitio (leerlo antes de editar)   |
 | `CLAUDE.md`     | Resumen de esas reglas, se carga solo en cada sesión de Claude |
 | `.claude/agents/agente-mp.md` | El agente de mantenimiento, se invoca con `@agente-mp` |
@@ -72,14 +73,41 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    renombrás ese subdominio (en Streamlit: Settings → App URL), acordate de actualizar
    el link en `estudio.html`: la dirección vieja deja de funcionar.
 
-   Esa página es **pública**, como todo el sitio: cualquiera que sepa la dirección ve
-   la lista de herramientas. Lo que está protegido es cada herramienta, que pide su
-   propio acceso. No está linkeada desde el menú, así que se entra escribiendo la
-   dirección. Eso es discreción, no seguridad.
+   Esa página **pide usuario y contraseña** (ver más abajo), y además cada herramienta
+   pide la suya: entrar al Área del Estudio no habilita ninguna. No está linkeada desde
+   el menú, así que se entra escribiendo la dirección.
 
    Para sumar una herramienta nueva: copiar el bloque `<article class="tool">` entero
    dentro de `estudio.html` y cambiarle el título, la descripción, las etiquetas y el
    link. No hace falta tocar el CSS.
+
+## La clave del Área del Estudio
+
+`estudiopochelu.com/estudio` pide usuario y contraseña. La clave **no está en el
+repositorio**: se carga en Vercel, en el proyecto → **Settings → Environment
+Variables**, con este nombre y este formato:
+
+| Nombre | Valor |
+|---|---|
+| `ACCESO_ESTUDIO` | `agustin:unaClaveLarga` |
+
+Para varias personas, separadas por coma y sin espacios:
+`agustin:unaClaveLarga,maria:otraClaveLarga`
+
+Marcala para los tres entornos (Production, Preview y Development). Después de
+guardarla hay que **redeployar** para que tome efecto: Vercel no aplica variables
+nuevas a un deploy ya hecho.
+
+Usá una contraseña **de 16 caracteres o más**. No hay bloqueo por intentos fallidos —
+el middleware no guarda estado entre pedidos—, así que lo único que frena a alguien
+probando claves es que sea larga.
+
+**Verificalo siempre después de publicar:** abrí `estudiopochelu.com/estudio` en una
+ventana de incógnito. Tiene que pedirte usuario y contraseña. Si entra derecho, el
+middleware no se está ejecutando y la página quedó abierta.
+
+Para cerrar la sesión hay que cerrar el navegador: el diálogo del navegador no tiene
+botón de salir. Si compartís la máquina, usá una ventana de incógnito.
 
 Para cambiar el teléfono o el nombre más adelante: bloque `CONFIG` arriba de
 `script.js`, y buscar/reemplazar en `index.html` y `clientes.html` (el WhatsApp y el

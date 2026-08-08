@@ -25,7 +25,7 @@ estables; ahí va lo que se aprende sobre la marcha. Leelo también al empezar.
 | **Qué es** | Landing page de un estudio contable unipersonal |
 | **Titular** | Agustín Pochelú — Contador Público |
 | **URL** | https://www.estudiopochelu.com (el apex redirige 308 a `www`) |
-| **Stack** | HTML + CSS + JS puro. Sin build, sin npm, sin framework |
+| **Stack** | HTML + CSS + JS puro. Sin build, sin npm, sin framework. Una sola excepción: `middleware.js`, que corre en el servidor de Vercel |
 | **Hosting** | Vercel, conectado al repo `agustinpochelu-del/landing-estudio` |
 | **Deploy** | Cada `git push` a `main` redeploya solo |
 | **Repo local** | `C:\Users\agust\Documents\Claude\Landing` |
@@ -40,6 +40,7 @@ estables; ahí va lo que se aprende sobre la marcha. Leelo también al empezar.
 | `clientes.html` | Área Clientes — pantalla de acceso, **solo maqueta visual** |
 | `clientes.js` | Año del footer, ver/ocultar clave, aviso al enviar |
 | `estudio.html` | Área del Estudio — herramientas internas. `noindex`, sin link en el menú |
+| `middleware.js` | Pide usuario y clave antes de servir `/estudio`. **Único archivo que corre del lado del servidor** |
 | `vercel.json` | `cleanUrls`, headers de seguridad y política de caché |
 | `README.md` | Documentación operativa para el titular |
 
@@ -124,6 +125,9 @@ Si un pedido choca con una de estas, hay que decirlo y ofrecer la alternativa.
 2. **No poner credenciales en el front.** Ninguna clave, usuario, token ni API
    key en HTML o JS. El Área Clientes **no** se "hace funcionar" con un password
    hardcodeado: cualquiera lo ve mirando el código fuente.
+   *(El acceso a `/estudio` no rompe esta regla: la comparación ocurre en
+   `middleware.js`, que se ejecuta en el servidor de Vercel y nunca llega al
+   navegador, y las credenciales están en una variable de entorno.)*
 3. **No publicar honorarios.** Ningún precio, tarifa ni "desde $", ni siquiera a
    modo de ejemplo. La única mención al tema es la FAQ, que dice que se definen
    por escrito antes de empezar.
@@ -208,6 +212,11 @@ Cosas que ya pasaron o que están esperando para morder:
    explícitamente.
 6. **`#testimonios` existe pero está comentada** en `index.html` con un aviso
    adentro. No descomentar sin testimonios reales.
+7. **El acceso a `/estudio` puede fallar en silencio.** Si el middleware no se
+   ejecuta, la página se sirve igual y queda abierta sin avisar nada. Después de
+   cada deploy que toque `middleware.js`, `vercel.json` o `estudio.html`: abrir
+   `estudiopochelu.com/estudio` en una ventana de incógnito y confirmar que pide
+   usuario y contraseña. Si entra derecho, está abierta.
 
 ---
 
@@ -250,6 +259,7 @@ Registro de intervenciones relevantes. Una línea por cambio, la más nueva arri
 
 | Fecha | Qué se hizo |
 |---|---|
+| 2026-08-08 | Se agrega `middleware.js`: `/estudio` pide usuario y clave |
 | 2026-08-08 | Se agrega `estudio.html` (Área del Estudio) y los estilos `.tool` |
 | 2026-08-02 | Se instala el subagente `.claude/agents/agente-mp.md` |
 | 2026-08-02 | Se crea este documento y el `CLAUDE.md` que lo referencia |
