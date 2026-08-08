@@ -12,12 +12,14 @@ cliente o potencial cliente pueda contactarse y agendar una cita.
 | `script.js`     | Menú, animaciones, validación y armado del link WhatsApp     |
 | `clientes.html` | Área Clientes — pantalla de acceso (**solo visual**, ver más abajo) |
 | `clientes.js`   | Año, ver/ocultar clave y aviso al enviar el formulario       |
+| `estudio.html`  | Área del Estudio — escritorio de herramientas internas       |
 | `AgenteMP.md`   | Reglas de mantenimiento del sitio (leerlo antes de editar)   |
 | `CLAUDE.md`     | Resumen de esas reglas, se carga solo en cada sesión de Claude |
 | `.claude/agents/agente-mp.md` | El agente de mantenimiento, se invoca con `@agente-mp` |
 
-`clientes.html` se sirve como `https://www.estudiopochelu.com/clientes` (Vercel tiene
-`cleanUrls` activado). Lleva `noindex`, así que no aparece en Google.
+`clientes.html` se sirve como `https://www.estudiopochelu.com/clientes` y
+`estudio.html` como `https://www.estudiopochelu.com/estudio` (Vercel tiene `cleanUrls`
+activado). Las dos llevan `noindex`, así que no aparecen en Google.
 
 ## Cómo verla
 
@@ -64,6 +66,20 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    los documentos a mostrar), lo que ya no es un sitio estático: se resuelve con
    Vercel Functions + una base de datos, o con un servicio de portal de clientes.
    **No pongas una clave en el JavaScript**: cualquiera la ve mirando el código.
+
+8. **Área del Estudio** — el botón "Abrir el liquidador" apunta a
+   `https://liquidador-pochelu.streamlit.app`. Si alguna vez
+   renombrás ese subdominio (en Streamlit: Settings → App URL), acordate de actualizar
+   el link en `estudio.html`: la dirección vieja deja de funcionar.
+
+   Esa página es **pública**, como todo el sitio: cualquiera que sepa la dirección ve
+   la lista de herramientas. Lo que está protegido es cada herramienta, que pide su
+   propio acceso. No está linkeada desde el menú, así que se entra escribiendo la
+   dirección. Eso es discreción, no seguridad.
+
+   Para sumar una herramienta nueva: copiar el bloque `<article class="tool">` entero
+   dentro de `estudio.html` y cambiarle el título, la descripción, las etiquetas y el
+   link. No hace falta tocar el CSS.
 
 Para cambiar el teléfono o el nombre más adelante: bloque `CONFIG` arriba de
 `script.js`, y buscar/reemplazar en `index.html` y `clientes.html` (el WhatsApp y el
