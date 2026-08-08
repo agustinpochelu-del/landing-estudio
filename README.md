@@ -68,7 +68,7 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    **No pongas una clave en el JavaScript**: cualquiera la ve mirando el código.
 
 8. **Área del Estudio** — el botón "Abrir el liquidador" apunta a
-   `https://calculo-de-intereses-a4qq6nxj4bea8eahdqne7x.streamlit.app`. Si alguna vez
+   `https://liquidador-pochelu.streamlit.app`. Si alguna vez
    renombrás ese subdominio (en Streamlit: Settings → App URL), acordate de actualizar
    el link en `estudio.html`: la dirección vieja deja de funcionar.
 
