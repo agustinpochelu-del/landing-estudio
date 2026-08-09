@@ -74,8 +74,9 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    el link en `estudio.html`: la dirección vieja deja de funcionar.
 
    Esa página **pide usuario y contraseña** (ver más abajo), y además cada herramienta
-   pide la suya: entrar al Área del Estudio no habilita ninguna. No está linkeada desde
-   el menú, así que se entra escribiendo la dirección.
+   pide la suya: entrar al Área del Estudio no habilita ninguna. Se entra desde el pie
+   de la página principal, en la columna "Estudio" — no está en el menú de arriba, para
+   no mostrarle al cliente una puerta que no es para él.
 
    Para sumar una herramienta nueva: copiar el bloque `<article class="tool">` entero
    dentro de `estudio.html` y cambiarle el título, la descripción, las etiquetas y el

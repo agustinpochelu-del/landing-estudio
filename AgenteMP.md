@@ -39,7 +39,7 @@ estables; ahí va lo que se aprende sobre la marcha. Leelo también al empezar.
 | `script.js` | Bloque `CONFIG` (WhatsApp, nombre, email), menú, animaciones, validación del formulario y armado del link de WhatsApp |
 | `clientes.html` | Área Clientes — pantalla de acceso, **solo maqueta visual** |
 | `clientes.js` | Año del footer, ver/ocultar clave, aviso al enviar |
-| `estudio.html` | Área del Estudio — herramientas internas. `noindex`, sin link en el menú |
+| `estudio.html` | Área del Estudio — herramientas internas. `noindex`, linkeada desde el pie (no desde el menú) |
 | `middleware.js` | Pide usuario y clave antes de servir `/estudio`. **Único archivo que corre del lado del servidor** |
 | `vercel.json` | `cleanUrls`, headers de seguridad y política de caché |
 | `README.md` | Documentación operativa para el titular |
@@ -259,6 +259,7 @@ Registro de intervenciones relevantes. Una línea por cambio, la más nueva arri
 
 | Fecha | Qué se hizo |
 |---|---|
+| 2026-08-09 | Se enlaza el Área del Estudio desde el pie de `index.html` |
 | 2026-08-08 | Se agrega `middleware.js`: `/estudio` pide usuario y clave |
 | 2026-08-08 | Se agrega `estudio.html` (Área del Estudio) y los estilos `.tool` |
 | 2026-08-02 | Se instala el subagente `.claude/agents/agente-mp.md` |
