@@ -94,9 +94,13 @@ Variables**, con este nombre y este formato:
 Para varias personas, separadas por coma y sin espacios:
 `agustin:unaClaveLarga,maria:otraClaveLarga`
 
-Marcala para los tres entornos (Production, Preview y Development). Después de
-guardarla hay que **redeployar** para que tome efecto: Vercel no aplica variables
-nuevas a un deploy ya hecho.
+⚠️ **Marcala para los tres entornos.** Abajo del formulario hay un desplegable
+llamado *Environments*: por defecto viene en **Development**, que es solo para pruebas
+locales. Si la dejás así, el sitio publicado no la ve y `/estudio` responde error 503.
+Tienen que quedar marcados **Production**, **Preview** y **Development**.
+
+Después de guardarla hay que **redeployar** para que tome efecto: Vercel no aplica
+variables nuevas a un deploy que ya está hecho.
 
 Usá una contraseña **de 16 caracteres o más**. No hay bloqueo por intentos fallidos —
 el middleware no guarda estado entre pedidos—, así que lo único que frena a alguien
