@@ -87,7 +87,10 @@
           <li>Carga desde Excel</li>
           <li>Todo en el navegador</li>
         </ul>
-        <a class="btn btn-primary" href="/estudio/libro-iva">Abrir el importador</a>
+        <!-- La dirección lleva /importador a propósito. El sitio se publica sin
+             barra final, así que en /estudio/libro-iva las rutas relativas de la
+             aplicación resolverían contra /estudio/ y no cargaría ni el CSS. -->
+        <a class="btn btn-primary" href="/estudio/libro-iva/importador">Abrir el importador</a>
       </div>
     </article>
 

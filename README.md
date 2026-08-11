@@ -97,6 +97,11 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    propio `README.md` y sus pruebas. Para actualizarlo hay que volver a copiar los ocho
    archivos; el instructivo está en `estudio/libro-iva/LEEME.md`.
 
+   Se abre en `/estudio/libro-iva/importador`, **con `/importador` al final**. No es un
+   capricho: el sitio se publica sin barra final, así que en `/estudio/libro-iva` las
+   rutas relativas de la aplicación resolverían contra `/estudio/` y la página saldría
+   sin estilos. Por eso tampoco hay que poner un `index.html` en esa carpeta.
+
    Sus `?v=` son propios y no tienen nada que ver con los de la landing.
 
    Las planillas de comprobantes **no se suben**: tienen CUIT, razones sociales e

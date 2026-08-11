@@ -227,6 +227,17 @@ Cosas que ya pasaron o que están esperando para morder:
    razones sociales e importes reales, y el sitio es público hasta donde llegue
    el middleware. No desbloquear esas extensiones ni forzar el alta de una
    planilla con `git add -f`.
+9. **La barra final y las rutas relativas.** `vercel.json` tiene
+   `trailingSlash: false`, así que `/estudio/libro-iva` se sirve **sin** barra y
+   una ruta relativa como `estilos.css` resuelve contra `/estudio/`. Cualquier
+   página con assets propios que se publique adentro de una carpeta tiene que
+   colgar un nivel más adentro: por eso el importador es
+   `/estudio/libro-iva/importador` y no `/estudio/libro-iva`.
+
+   **`python -m http.server` no sirve para detectar esto**: redirige los
+   directorios agregando la barra final, o sea lo contrario que Vercel, y la
+   página se ve bien en local mientras en producción sale sin estilos. Hay que
+   probar la dirección exacta, sin barra.
 
 ---
 
