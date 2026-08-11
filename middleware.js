@@ -29,8 +29,11 @@
    quedó abierta.
    ═══════════════════════════════════════════════════════════════ */
 
+/* `/estudio/:path*` cubre las herramientas que se publican adentro del área
+   (hoy `/estudio/libro-iva`) y todos sus archivos. Si se acorta a `/estudio`,
+   esas páginas quedan abiertas para cualquiera sin ningún aviso. */
 export const config = {
-  matcher: ['/estudio', '/estudio.html'],
+  matcher: ['/estudio', '/estudio.html', '/estudio/:path*'],
 };
 
 /* Compara sin cortar al primer carácter distinto, para que el tiempo de

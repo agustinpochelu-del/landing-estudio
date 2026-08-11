@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E3B34">
+<title>Pruebas — Importador de Libro de IVA Digital</title>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E3B34'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23D9BC6A' text-anchor='middle'%3EAP%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css?v=5">
+<style>
+  /* Solo lo propio de esta página; el resto sale de estilos.css. */
+  #encabezado {
+    display: inline-block; padding: .6rem 1rem; border-radius: 999px;
+    font-weight: 600; font-size: .92rem; margin-bottom: 1.6rem;
+  }
+  #encabezado.ok { background: var(--bien-fondo); color: var(--bien); }
+  #encabezado.mal { background: var(--mal-fondo); color: var(--mal); }
+
+  .suite {
+    background: var(--white);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: .9rem 1.1rem; margin-bottom: .8rem;
+  }
+  .suite.con-fallas { border-color: var(--mal); border-left-width: 4px; }
+  .suite h2 {
+    font-size: .98rem; margin: 0 0 .55rem;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+  }
+  .cuenta { font-family: var(--sans); font-weight: 400; font-size: .82rem; color: var(--muted); }
+  .suite ul { list-style: none; margin: 0; padding: 0; }
+  .suite li { padding: .12rem 0; font-size: .89rem; }
+  .marca { display: inline-block; width: 1.2rem; font-weight: 700; }
+  /* .ok es la clase global de señales: acá solo tiñe el tilde, no la línea
+     entera, para que la lista se pueda barrer de un vistazo. */
+  .suite li.ok { color: var(--body); font-weight: 400; }
+  .suite li.ok .marca { color: var(--bien); }
+  .suite li.mal { color: var(--mal); font-weight: 600; }
+  .detalle { margin-left: 1.2rem; font-weight: 400; font-size: .84rem; color: var(--body); }
+
+  h2.seccion {
+    font-size: 1.3rem; margin: 2.5rem 0 1.2rem;
+    padding-top: 1.5rem; border-top: 1px solid var(--line);
+  }
+  #control table { margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="index.html" aria-label="Volver al importador">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="38" height="38"><rect width="64" height="64" rx="14" fill="currentColor"/><text x="32" y="43" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#D9BC6A" text-anchor="middle">AP</text></svg>
+      </span>
+      <span class="brand-text">
+        <strong>Agustín Pochelú</strong>
+        <small>Estudio contable</small>
+      </span>
+    </a>
+
+    <a class="btn-volver" href="index.html">Volver al importador</a>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+  <header class="principal">
+    <p class="eyebrow"><span class="dot"></span> Control interno</p>
+    <h1>Pruebas del importador</h1>
+    <p>
+      Verifica las funciones de cálculo y después corre el proceso completo sobre
+      <code>Facturas de compras.xlsx</code>.
+    </p>
+  </header>
+
+  <div id="encabezado">Corriendo…</div>
+  <div id="resultados"></div>
+
+  <h2 class="seccion">Control de importes</h2>
+  <div id="control" class="tabla-scroll"></div>
+
+  <p class="pie">
+    Agustín Pochelú · Contador Público · Herramienta de uso interno del estudio.
+  </p>
+
+</div>
+
+<script src="tablas.js?v=5"></script>
+<script src="xlsx.js?v=5"></script>
+<script src="libro.js?v=5"></script>
+<script src="pruebas.js?v=5"></script>
+</body>
+</html>

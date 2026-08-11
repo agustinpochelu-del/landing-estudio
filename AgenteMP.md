@@ -40,7 +40,8 @@ estables; ahí va lo que se aprende sobre la marcha. Leelo también al empezar.
 | `clientes.html` | Área Clientes — pantalla de acceso, **solo maqueta visual** |
 | `clientes.js` | Año del footer, ver/ocultar clave, aviso al enviar |
 | `estudio.html` | Área del Estudio — herramientas internas. `noindex`, linkeada desde el pie (no desde el menú) |
-| `middleware.js` | Pide usuario y clave antes de servir `/estudio`. **Único archivo que corre del lado del servidor** |
+| `estudio/libro-iva/` | Importador de Libro de IVA Digital. **Copia** del proyecto que vive en `F:\OneDrive\ESTUDIO\desarrollos\LIVA D`; el instructivo para actualizarla está en su `LEEME.md` |
+| `middleware.js` | Pide usuario y clave antes de servir `/estudio` **y todo lo que cuelga de ahí**. **Único archivo que corre del lado del servidor** |
 | `vercel.json` | `cleanUrls`, headers de seguridad y política de caché |
 | `README.md` | Documentación operativa para el titular |
 
@@ -215,8 +216,17 @@ Cosas que ya pasaron o que están esperando para morder:
 7. **El acceso a `/estudio` puede fallar en silencio.** Si el middleware no se
    ejecuta, la página se sirve igual y queda abierta sin avisar nada. Después de
    cada deploy que toque `middleware.js`, `vercel.json` o `estudio.html`: abrir
-   `estudiopochelu.com/estudio` en una ventana de incógnito y confirmar que pide
-   usuario y contraseña. Si entra derecho, está abierta.
+   `estudiopochelu.com/estudio` **y** `estudiopochelu.com/estudio/libro-iva` en
+   una ventana de incógnito y confirmar que las dos piden usuario y contraseña.
+   Si alguna entra derecho, está abierta.
+
+   El `matcher` de `middleware.js` tiene que seguir incluyendo `/estudio/:path*`:
+   es lo único que protege a las herramientas publicadas adentro del área.
+8. **Datos de clientes en el repositorio.** El `.gitignore` bloquea `.xlsx`,
+   `.xls` y `.csv` en todo el repo. Las planillas de comprobantes tienen CUIT,
+   razones sociales e importes reales, y el sitio es público hasta donde llegue
+   el middleware. No desbloquear esas extensiones ni forzar el alta de una
+   planilla con `git add -f`.
 
 ---
 
@@ -259,6 +269,7 @@ Registro de intervenciones relevantes. Una línea por cambio, la más nueva arri
 
 | Fecha | Qué se hizo |
 |---|---|
+| 2026-08-11 | Se publica el Importador de Libro de IVA en `/estudio/libro-iva` y se extiende el matcher del middleware a `/estudio/:path*` |
 | 2026-08-09 | Se enlaza el Área del Estudio desde el pie de `index.html` |
 | 2026-08-08 | Se agrega `middleware.js`: `/estudio` pide usuario y clave |
 | 2026-08-08 | Se agrega `estudio.html` (Área del Estudio) y los estilos `.tool` |

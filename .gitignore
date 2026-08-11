@@ -5,3 +5,9 @@ Thumbs.db
 
 # Notas privadas de trabajo — no se publican
 Memoria.md
+
+# Planillas de comprobantes: son datos de clientes y el sitio es público
+# hasta donde llegue el middleware. Nunca se suben.
+*.xlsx
+*.xls
+*.csv

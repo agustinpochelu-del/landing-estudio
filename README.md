@@ -13,7 +13,8 @@ cliente o potencial cliente pueda contactarse y agendar una cita.
 | `clientes.html` | Área Clientes — pantalla de acceso (**solo visual**, ver más abajo) |
 | `clientes.js`   | Año, ver/ocultar clave y aviso al enviar el formulario       |
 | `estudio.html`  | Área del Estudio — escritorio de herramientas internas       |
-| `middleware.js` | Pide usuario y clave antes de servir `/estudio` (corre en Vercel) |
+| `estudio/libro-iva/` | Importador de Libro de IVA Digital (copia del proyecto, ver `LEEME.md`) |
+| `middleware.js` | Pide usuario y clave antes de servir `/estudio` y todo lo que cuelga de ahí (corre en Vercel) |
 | `AgenteMP.md`   | Reglas de mantenimiento del sitio (leerlo antes de editar)   |
 | `CLAUDE.md`     | Resumen de esas reglas, se carga solo en cada sesión de Claude |
 | `.claude/agents/agente-mp.md` | El agente de mantenimiento, se invoca con `@agente-mp` |
@@ -73,14 +74,36 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    renombrás ese subdominio (en Streamlit: Settings → App URL), acordate de actualizar
    el link en `estudio.html`: la dirección vieja deja de funcionar.
 
-   Esa página **pide usuario y contraseña** (ver más abajo), y además cada herramienta
-   pide la suya: entrar al Área del Estudio no habilita ninguna. Se entra desde el pie
+   Esa página **pide usuario y contraseña** (ver más abajo). Se entra desde el pie
    de la página principal, en la columna "Estudio" — no está en el menú de arriba, para
    no mostrarle al cliente una puerta que no es para él.
+
+   Hay dos clases de herramienta, y conviene no mezclarlas:
+
+   - **Alojadas afuera**, como el liquidador. Viven en otro servidor y piden su propia
+     clave. El Área del Estudio solo las enlaza.
+   - **Alojadas acá adentro**, como el importador de Libro de IVA, que está en
+     `estudio/libro-iva/` y se publica en `/estudio/libro-iva`. Usan la clave del Área
+     del Estudio, porque el `matcher` de `middleware.js` incluye `/estudio/:path*`.
+     **Si alguien acorta ese matcher a `/estudio`, esas páginas quedan abiertas para
+     cualquiera sin ningún aviso.**
 
    Para sumar una herramienta nueva: copiar el bloque `<article class="tool">` entero
    dentro de `estudio.html` y cambiarle el título, la descripción, las etiquetas y el
    link. No hace falta tocar el CSS.
+
+9. **Importador de Libro de IVA Digital** — los archivos de `estudio/libro-iva/` son
+   una **copia**. El proyecto vive en `F:\OneDrive\ESTUDIO\desarrollos\LIVA D`, con su
+   propio `README.md` y sus pruebas. Para actualizarlo hay que volver a copiar los ocho
+   archivos; el instructivo está en `estudio/libro-iva/LEEME.md`.
+
+   Sus `?v=` son propios y no tienen nada que ver con los de la landing.
+
+   Las planillas de comprobantes **no se suben**: tienen CUIT, razones sociales e
+   importes de clientes. El `.gitignore` bloquea `.xlsx`, `.xls` y `.csv` en todo el
+   repositorio para que no se cuelen por descuido. Por eso, la página de pruebas
+   publicada corre solo las verificaciones de cálculo y avisa que la corrida sobre la
+   planilla real no se ejecutó.
 
 ## La clave del Área del Estudio
 

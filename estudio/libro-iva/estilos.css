@@ -1,0 +1,330 @@
+/* Importador de Libro de IVA Digital — hoja de estilos única.
+   Los colores y tipografías son los de estudiopochelu.com. Si cambian
+   allá, hay que traerlos acá: no hay nada compartido entre los dos. */
+
+:root {
+  color-scheme: light;
+
+  /* Marca */
+  --green-900: #082622;
+  --green-800: #0E3B34;
+  --green-700: #145046;
+  --green-600: #1B6B5C;
+  --green-500: #2C8A76;
+  --gold: #C9A227;
+  --gold-soft: #D9BC6A;
+
+  /* Neutros */
+  --ink: #0C1A17;
+  --body: #445350;
+  --muted: #6B7B77;
+  --line: #E1E4DF;
+  --cream: #F6F5F0;
+  --cream-2: #EFEEE7;
+  --white: #FFFFFF;
+
+  /* Señales. El rojo y el ámbar no están en la marca: se usan solo para
+     avisar y se eligieron para contrastar bien sobre el crema. */
+  --bien: #146B4E;
+  --bien-fondo: #E4F2EA;
+  --mal: #A32217;
+  --mal-fondo: #FBEAE8;
+  --ojo: #8A6410;
+  --ojo-fondo: #FAF1DC;
+
+  /* Sistema */
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(8, 38, 34, .06), 0 4px 12px rgba(8, 38, 34, .05);
+  --shadow-md: 0 2px 6px rgba(8, 38, 34, .07), 0 18px 40px rgba(8, 38, 34, .09);
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --wrap: 1160px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--body);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  color: var(--ink);
+  line-height: 1.18;
+  letter-spacing: -.015em;
+  font-weight: 600;
+  margin: 0 0 .5em;
+}
+
+a { color: var(--green-700); }
+
+/* ── Encabezado del sitio ── */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255, 255, 255, .9);
+  backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 6px 24px rgba(8, 38, 34, .06);
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  max-width: var(--wrap); margin: 0 auto; padding: .85rem 1.25rem;
+}
+.brand { display: inline-flex; align-items: center; gap: .7rem; text-decoration: none; color: var(--green-800); }
+.brand-mark { display: grid; place-items: center; line-height: 0; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.05; }
+.brand-text strong { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+.brand-text small { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+
+/* Mismo aspecto que el .btn-ghost del sitio. */
+.btn-volver {
+  display: inline-flex; align-items: center;
+  font-size: .88rem; font-weight: 600; line-height: 1;
+  padding: .65rem 1.1rem; border-radius: 999px;
+  border: 1.5px solid rgba(12, 26, 23, .22);
+  color: var(--ink); text-decoration: none; white-space: nowrap;
+  transition: transform .18s ease, border-color .18s ease, color .18s ease, background-color .18s ease;
+}
+.btn-volver:hover {
+  transform: translateY(-2px);
+  border-color: var(--green-700); color: var(--green-800);
+  background: rgba(27, 107, 92, .06);
+}
+
+/* ── Portada de la herramienta ── */
+.envoltorio { max-width: 68rem; margin: 0 auto; padding: 2.2rem 1.25rem 5rem; }
+
+.eyebrow {
+  font-size: .76rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--green-600); margin: 0 0 .8rem;
+  display: inline-flex; align-items: center; gap: .55rem;
+}
+.eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); }
+
+header.principal { margin-bottom: 2rem; }
+header.principal h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin-bottom: .45rem; }
+header.principal p { margin: 0; color: var(--muted); max-width: 46rem; font-size: .98rem; }
+
+/* ── Paso ── */
+.paso {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem 1.6rem;
+  margin-bottom: 1.1rem;
+}
+.paso[hidden] { display: none; }
+.paso > h2 {
+  font-size: 1.15rem;
+  margin: 0 0 1.1rem;
+  display: flex;
+  align-items: baseline;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+.paso > h2 .numero {
+  font-family: var(--sans);
+  font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+  color: var(--green-700); background: rgba(27, 107, 92, .1);
+  border-radius: 999px; padding: .2rem .6rem;
+}
+.paso > h2 .aclaracion {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: .82rem; font-weight: 400; color: var(--muted);
+}
+
+/* ── Zona de carga ──
+   Es un <label>, que por defecto es inline: sin display:block el <strong>
+   de adentro lo desarma y el recuadro queda corrido. */
+.zona-carga {
+  display: block;
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--cream);
+  padding: 2.4rem 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+.zona-carga:hover, .zona-carga.encima { border-color: var(--green-600); background: rgba(27, 107, 92, .05); }
+.zona-carga strong { display: block; font-size: 1rem; color: var(--ink); margin-bottom: .3rem; }
+.zona-carga span { color: var(--muted); font-size: .87rem; }
+.zona-carga input { display: none; }
+
+/* ── Formularios ── */
+.campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem 1.15rem; }
+.campo { display: flex; flex-direction: column; gap: .35rem; }
+.campo label { font-size: .8rem; font-weight: 600; color: var(--ink); }
+.campo .nota { font-size: .77rem; color: var(--muted); font-weight: 400; }
+
+input[type="text"], input[type="month"], select {
+  font: inherit;
+  font-size: .94rem;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: .55rem .7rem;
+  width: 100%;
+  transition: border-color .18s ease;
+}
+input[type="text"]:hover, input[type="month"]:hover, select:hover { border-color: #CFD8D4; }
+input[type="text"]:focus-visible, input[type="month"]:focus-visible,
+select:focus-visible, button:focus-visible, .zona-carga:focus-visible, a:focus-visible {
+  outline: 2px solid var(--green-600);
+  outline-offset: 2px;
+}
+input.num { text-align: right; font-variant-numeric: tabular-nums; }
+input.invalido { border-color: var(--mal); }
+
+.casilla { display: flex; align-items: flex-start; gap: .5rem; font-size: .9rem; }
+.casilla input { margin-top: .3rem; accent-color: var(--green-700); }
+.casilla .nota { display: block; font-size: .78rem; color: var(--muted); }
+
+/* ── Botones ── */
+button {
+  font-family: var(--sans);
+  font-size: .94rem; font-weight: 600; line-height: 1;
+  border-radius: 999px;
+  border: 1.5px solid rgba(12, 26, 23, .18);
+  background: var(--white);
+  color: var(--ink);
+  padding: .68rem 1.25rem;
+  cursor: pointer;
+  transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease, color .18s ease, border-color .18s ease;
+}
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--green-700); color: var(--green-800);
+  background: rgba(27, 107, 92, .06);
+}
+button:active:not(:disabled) { transform: translateY(0); }
+button.primario {
+  background: var(--green-800); border-color: var(--green-800); color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+button.primario:hover:not(:disabled) { background: var(--green-700); border-color: var(--green-700); color: #fff; box-shadow: var(--shadow-md); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.chico { padding: .42rem .9rem; font-size: .84rem; font-weight: 500; }
+.botonera { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; margin-top: 1.2rem; }
+
+/* ── Tablas ── */
+.tabla-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+caption { text-align: left; font-weight: 600; color: var(--ink); padding-bottom: .6rem; }
+th, td { padding: .42rem .65rem; text-align: left; border-bottom: 1px solid var(--line); }
+thead th {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); border-bottom: 2px solid var(--line); white-space: nowrap;
+}
+tbody th { font-weight: 500; color: var(--ink); }
+tbody tr:hover td, tbody tr:hover th { background: var(--cream); }
+tfoot td, tfoot th { font-weight: 700; color: var(--ink); border-top: 2px solid var(--line); border-bottom: none; }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .85em; }
+
+/* ── Señales ── */
+.cero, .ok { color: var(--bien); font-weight: 600; }
+.distinto { color: var(--mal); font-weight: 700; }
+.aviso { color: var(--ojo); font-weight: 600; }
+
+.cartel {
+  border-radius: var(--radius);
+  padding: .85rem 1rem;
+  margin-bottom: 1rem;
+  font-size: .89rem;
+  border: 1px solid transparent;
+}
+.cartel.bien { background: var(--bien-fondo); color: var(--bien); border-color: rgba(20, 107, 78, .2); }
+.cartel.mal { background: var(--mal-fondo); color: var(--mal); border-color: rgba(163, 34, 23, .2); }
+.cartel.ojo { background: var(--ojo-fondo); color: var(--ojo); border-color: rgba(201, 162, 39, .3); }
+.cartel strong { display: block; margin-bottom: .2rem; }
+.cartel ul { margin: .45rem 0 0; padding-left: 1.1rem; }
+
+.etiqueta {
+  display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .04em;
+  border-radius: 999px; padding: .16rem .6rem; vertical-align: middle;
+}
+.etiqueta.exacta, .etiqueta.declarada { background: var(--bien-fondo); color: var(--bien); }
+.etiqueta.sugerida { background: var(--ojo-fondo); color: var(--ojo); }
+.etiqueta.sin_resolver { background: var(--mal-fondo); color: var(--mal); }
+.etiqueta.sin_gravado { background: var(--cream-2); color: var(--muted); }
+
+/* ── Tarjeta de revisión de alícuotas ── */
+.revision {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--white);
+  padding: 1rem 1.1rem; margin-bottom: .85rem;
+}
+.revision.pendiente { border-left: 4px solid var(--gold); }
+.revision.trabada { border-left: 4px solid var(--mal); }
+.revision.resuelta { border-left: 4px solid var(--bien); }
+.revision h3 { font-size: 1rem; margin: 0 0 .15rem; }
+.revision .meta { font-size: .83rem; color: var(--muted); margin: 0 0 .75rem; }
+.revision .meta b { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+.revision .opciones { display: flex; flex-direction: column; gap: .4rem; }
+.revision label.opcion { display: flex; gap: .5rem; align-items: baseline; font-size: .87rem; cursor: pointer; }
+.revision label.opcion input { accent-color: var(--green-700); }
+.revision .manual {
+  margin-top: .8rem; padding-top: .8rem;
+  border-top: 1px dashed var(--line);
+  overflow-x: auto;
+}
+.revision .manual[hidden] { display: none; }
+.revision .manual table { font-size: .85rem; min-width: 22rem; }
+.revision .manual input { max-width: 11rem; min-width: 6rem; }
+.revision .saldo { margin-top: .55rem; font-size: .85rem; font-weight: 600; }
+
+/* ── Descargas ── */
+.periodo {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .8rem;
+  padding: .75rem 0; border-bottom: 1px solid var(--line);
+}
+.periodo:last-child { border-bottom: none; }
+.periodo .nombre { font-weight: 700; color: var(--ink); min-width: 8rem; font-variant-numeric: tabular-nums; }
+.periodo .detalle { color: var(--muted); font-size: .85rem; flex: 1 1 16rem; line-height: 1.5; }
+.periodo .detalle .mono { font-size: .82em; word-break: break-all; }
+.periodo .acciones { display: flex; gap: .45rem; flex-wrap: wrap; }
+.periodo.combinado {
+  border-top: 2px solid var(--green-600);
+  border-bottom: none;
+  margin-top: .6rem;
+  padding-top: 1rem;
+}
+.periodo.combinado .nombre { color: var(--green-700); }
+
+#muestra pre {
+  background: var(--green-900); color: #E8EFEC;
+  border-radius: var(--radius); padding: 1rem;
+  margin: 0; line-height: 1.5;
+}
+#muestra pre strong { color: var(--gold-soft); }
+
+/* ── Pie ── */
+.pie {
+  margin-top: 2.5rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: .82rem; color: var(--muted); text-align: center;
+}
+
+.visualmente-oculto {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .envoltorio { padding: 1.5rem 1rem 4rem; }
+  .paso { padding: 1.2rem 1.1rem; border-radius: var(--radius); }
+  .paso > h2 .aclaracion { margin-left: 0; flex-basis: 100%; }
+  .brand-text small { display: none; }
+}
