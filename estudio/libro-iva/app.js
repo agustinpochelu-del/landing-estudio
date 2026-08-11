@@ -16,6 +16,8 @@ const estado = {
   filas: [],
   mapa: {},
   columnasAlicuota: [],
+  perfil: perfilPorId('generico'),
+  perfilAutomatico: true,   // false una vez que se elige a mano
   comprobantes: [],
   ajustes: [],
   libro: 'compras',
@@ -94,6 +96,23 @@ async function cargar(archivo) {
   }
 }
 
+/** Muestra el perfil de origen detectado y permite cambiarlo. */
+function pintarPerfil() {
+  const sel = $('perfil');
+  sel.innerHTML = PERFILES
+    .map((p) => `<option value="${p.id}">${escapar(p.nombre)}</option>`).join('');
+  sel.value = estado.perfil.id;
+
+  const nota = $('nota-perfil');
+  if (estado.perfilAutomatico) {
+    nota.textContent = estado.perfilPuntaje
+      ? `Reconocido por los encabezados. ${estado.perfil.notas}`
+      : 'Ningún perfil reconoció el archivo, así que se usa el genérico.';
+  } else {
+    nota.textContent = `Elegido a mano. ${estado.perfil.notas}`;
+  }
+}
+
 /** Las columnas de detalle por alícuota que tiene una hoja, si tiene. */
 function detalleDeHoja(hoja) {
   const primera = (hoja.filas || []).find((f) => f && f.some((c) => c != null && String(c).trim() !== ''));
@@ -119,7 +138,20 @@ function tomarHoja() {
   estado.encabezados = filas[0].map((c) => String(c ?? '').trim());
   estado.filas = filas.slice(1);
   estado.columnasAlicuota = detectarAlicuotas(estado.encabezados, TABLAS);
-  estado.mapa = detectarColumnas(estado.encabezados, indicesDeAlicuotas(estado.columnasAlicuota));
+
+  if (estado.perfilAutomatico) {
+    const hallazgo = detectarPerfil(estado.encabezados, normalizarEncabezado);
+    estado.perfil = hallazgo.perfil;
+    estado.perfilPuntaje = hallazgo.puntaje;
+  }
+  estado.config.perfil = estado.perfil;
+  pintarPerfil();
+
+  estado.mapa = detectarColumnas(
+    estado.encabezados,
+    indicesDeAlicuotas(estado.columnasAlicuota),
+    estado.perfil.sinonimos
+  );
 
   const detalle = estado.columnasAlicuota.length
     ? ` Trae el detalle abierto por alícuota (${estado.columnasAlicuota.map((a) => a.etiqueta).join(', ')}), ` +
@@ -143,6 +175,11 @@ function prepararConfig() {
   $('moneda').value = 'PES';
 
   $('hoja').addEventListener('change', (e) => { estado.hoja = Number(e.target.value); tomarHoja(); });
+  $('perfil').addEventListener('change', (e) => {
+    estado.perfil = perfilPorId(e.target.value);
+    estado.perfilAutomatico = false;
+    tomarHoja();
+  });
   $('libro').addEventListener('change', (e) => { estado.libro = e.target.value; recalcular(); });
   $('moneda').addEventListener('change', (e) => { estado.config.monedaPorDefecto = e.target.value; recalcular(); });
   $('nc-positivo').addEventListener('change', (e) => {

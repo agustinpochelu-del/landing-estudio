@@ -69,8 +69,12 @@ const ALIAS_DOCUMENTO = {
   'SIN IDENTIFICAR': '99', 'CONSUMIDOR FINAL': '99', 'VENTA GLOBAL DIARIA': '99',
 };
 
-/** Acepta "80", 80, "CUIT", "C.U.I.T.". Devuelve null si no lo reconoce. */
-function resolverTipoDocumento(valor) {
+/**
+ * Acepta "80", 80, "CUIT", "C.U.I.T.". Devuelve null si no lo reconoce.
+ * `aliasExtra` es el vocabulario propio del perfil de origen, si lo hay:
+ * tiene prioridad sobre la tabla general.
+ */
+function resolverTipoDocumento(valor, aliasExtra) {
   if (valor == null || valor === '') return null;
 
   const bruto = String(valor).trim();
@@ -82,7 +86,11 @@ function resolverTipoDocumento(valor) {
   /* El normalizado convierte los puntos en espacios, así que "C.U.I.T."
      queda como "C U I T": hay que probar también la versión sin espacios. */
   const norm = normalizarTexto(bruto);
-  return ALIAS_DOCUMENTO[norm] || ALIAS_DOCUMENTO[norm.replace(/\s+/g, '')] || null;
+  const compacto = norm.replace(/\s+/g, '');
+  const extra = aliasExtra || {};
+
+  return extra[norm] || extra[compacto] ||
+    ALIAS_DOCUMENTO[norm] || ALIAS_DOCUMENTO[compacto] || null;
 }
 
 /* Monedas. PES es la única que se usa salvo operaciones con el exterior. */
@@ -284,9 +292,19 @@ const INDICE_COMPROBANTES = (() => {
 /**
  * Devuelve el código de 3 dígitos, o null si no lo reconoce.
  * Acepta "001", 1, "1 - Factura A", "Factura A", "FACTURAS A".
+ *
+ * `aliasExtra` es el vocabulario propio del perfil de origen, si lo hay.
+ * Tiene prioridad sobre la tabla general: un sistema puede llamarle "FA" a
+ * la factura A, y eso solo vale para ese origen.
  */
-function resolverTipoComprobante(valor) {
+function resolverTipoComprobante(valor, aliasExtra) {
   if (valor == null || valor === '') return null;
+
+  const extra = aliasExtra || {};
+  const buscar = (texto) => {
+    const n = normalizarTexto(texto);
+    return extra[n] || INDICE_COMPROBANTES.get(n) || null;
+  };
 
   /* Número puro: 1 -> 001 */
   if (typeof valor === 'number' && Number.isInteger(valor)) {
@@ -295,6 +313,11 @@ function resolverTipoComprobante(valor) {
   }
 
   const bruto = String(valor).trim();
+
+  /* El alias del perfil se prueba antes que nada: puede reasignar hasta un
+     texto que la tabla general ya conoce. */
+  const porAlias = extra[normalizarTexto(bruto)];
+  if (porAlias) return porAlias;
 
   /* "001" o "1" */
   if (/^\d{1,3}$/.test(bruto)) {
@@ -307,10 +330,10 @@ function resolverTipoComprobante(valor) {
   if (conNumero) {
     const cod = conNumero[1].padStart(3, '0');
     if (tipoComprobantePorCodigo(cod)) return cod;
-    return INDICE_COMPROBANTES.get(normalizarTexto(conNumero[2])) || null;
+    return buscar(conNumero[2]);
   }
 
-  return INDICE_COMPROBANTES.get(normalizarTexto(bruto)) || null;
+  return buscar(bruto);
 }
 
 if (typeof module !== 'undefined' && module.exports) {

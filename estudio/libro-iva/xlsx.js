@@ -286,7 +286,31 @@ function leerCsv(texto) {
   return { hojas: [{ nombre: 'CSV', filas }] };
 }
 
-/** Punto de entrada: recibe un File y devuelve { hojas }. */
+/* ---------- Punto de entrada ---------- */
+
+/**
+ * Recibe un File y devuelve { hojas: [{ nombre, filas }] }.
+ *
+ * ── Para sumar un formato nuevo ─────────────────────────────────────────
+ *
+ * Este archivo tiene una sola responsabilidad: convertir un archivo en filas.
+ * Todo lo que sigue después —qué columna es cuál, cómo se llaman los tipos de
+ * comprobante— es problema de `perfiles.js` y `libro.js`, y no hay que tocarlo.
+ *
+ * Para leer, por ejemplo, un TXT de ancho fijo de otro sistema:
+ *
+ *   1. Escribí una función `leerLoQueSea(texto|buffer)` que devuelva
+ *      `{ hojas: [{ nombre, filas }] }`, donde `filas[0]` son los encabezados
+ *      y el resto los datos. Los valores pueden ser string, number o Date;
+ *      `libro.js` sabe interpretar los tres.
+ *   2. Sumá la extensión al `if` de abajo.
+ *   3. Sumá el perfil correspondiente en `perfiles.js` y una prueba con un
+ *      archivo real.
+ *
+ * Si el formato no tiene fila de encabezados —el caso típico del ancho fijo—,
+ * inventala en el lector: devolvé una primera fila con los nombres que después
+ * declare el perfil. Así el resto del programa no se entera de la diferencia.
+ */
 async function leerPlanilla(archivo) {
   const nombre = (archivo.name || '').toLowerCase();
   if (nombre.endsWith('.csv') || nombre.endsWith('.txt')) {

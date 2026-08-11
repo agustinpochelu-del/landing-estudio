@@ -159,6 +159,73 @@ suite('Detección de columnas');
   igual('total', m.total, 9);
 }
 
+/* ---------- Perfiles de origen ---------- */
+
+suite('Perfiles de origen');
+{
+  const misComprobantes = ['Fecha', 'Tipo', 'Punto de Venta', 'Número', 'CUIT',
+    'Denominación Emisor', 'Tipo Doc. Receptor', 'Neto Gravado Total',
+    'Otros Tributos', 'Total IVA', 'Imp. Total'];
+
+  const hallazgo = detectarPerfil(misComprobantes, normalizarEncabezado);
+  igual('reconoce Mis Comprobantes', hallazgo.perfil.id, 'mis-comprobantes');
+  verificar('encontró más de una señal', hallazgo.puntaje >= 2,
+    'señales: ' + hallazgo.senalesEncontradas.join(', '));
+
+  const cualquiera = detectarPerfil(['columna a', 'columna b'], normalizarEncabezado);
+  igual('sin señales cae en el genérico', cualquiera.perfil.id, 'generico');
+  igual('y con puntaje cero', cualquiera.puntaje, 0);
+
+  igual('perfilPorId encuentra el que existe', perfilPorId('mis-comprobantes').id, 'mis-comprobantes');
+  igual('perfilPorId con un id inventado cae en el genérico', perfilPorId('tango-2030').id, 'generico');
+
+  /* El genérico no puede aportar sinónimos: si aportara, ensuciaría todo. */
+  igual('el genérico no aporta sinónimos', Object.keys(perfilPorId('generico').sinonimos).length, 0);
+
+  /* Ningún perfil puede declarar un id repetido. */
+  const ids = PERFILES.map((p) => p.id);
+  igual('los id de perfil son únicos', ids.length, new Set(ids).size);
+  verificar('todos los perfiles tienen nombre y notas',
+    PERFILES.every((p) => p.nombre && p.notas));
+}
+
+suite('Vocabulario propio del perfil');
+{
+  /* Un origen imaginario que llama "FA" a la factura A y "DOC" al CUIT.
+     Sirve para verificar el mecanismo, no describe a ningún sistema real. */
+  const alias = { FA: '001', 'NC A': '003' };
+
+  igual('el alias del perfil resuelve', resolverTipoComprobante('FA', alias), '001');
+  igual('sin alias no resuelve', resolverTipoComprobante('FA'), null);
+  igual('el alias tiene prioridad sobre la tabla general',
+    resolverTipoComprobante('Nota de Credito A', { 'NOTA DE CREDITO A': '013' }), '013');
+  igual('lo que el alias no cubre sigue funcionando',
+    resolverTipoComprobante('1 - Factura A', alias), '001');
+
+  igual('alias de documento', resolverTipoDocumento('RUT', { RUT: '80' }), '80');
+  igual('sin alias, RUT no existe', resolverTipoDocumento('RUT'), null);
+  igual('el código numérico sigue mandando', resolverTipoDocumento('96', { '96': '80' }), '96');
+}
+
+suite('Sinónimos del perfil en la detección de columnas');
+{
+  const encabezados = ['Fecha', 'Tipo', 'PV', 'Nro', 'CUIT', 'Razon Social',
+    'Neto', 'IVA', 'Total'];
+
+  /* Sin perfil, "Razon Social" ya lo toma el sinónimo general. */
+  const base = detectarColumnas(encabezados, null);
+  igual('la detección general encuentra la razón social', base.denominacion, 5);
+
+  /* Un perfil puede redirigir un encabezado a otro campo. */
+  const conPerfil = detectarColumnas(encabezados, null, { despacho: ['razon social'] });
+  igual('el sinónimo del perfil gana', conPerfil.despacho, 5);
+  verificar('y la denominación se va a otra columna o queda sin asignar',
+    conPerfil.denominacion !== 5);
+
+  /* Los sinónimos del perfil no rompen lo que ya funcionaba. */
+  igual('el resto se sigue detectando igual', conPerfil.total, 8);
+}
+
 /* ---------- Nombres de archivo ---------- */
 
 suite('Nombres de archivo');
@@ -309,18 +376,22 @@ suite('Libro de ventas');
 
 /* ---------- Corrida completa sobre el Excel real ---------- */
 
-/** Prepara una hoja del Excel real: encabezados, mapa y comprobantes. */
+/** Prepara una hoja del Excel real: perfil, encabezados, mapa y comprobantes. */
 function prepararHoja(libroExcel, nombre) {
   const hoja = libroExcel.hojas.find((h) => h.nombre === nombre);
   if (!hoja) throw new Error(`La planilla no tiene la hoja «${nombre}».`);
 
   const filas = hoja.filas;
   const encabezados = filas[0].map((c) => String(c ?? ''));
+  const perfil = detectarPerfil(encabezados, normalizarEncabezado).perfil;
+  const config = { ...CONFIG, perfil };
   const columnasAlicuota = detectarAlicuotas(encabezados, TABLAS);
-  const mapa = detectarColumnas(encabezados, indicesDeAlicuotas(columnasAlicuota));
-  const comprobantes = normalizarComprobantes(filas.slice(1), mapa, CONFIG, TABLAS, columnasAlicuota);
+  const mapa = detectarColumnas(
+    encabezados, indicesDeAlicuotas(columnasAlicuota), perfil.sinonimos
+  );
+  const comprobantes = normalizarComprobantes(filas.slice(1), mapa, config, TABLAS, columnasAlicuota);
   const ajustes = cuadrar(comprobantes);
-  return { encabezados, mapa, columnasAlicuota, comprobantes, ajustes };
+  return { encabezados, perfil, mapa, columnasAlicuota, comprobantes, ajustes };
 }
 
 /* Se levanta cuando la planilla de prueba no está en la carpeta. No es una
@@ -345,6 +416,7 @@ async function corridaReal() {
   const { comprobantes, ajustes } = conDetalle;
 
   suite('Corrida sobre el Excel real');
+  igual('se reconoce el origen', conDetalle.perfil.id, 'mis-comprobantes');
   igual('se leyeron los 128 comprobantes', comprobantes.length, 128);
   igual('se detectaron las tres alícuotas', conDetalle.columnasAlicuota.length, 3);
 

@@ -439,21 +439,48 @@ function indicesDeAlicuotas(alicuotas) {
 /**
  * Empareja los encabezados de la planilla con los campos conocidos.
  * Devuelve { campo: índice de columna }.
+ *
  * `excluidas` son columnas ya tomadas por el detalle de alícuotas.
+ * `sinonimosExtra` son los del perfil de origen: se prueban ANTES que los
+ * generales, para que un sistema pueda desambiguar un encabezado que de otro
+ * modo caería en el campo equivocado.
  */
-function detectarColumnas(encabezados, excluidas) {
+function detectarColumnas(encabezados, excluidas, sinonimosExtra) {
   const normalizados = encabezados.map(normalizarEncabezado);
   const mapa = {};
   const usadas = new Set(excluidas || []);
+  const extra = sinonimosExtra || {};
 
-  /* Primero las coincidencias exactas, después las parciales. */
-  for (const exacto of [true, false]) {
-    for (const [campo, opciones] of Object.entries(SINONIMOS)) {
+  const campos = [...new Set(Object.keys(SINONIMOS).concat(Object.keys(extra)))];
+
+  /*
+   * Cuatro pasadas, en este orden:
+   *   1. exacta sobre los sinónimos del perfil
+   *   2. exacta sobre los generales
+   *   3. parcial sobre los del perfil
+   *   4. parcial sobre los generales
+   *
+   * La prioridad tiene que ser explícita. Si se mezclaran las fuentes en una
+   * sola pasada, ganaría el campo que aparece primero en SINONIMOS y el perfil
+   * no serviría para desambiguar, que es justo para lo que está.
+   */
+  const pasadas = [
+    { exacto: true, delPerfil: true },
+    { exacto: true, delPerfil: false },
+    { exacto: false, delPerfil: true },
+    { exacto: false, delPerfil: false },
+  ];
+
+  for (const pasada of pasadas) {
+    for (const campo of campos) {
       if (mapa[campo] != null) continue;
+      const opciones = pasada.delPerfil ? (extra[campo] || []) : (SINONIMOS[campo] || []);
+      if (!opciones.length) continue;
+
       for (let i = 0; i < normalizados.length; i++) {
         if (usadas.has(i) || !normalizados[i]) continue;
         const h = normalizados[i];
-        const pega = exacto
+        const pega = pasada.exacto
           ? opciones.includes(h)
           : opciones.some((o) => o.length >= 4 && (h.includes(o) || o.includes(h)));
         if (pega) { mapa[campo] = i; usadas.add(i); break; }
@@ -472,6 +499,8 @@ function detectarColumnas(encabezados, excluidas) {
 function normalizarComprobantes(filas, mapa, config, tablas, columnasAlicuota) {
   const tasas = armarTasas(tablas.ALICUOTAS, tablas.ALICUOTAS_HABITUALES);
   const detalle = columnasAlicuota || [];
+  /* El perfil de origen aporta vocabulario propio; sin perfil, no aporta nada. */
+  const perfil = config.perfil || { aliasComprobante: {}, aliasDocumento: {} };
   const salida = [];
 
   const leer = (fila, campo) => (mapa[campo] == null ? null : fila[mapa[campo]] ?? null);
@@ -494,7 +523,7 @@ function normalizarComprobantes(filas, mapa, config, tablas, columnasAlicuota) {
     /* Tipo de comprobante */
     const tipoBruto = leer(fila, 'tipo');
     c.tipoBruto = tipoBruto;
-    c.tipo = tablas.resolverTipoComprobante(tipoBruto);
+    c.tipo = tablas.resolverTipoComprobante(tipoBruto, perfil.aliasComprobante);
     if (!c.tipo) problemas.push({ campo: 'tipo', mensaje: `Tipo de comprobante no reconocido: "${tipoBruto ?? ''}".` });
     c.esNotaCredito = c.tipo ? tablas.esNotaDeCredito(c.tipo) : false;
 
@@ -513,7 +542,7 @@ function normalizarComprobantes(filas, mapa, config, tablas, columnasAlicuota) {
     const docBruto = leer(fila, 'documentoNro');
     c.documentoNro = String(docBruto ?? '').replace(/\D/g, '');
     /* La planilla puede traer el código ("80") o el nombre ("CUIT"). */
-    c.documentoTipo = tablas.resolverTipoDocumento(leer(fila, 'documentoTipo'));
+    c.documentoTipo = tablas.resolverTipoDocumento(leer(fila, 'documentoTipo'), perfil.aliasDocumento);
     if (!c.documentoTipo) {
       c.documentoTipo = c.documentoNro.length === 11 ? '80' : config.documentoTipoPorDefecto;
     }

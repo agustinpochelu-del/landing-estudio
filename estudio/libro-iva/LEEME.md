@@ -25,14 +25,14 @@ que seguir apuntando a `/estudio/libro-iva/importador`.
 
 ## Para actualizar
 
-Copiá los ocho archivos desde la carpeta del proyecto:
+Copiá los nueve archivos de la aplicación desde la carpeta del proyecto:
 
 ```bash
 cd "C:/Users/agust/Documents/Claude/Landing"
 ```
 
 ```bash
-for f in importador.html estilos.css tablas.js xlsx.js libro.js app.js pruebas.html pruebas.js; do cp "F:/OneDrive/ESTUDIO/desarrollos/LIVA D/$f" "estudio/libro-iva/$f"; done
+for f in importador.html estilos.css tablas.js perfiles.js xlsx.js libro.js app.js pruebas.html pruebas.js; do cp "F:/OneDrive/ESTUDIO/desarrollos/LIVA D/$f" "estudio/libro-iva/$f"; done
 ```
 
 Los `?v=` de `importador.html` y `pruebas.html` son propios de esta aplicación y
@@ -49,6 +49,8 @@ error. Hay que abrir la dirección exacta `/estudio/libro-iva/importador`.
   sociales e importes de clientes. El `.gitignore` del repo bloquea `.xlsx`,
   `.xls` y `.csv` para que no se cuelen por descuido.
 - Los PDF de los anexos de ARCA, que son documentación de trabajo.
+- Los documentos internos del proyecto: `AGENTE.md`, `RESUMEN.md`, `Memoria.md`,
+  `CLAUDE.md` y `.claude/`. Viven en la carpeta del estudio, no acá.
 
 Por eso `pruebas.html`, acá, corre solo las verificaciones de cálculo y avisa que
 la corrida sobre la planilla real no se ejecutó. Para correr todo hay que abrir
