@@ -47,6 +47,50 @@ const $ = (id) => document.getElementById(id);
 const escapar = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+/* ---------- Pasos plegables ----------
+ * Cada paso se abre o se cierra haciendo clic en su título. El programa
+ * sugiere cuáles conviene dejar abiertos —los que piden atención—, pero en
+ * cuanto el usuario abre o cierra uno a mano, esa decisión manda: no se le
+ * vuelve a mover solo. El resumen gris del título cuenta qué hay adentro para
+ * no tener que abrirlo. */
+
+const plegables = {};        // id del paso -> { boton, cuerpo, resumen }
+const abiertosAMano = new Set();
+
+function prepararPlegables() {
+  for (const seccion of document.querySelectorAll('.paso')) {
+    const boton = seccion.querySelector('.cabecera');
+    const cuerpo = seccion.querySelector('.cuerpo');
+    if (!boton || !cuerpo) continue;
+
+    plegables[seccion.id] = { boton, cuerpo, resumen: $(`resumen-${seccion.id}`) };
+    boton.addEventListener('click', () => {
+      abiertosAMano.add(seccion.id);
+      plegar(seccion.id, cuerpo.hidden);
+    });
+  }
+}
+
+function plegar(id, abierto) {
+  const p = plegables[id];
+  if (!p) return;
+  p.cuerpo.hidden = !abierto;
+  p.boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+}
+
+/** Estado sugerido: solo se aplica si el usuario no tocó ese paso. */
+function sugerir(id, abierto) {
+  if (!abiertosAMano.has(id)) plegar(id, abierto);
+}
+
+/** El resumen gris del título, con el color de la señal si corresponde. */
+function resumir(id, texto, clase) {
+  const p = plegables[id];
+  if (!p || !p.resumen) return;
+  p.resumen.textContent = texto || '';
+  p.resumen.className = 'aclaracion' + (clase ? ' ' + clase : '');
+}
+
 /* ---------- Paso 1: cargar la planilla ---------- */
 
 function prepararCarga() {
@@ -199,6 +243,7 @@ function prepararConfig() {
       ? 'Se usa solo para nombrar los archivos.'
       : (valido ? 'CUIT válido.' : 'El dígito verificador no da.');
     pintarArchivos();
+    acomodarPasos();
   });
 }
 
@@ -328,6 +373,69 @@ function recalcular() {
   pintarRevision();
   pintarControl();
   pintarArchivos();
+  acomodarPasos();
+}
+
+/**
+ * Deja abiertos los pasos que piden atención y cierra los que están en orden,
+ * y le pone a cada título un resumen de lo que hay adentro. Se llama después
+ * de cada recálculo; los pasos que el usuario abrió o cerró él no se tocan.
+ */
+function acomodarPasos() {
+  /* 1. La planilla: una vez leída, lo único que importa es qué se leyó. */
+  if (estado.planilla) {
+    resumir('paso-archivo',
+      `${estado.nombreArchivo} · ${estado.filas.length} filas` +
+      (estado.columnasAlicuota.length ? ' · con detalle por alícuota' : ''));
+    sugerir('paso-archivo', false);
+  }
+
+  /* 2. Qué libro y de quién. Queda abierto: el CUIT hay que escribirlo. */
+  resumir('paso-config',
+    (estado.libro === 'compras' ? 'Compras' : 'Ventas') +
+    (estado.cuit ? ` · CUIT ${estado.cuit}` : ' · sin CUIT'));
+
+  /* 3. Las columnas: solo se abre si falta asignar algo obligatorio. */
+  const faltan = camposDelLibro()
+    .filter(([campo, , obligatorio]) => obligatorio && estado.mapa[campo] == null);
+  resumir('paso-columnas',
+    faltan.length
+      ? (faltan.length === 1
+        ? 'Falta asignar un campo obligatorio'
+        : `Faltan asignar ${faltan.length} campos obligatorios`)
+      : `${Object.keys(estado.mapa).length} columnas reconocidas`,
+    faltan.length ? 'aviso' : '');
+  sugerir('paso-columnas', faltan.length > 0);
+
+  /* 4. Lo que hay que revisar. */
+  const rev = estado.revision || { pendientes: 0, errores: 0 };
+  const partes = [];
+  if (rev.errores) partes.push(`${rev.errores} con datos que no sirven`);
+  if (rev.pendientes) partes.push(`${rev.pendientes} por confirmar`);
+  if (estado.ajustes.length && !partes.length) partes.push(`${estado.ajustes.length} redondeos ajustados`);
+  resumir('paso-revision',
+    partes.length ? partes.join(' · ') : 'No queda nada por revisar',
+    rev.errores ? 'mal' : (rev.pendientes ? 'aviso' : (partes.length ? '' : 'bien')));
+  sugerir('paso-revision', rev.errores > 0 || rev.pendientes > 0);
+
+  /* 5. Control de importes: cerrado mientras dé cero, que es lo esperable. */
+  const ctrl = estado.control || { sinExplicar: 0, descuadre: 0 };
+  const cierra = ctrl.sinExplicar === 0 && ctrl.descuadre === 0;
+  resumir('paso-control',
+    cierra
+      ? (estado.ajustes.length ? 'Cierra, con centavos de redondeo' : 'Cierra: la diferencia da cero')
+      : 'Hay diferencias que no cierran',
+    cierra ? 'bien' : 'mal');
+  sugerir('paso-control', !cierra);
+
+  /* 6. Los archivos: es lo que se viene a buscar, queda siempre abierto. */
+  const arch = estado.archivos || { archivos: 0, comprobantes: 0 };
+  resumir('paso-archivos',
+    arch.archivos
+      ? `${arch.archivos} archivos · ${arch.comprobantes} comprobantes`
+      : 'No hay nada para escribir',
+    arch.archivos ? '' : 'mal');
+  sugerir('paso-archivos', true);
 }
 
 /** Comprobantes que no se pueden escribir todavía. */
@@ -374,9 +482,7 @@ function pintarRevision() {
   for (const c of pendientes) html += tarjetaRevision(c);
 
   cont.innerHTML = html;
-  $('cuenta-revision').textContent = pendientes.length
-    ? `${pendientes.length} comprobante${pendientes.length > 1 ? 's' : ''} por confirmar`
-    : '';
+  estado.revision = { pendientes: pendientes.length, errores: conError.length };
 
   for (const tarjeta of cont.querySelectorAll('.revision')) engancharRevision(tarjeta);
 }
@@ -517,6 +623,7 @@ function reCuadrar() {
   estado.ajustes = cuadrar(estado.comprobantes);
   pintarControl();
   pintarArchivos();
+  acomodarPasos();
 }
 
 /* ---------- Paso 5: control ---------- */
@@ -543,17 +650,21 @@ function pintarControl() {
   html += '<thead><tr><th scope="col">Concepto</th><th scope="col">Planilla</th>' +
     '<th scope="col">Archivo TXT</th><th scope="col">Diferencia</th></tr></thead><tbody>';
 
+  let sinExplicar = 0;
   for (const [etiqueta, clave] of FILAS_CONTROL) {
     const dif = ctrl.diferencia[clave];
     /* Una diferencia explicada por un ajuste de redondeo no es un error. */
     const explicada = dif !== 0 && clave === 'neto' && dif === ajusteNeto;
     const clase = dif === 0 ? 'cero' : (explicada ? 'aviso' : 'distinto');
     const texto = pesos(dif) + (explicada ? ' (redondeo)' : '');
+    if (dif !== 0 && !explicada) sinExplicar++;
     html += `<tr><th scope="row">${etiqueta}</th>`;
     html += `<td class="num">${pesos(ctrl.planilla[clave])}</td>`;
     html += `<td class="num">${pesos(ctrl.archivo[clave])}</td>`;
     html += `<td class="num ${clase}">${texto}</td></tr>`;
   }
+
+  estado.control = { sinExplicar, descuadre: ctrl.archivo.descuadre };
 
   html += '</tbody><tfoot><tr><th scope="row">Suma de las partes contra el total</th>';
   html += `<td class="num" colspan="2">${pesos(ctrl.archivo.sumaPartes)}</td>`;
@@ -631,10 +742,12 @@ function pintarArchivos() {
   if (!buenos.length) {
     cont.innerHTML = '<div class="cartel mal"><strong>No hay nada para escribir</strong>' +
       'Revisá el paso anterior.</div>';
+    estado.archivos = { archivos: 0, comprobantes: 0 };
     return;
   }
 
   const grupos = agrupar(buenos);
+  estado.archivos = { archivos: grupos.length * 2, comprobantes: buenos.length };
   let html = '';
 
   const trab = trabados();
@@ -777,7 +890,7 @@ function verMuestra(grupos) {
   };
 
   $('muestra').innerHTML =
-    '<div class="tabla-scroll" style="margin-top:1rem"><pre class="mono" style="margin:0;line-height:1.5">' +
+    '<div class="tabla-scroll"><pre class="mono">' +
     `<strong>Comprobantes (${cab.length} posiciones)</strong>\n` +
     escapar(regla(cab.length)) + '\n' + escapar(cab) + '\n\n' +
     `<strong>Alícuotas (${ali.length} posiciones)</strong>\n` +
@@ -787,5 +900,6 @@ function verMuestra(grupos) {
 
 /* ---------- Arranque ---------- */
 
+prepararPlegables();
 prepararCarga();
 prepararConfig();

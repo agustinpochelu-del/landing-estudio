@@ -123,25 +123,67 @@ header.principal p { margin: 0; color: var(--muted); max-width: 46rem; font-size
   margin-bottom: 1.1rem;
 }
 .paso[hidden] { display: none; }
-.paso > h2 {
-  font-size: 1.15rem;
-  margin: 0 0 1.1rem;
+.paso > h2 { font-size: 1.15rem; margin: 0; }
+
+/* El título es el botón que pliega el paso: hay que apagarle todo lo que el
+   <button> trae de fábrica y lo que le pone la hoja más arriba. */
+.cabecera {
   display: flex;
   align-items: baseline;
   gap: .7rem;
   flex-wrap: wrap;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
-.paso > h2 .numero {
+.cabecera:hover:not(:disabled) {
+  transform: none; background: none; border-color: transparent;
+  color: var(--green-800);
+}
+.cabecera .titulo { font-family: var(--serif); }
+.cabecera .numero {
   font-family: var(--sans);
   font-size: .72rem; font-weight: 700; letter-spacing: .06em;
   color: var(--green-700); background: rgba(27, 107, 92, .1);
   border-radius: 999px; padding: .2rem .6rem;
 }
-.paso > h2 .aclaracion {
+.cabecera .aclaracion {
   margin-left: auto;
   font-family: var(--sans);
   font-size: .82rem; font-weight: 400; color: var(--muted);
 }
+.cabecera .aclaracion.aviso { color: var(--ojo); font-weight: 600; }
+.cabecera .aclaracion.bien { color: var(--bien); font-weight: 600; }
+.cabecera .aclaracion.mal { color: var(--mal); font-weight: 700; }
+
+/* La flecha: un cuadrado con dos bordes, girado. Apunta abajo cuando el paso
+   está cerrado y arriba cuando está abierto. */
+.cabecera .flecha {
+  flex: none;
+  align-self: center;
+  width: .5rem; height: .5rem;
+  margin-bottom: .15rem;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform .18s ease, border-color .18s ease;
+}
+.cabecera[aria-expanded="true"] .flecha { transform: rotate(-135deg); margin-bottom: -.15rem; }
+.cabecera:hover .flecha { border-color: var(--green-700); }
+
+.paso > .cuerpo { margin-top: 1.1rem; }
+.paso > .cuerpo[hidden] { display: none; }
+/* Cerrado ocupa menos: si no, queda un cajón alto con una sola línea adentro. */
+.paso:has(> .cuerpo[hidden]) { padding-top: 1.1rem; padding-bottom: 1.1rem; }
+
+.paso > .cuerpo > .nota { margin: -.2rem 0 1rem; font-size: .84rem; color: var(--muted); }
 
 /* ── Zona de carga ──
    Es un <label>, que por defecto es inline: sin display:block el <strong>
@@ -303,10 +345,23 @@ tfoot td, tfoot th { font-weight: 700; color: var(--ink); border-top: 2px solid 
 }
 .periodo.combinado .nombre { color: var(--green-700); }
 
+/* El recuadro oscuro tiene que acompañar al texto cuando se corre al costado:
+   con un ancho normal el fondo termina donde termina la pantalla y las líneas
+   largas quedan en blanco sobre crema, ilegibles. De ahí el max-content. */
+#muestra .tabla-scroll {
+  background: var(--green-900);
+  border-radius: var(--radius);
+  margin-top: 1rem;
+}
 #muestra pre {
-  background: var(--green-900); color: #E8EFEC;
-  border-radius: var(--radius); padding: 1rem;
-  margin: 0; line-height: 1.5;
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  background: none;
+  color: #E8EFEC;
+  padding: 1rem 1.2rem;
+  margin: 0;
+  line-height: 1.5;
 }
 #muestra pre strong { color: var(--gold-soft); }
 
@@ -325,6 +380,8 @@ tfoot td, tfoot th { font-weight: 700; color: var(--ink); border-top: 2px solid 
 @media (max-width: 640px) {
   .envoltorio { padding: 1.5rem 1rem 4rem; }
   .paso { padding: 1.2rem 1.1rem; border-radius: var(--radius); }
-  .paso > h2 .aclaracion { margin-left: 0; flex-basis: 100%; }
+  /* La flecha se queda arriba con el título y el resumen baja de renglón. */
+  .cabecera .flecha { order: 3; margin-left: auto; }
+  .cabecera .aclaracion { order: 4; margin-left: 0; flex-basis: 100%; }
   .brand-text small { display: none; }
 }
