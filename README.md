@@ -74,9 +74,14 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    renombrás ese subdominio (en Streamlit: Settings → App URL), acordate de actualizar
    el link en `estudio.html`: la dirección vieja deja de funcionar.
 
-   Esa página **pide usuario y contraseña** (ver más abajo). Se entra desde el pie
-   de la página principal, en la columna "Estudio" — no está en el menú de arriba, para
-   no mostrarle al cliente una puerta que no es para él.
+   Esa página **pide usuario y contraseña** (ver más abajo). Se entra por dos lados:
+   el **ícono de la llave inglesa** del menú de arriba, al lado de "Área Clientes", y
+   el link del pie, en la columna "Estudio".
+
+   El del menú va **sin texto, solo el ícono**, y es a propósito: con el nombre completo
+   el menú le come 26 px al bloque del logo en pantallas de 1024 px y "Agustín Pochelú"
+   queda apretado contra los links. En el celular, donde el menú se despliega en vertical
+   y sobra lugar, el nombre completo sí aparece.
 
    Hay dos clases de herramienta, y conviene no mezclarlas:
 

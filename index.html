@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
 <!-- El ?v= rompe la caché del navegador. Subile el número cada vez que cambien
      styles.css o script.js, si no los visitantes siguen viendo la versión vieja. -->
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 
 <script type="application/ld+json">
 {
@@ -81,9 +81,16 @@
       <a href="#estudio">Quién te atiende</a>
       <a href="#proceso">Cómo trabajamos</a>
       <a href="#faq">Preguntas</a>
-      <a class="nav-clientes" href="clientes.html">
+      <a class="nav-area" href="clientes.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
         Área Clientes
+      </a>
+      <!-- Acceso interno. En escritorio va SOLO el ícono: el menú no tiene ancho para
+           el nombre completo sin comprimir el logo. En mobile, que se despliega en
+           vertical, el nombre sí se muestra (ver .nav-estudio-txt en styles.css). -->
+      <a class="nav-area nav-estudio" href="estudio.html" title="Área del Estudio" aria-label="Área del Estudio — acceso interno">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span class="nav-estudio-txt">Área del Estudio</span>
       </a>
       <a class="btn btn-sm btn-primary nav-cta" href="#agenda">Agendar cita</a>
     </nav>

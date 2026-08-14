@@ -605,9 +605,19 @@ body:has(.auth-page) { display: flex; flex-direction: column; min-height: 100dvh
   .tool { flex-direction: column; gap: .9rem; }
 }
 
-/* Link "Área Clientes" del header de la landing */
-.nav-clientes { display: inline-flex; align-items: center; gap: .45rem; }
-.nav-clientes svg { width: 16px; height: 16px; flex-shrink: 0; }
+/* Accesos a las áreas privadas dentro del menú de la landing (Clientes y Estudio). */
+.nav-area { display: inline-flex; align-items: center; gap: .45rem; }
+.nav-area svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* El Área del Estudio va solo con el ícono: con el nombre completo el menú le come
+   26px al logo entre 980 y 1200px de ancho. El nombre reaparece en mobile, donde el
+   menú se despliega en vertical y hay lugar de sobra. */
+.nav-estudio-txt { display: none; }
+
+/* Un ícono de 16px es un blanco de clic muy chico: se agranda con padding y se
+   compensa con margen negativo, así el espaciado del menú no se mueve. */
+.nav-estudio { padding: .5rem; margin: -.5rem; border-radius: 9px; transition: background-color .18s ease; }
+.nav-estudio:hover, .nav-estudio:focus-visible { background: rgba(27, 107, 92, .09); }
 
 /* ── Animación de entrada ──────────────────── */
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.22,.8,.3,1), transform .7s cubic-bezier(.22,.8,.3,1); }
@@ -647,7 +657,10 @@ body:has(.auth-page) { display: flex; flex-direction: column; min-height: 100dvh
   }
   .nav.is-open { opacity: 1; visibility: visible; transform: none; }
   .nav > a { padding: .95rem .2rem; border-bottom: 1px solid var(--line); font-size: 1rem; }
-  .nav-clientes { display: flex; justify-content: flex-start; }
+  .nav-area { display: flex; justify-content: flex-start; }
+  .nav-estudio-txt { display: inline; }
+  /* Acá el link ya ocupa toda la fila: no hace falta el margen negativo del ícono. */
+  .nav-estudio { margin: 0; border-radius: 0; }
   .nav .nav-cta { margin-top: 1rem; border-bottom: 0; justify-content: center; }
   .nav-toggle { display: inline-flex; }
 }
