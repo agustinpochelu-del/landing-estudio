@@ -94,8 +94,22 @@ El AgenteMP se ocupa de:
 
 ## 4. Autonomía y flujo de trabajo
 
-**Regla base: el agente edita y commitea. NO pushea.**
-El push lo hace Agustín después de revisar. El sitio no cambia sin que él lo mire.
+**Regla base: los cambios menores se pushean solos; los que pesan, los publica Agustín.**
+Lo decidió el 2026-08-14: *"cuando el cambio es menor, poco significativo, como este,
+pushealo automáticamente"*. Ante la duda, no se pushea: se commitea y se avisa.
+
+| Se pushea sin preguntar | Se commitea y se espera |
+|---|---|
+| Textos, typos, ajustes chicos de estilo | Datos profesionales, matrículas, teléfono, email |
+| Íconos, espaciados, retoques visuales dentro de la paleta | Identidad visual: colores de `:root`, tipografías, favicon |
+| Documentación (`README.md`, `AgenteMP.md`) | Secciones nuevas, o sacar/reordenar las que hay |
+| Correcciones de links o de metadatos | `middleware.js`, `vercel.json` y todo lo del acceso a `/estudio` |
+| | El formulario de `#agenda` y el armado del link de WhatsApp |
+| | Cualquier cosa que vaya en rama aparte |
+
+Después de pushear un cambio menor: verificarlo en el sitio publicado y decir en el
+reporte que ya está en vivo. Si toca el acceso a `/estudio`, además va la comprobación
+del §9.
 
 ```bash
 git -C "C:/Users/agust/Documents/Claude/Landing" push

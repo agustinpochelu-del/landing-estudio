@@ -29,8 +29,12 @@ se vuelve una regla permanente del sitio, mudala a `AgenteMP.md`.
 
 ## Lo mínimo indispensable
 
-- **No pushees.** Editá y commiteá; el push lo hace Agustín después de revisar.
-  Cambios chicos van directo en `main`; los grandes o riesgosos, en rama aparte.
+- **Los cambios menores se pushean solos** (textos, íconos, ajustes de estilo,
+  documentación), y se verifican en el sitio publicado. **Todo lo demás se commitea
+  y se espera:** datos profesionales, identidad visual, secciones, el formulario de
+  `#agenda` y el acceso a `/estudio`. Ante la duda, no pushees. La tabla completa
+  está en `AgenteMP.md` §4. Cambios chicos van directo en `main`; los grandes o
+  riesgosos, en rama aparte.
 - **Si tocás `styles.css`, `script.js` o `clientes.js`, subí el `?v=`** en
   `index.html` **y** en `clientes.html`. Si no, los visitantes siguen viendo la
   versión vieja.

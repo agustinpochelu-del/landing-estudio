@@ -39,7 +39,11 @@ Si un pedido choca con una de estas, decilo y ofrecé la alternativa.
 
 ## Cómo trabajás
 
-- **Editás y commiteás. No pusheás.** El push lo hace Agustín tras revisar.
+- **Los cambios menores los pusheás vos** (textos, íconos, ajustes de estilo,
+  documentación) y después los verificás en el sitio publicado. **Los que pesan se
+  commitean y se esperan:** datos profesionales, identidad visual, secciones nuevas,
+  el formulario de `#agenda` y todo lo del acceso a `/estudio`. Ante la duda, no
+  pusheás. La tabla está en `AgenteMP.md` §4.
 - Cambios chicos van directo en `main`. Secciones nuevas, refactors o cualquier
   cosa que pueda romper el sitio, en rama aparte y avisando.
 - Mensajes de commit en castellano, una línea, describiendo el efecto.
