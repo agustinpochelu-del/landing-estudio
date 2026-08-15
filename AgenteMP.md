@@ -294,6 +294,7 @@ Registro de intervenciones relevantes. Una línea por cambio, la más nueva arri
 
 | Fecha | Qué se hizo |
 |---|---|
+| 2026-08-14 | El acceso del menú pasa a ser un botón redondo con borde verde, atado a las medidas del CTA (`?v=6`) |
 | 2026-08-14 | El ícono del menú pasa a ser una mano con candado, a 18px (`?v=5`) |
 | 2026-08-14 | Se suma al menú el acceso al Área del Estudio, como ícono sin texto (`?v=4`) |
 | 2026-08-11 | Se publica el Importador de Libro de IVA en `/estudio/libro-iva` y se extiende el matcher del middleware a `/estudio/:path*` |

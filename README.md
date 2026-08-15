@@ -78,10 +78,17 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    el **ícono de la mano con candado** del menú de arriba, al lado de "Área Clientes", y
    el link del pie, en la columna "Estudio".
 
-   El del menú va **sin texto, solo el ícono**, y es a propósito: con el nombre completo
-   el menú le come 26 px al bloque del logo en pantallas de 1024 px y "Agustín Pochelú"
-   queda apretado contra los links. En el celular, donde el menú se despliega en vertical
-   y sobra lugar, el nombre completo sí aparece.
+   El del menú es un **botón redondo con borde verde**, al lado de "Agendar cita":
+   mismo alto que ese botón y el 30 % de su ancho. Va **sin texto, solo el ícono**, y es
+   a propósito: con el nombre completo el menú le come 26 px al bloque del logo en
+   pantallas de 1024 px y "Agustín Pochelú" queda apretado contra los links. En el
+   celular, donde el menú se despliega en vertical y sobra lugar, el nombre completo sí
+   aparece y el botón vuelve a ser una fila común.
+
+   ⚠️ Las medidas del botón están atadas al de "Agendar cita" y se calcularon a mano
+   (`--cta-ancho` y `--cta-alto`, arriba de la regla `.nav-estudio` en `styles.css`).
+   **Si algún día le cambiás el texto a "Agendar cita", ese botón cambia de ancho y hay
+   que volver a medirlo**, si no el 30 % deja de ser 30 %.
 
    Hay dos clases de herramienta, y conviene no mezclarlas:
 
