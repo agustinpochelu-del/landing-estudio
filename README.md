@@ -75,7 +75,7 @@ Y abrir http://localhost:5173. También podés abrir `index.html` con doble clic
    el link en `estudio.html`: la dirección vieja deja de funcionar.
 
    Esa página **pide usuario y contraseña** (ver más abajo). Se entra por dos lados:
-   el **ícono de la llave inglesa** del menú de arriba, al lado de "Área Clientes", y
+   el **ícono de la mano con candado** del menú de arriba, al lado de "Área Clientes", y
    el link del pie, en la columna "Estudio".
 
    El del menú va **sin texto, solo el ícono**, y es a propósito: con el nombre completo

@@ -39,7 +39,7 @@ estables; ahí va lo que se aprende sobre la marcha. Leelo también al empezar.
 | `script.js` | Bloque `CONFIG` (WhatsApp, nombre, email), menú, animaciones, validación del formulario y armado del link de WhatsApp |
 | `clientes.html` | Área Clientes — pantalla de acceso, **solo maqueta visual** |
 | `clientes.js` | Año del footer, ver/ocultar clave, aviso al enviar |
-| `estudio.html` | Área del Estudio — herramientas internas. `noindex`. Se entra por el ícono de llave inglesa del menú (sin texto) y por el link del pie |
+| `estudio.html` | Área del Estudio — herramientas internas. `noindex`. Se entra por el ícono de mano con candado del menú (sin texto) y por el link del pie |
 | `estudio/libro-iva/` | Importador de Libro de IVA Digital. **Copia** del proyecto que vive en `F:\OneDrive\ESTUDIO\desarrollos\LIVA D`; el instructivo para actualizarla está en su `LEEME.md` |
 | `middleware.js` | Pide usuario y clave antes de servir `/estudio` **y todo lo que cuelga de ahí**. **Único archivo que corre del lado del servidor** |
 | `vercel.json` | `cleanUrls`, headers de seguridad y política de caché |
@@ -280,6 +280,7 @@ Registro de intervenciones relevantes. Una línea por cambio, la más nueva arri
 
 | Fecha | Qué se hizo |
 |---|---|
+| 2026-08-14 | El ícono del menú pasa a ser una mano con candado, a 18px (`?v=5`) |
 | 2026-08-14 | Se suma al menú el acceso al Área del Estudio, como ícono sin texto (`?v=4`) |
 | 2026-08-11 | Se publica el Importador de Libro de IVA en `/estudio/libro-iva` y se extiende el matcher del middleware a `/estudio/:path*` |
 | 2026-08-09 | Se enlaza el Área del Estudio desde el pie de `index.html` |

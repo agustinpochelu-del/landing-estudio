@@ -614,9 +614,12 @@ body:has(.auth-page) { display: flex; flex-direction: column; min-height: 100dvh
    menú se despliega en vertical y hay lugar de sobra. */
 .nav-estudio-txt { display: none; }
 
-/* Un ícono de 16px es un blanco de clic muy chico: se agranda con padding y se
+/* Un ícono chico es un blanco de clic muy chico: se agranda con padding y se
    compensa con margen negativo, así el espaciado del menú no se mueve. */
 .nav-estudio { padding: .5rem; margin: -.5rem; border-radius: 9px; transition: background-color .18s ease; }
+/* La mano con candado tiene más detalle que un candado solo: 2px extra para que
+   los dedos no se empasten. Sale del aire que sobra al no llevar texto. */
+.nav-estudio svg { width: 18px; height: 18px; }
 .nav-estudio:hover, .nav-estudio:focus-visible { background: rgba(27, 107, 92, .09); }
 
 /* ── Animación de entrada ──────────────────── */
@@ -659,8 +662,11 @@ body:has(.auth-page) { display: flex; flex-direction: column; min-height: 100dvh
   .nav > a { padding: .95rem .2rem; border-bottom: 1px solid var(--line); font-size: 1rem; }
   .nav-area { display: flex; justify-content: flex-start; }
   .nav-estudio-txt { display: inline; }
-  /* Acá el link ya ocupa toda la fila: no hace falta el margen negativo del ícono. */
+  /* Acá el link ya ocupa toda la fila: no hace falta el margen negativo del ícono.
+     Y el ícono vuelve a 16px para que su texto arranque a la misma altura que el de
+     "Área Clientes" — con 18px quedaban 2px corridos uno del otro. */
   .nav-estudio { margin: 0; border-radius: 0; }
+  .nav-estudio svg { width: 16px; height: 16px; }
   .nav .nav-cta { margin-top: 1rem; border-bottom: 0; justify-content: center; }
   .nav-toggle { display: inline-flex; }
 }
