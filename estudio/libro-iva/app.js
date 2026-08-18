@@ -256,6 +256,7 @@ const CAMPOS_VISIBLES = {
     ['tipo', 'Tipo de comprobante', true],
     ['puntoVenta', 'Punto de venta', true],
     ['numero', 'Número', true],
+    ['comprobanteNro', 'Letra, punto de venta y número juntos', false],
     ['documentoNro', 'CUIT / documento', true],
     ['documentoTipo', 'Tipo de documento', false],
     ['denominacion', 'Razón social', true],
@@ -311,17 +312,25 @@ function pintarColumnas() {
     '<th scope="col">Campo de ARCA</th><th scope="col">Columna de la planilla</th>' +
     '<th scope="col">Primer valor</th></tr></thead><tbody>';
 
+  /* Si el comprobante viene entero en una columna, el punto de venta y el
+     número salen de ahí y no hay que reclamarlos por separado. */
+  const juntos = estado.mapa.comprobanteNro != null;
+  const cubiertos = juntos ? ['puntoVenta', 'numero'] : [];
+
   for (const [campo, etiqueta, obligatorio] of camposDelLibro()) {
     const indice = estado.mapa[campo];
     const muestra = indice != null && estado.filas.length
       ? paraMostrar(estado.filas[0][indice]) : '';
-    const falta = obligatorio && indice == null;
+    const falta = obligatorio && indice == null && !cubiertos.includes(campo);
 
     html += '<tr>';
     html += `<th scope="row">${escapar(etiqueta)}` +
       (obligatorio ? ' <span class="aviso" title="obligatorio">•</span>' : '') + '</th>';
     html += `<td><select data-campo="${campo}" ${falta ? 'class="invalido"' : ''}>${opciones}</select></td>`;
-    html += `<td class="mono">${escapar(muestra.length > 40 ? muestra.slice(0, 40) + '…' : muestra)}</td>`;
+    const texto = indice == null && cubiertos.includes(campo)
+      ? '<span class="nota">sale de la columna de al lado</span>'
+      : escapar(muestra.length > 40 ? muestra.slice(0, 40) + '…' : muestra);
+    html += `<td class="mono">${texto}</td>`;
     html += '</tr>';
   }
   html += '</tbody></table></div>';
@@ -396,8 +405,10 @@ function acomodarPasos() {
     (estado.cuit ? ` · CUIT ${estado.cuit}` : ' · sin CUIT'));
 
   /* 3. Las columnas: solo se abre si falta asignar algo obligatorio. */
-  const faltan = camposDelLibro()
-    .filter(([campo, , obligatorio]) => obligatorio && estado.mapa[campo] == null);
+  const cubiertos = estado.mapa.comprobanteNro != null ? ['puntoVenta', 'numero'] : [];
+  const faltan = camposDelLibro().filter(
+    ([campo, , obligatorio]) =>
+      obligatorio && estado.mapa[campo] == null && !cubiertos.includes(campo));
   resumir('paso-columnas',
     faltan.length
       ? (faltan.length === 1
@@ -703,6 +714,7 @@ function comprobantesEscribibles() {
 /* De dónde salió la descomposición por alícuota de cada comprobante. */
 const ORIGEN_ALICUOTA = {
   declarada: 'del detalle de la planilla',
+  calculada: 'neto calculado desde el IVA declarado',
   exacta: 'deducida, cierra exacto',
   sugerida: 'deducida, sin confirmar',
   sin_gravado: 'sin importe gravado',

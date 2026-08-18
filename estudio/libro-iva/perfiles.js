@@ -20,8 +20,14 @@
  *      descripcion   una línea sobre de dónde sale el archivo
  *      senales       encabezados que delatan a ese origen (normalizados).
  *                    Cuantos más propios, mejor: son los que lo distinguen.
- *      sinonimos     { campo: ['encabezado', ...] } que se suman a los generales
- *      aliasComprobante  { 'TEXTO': '001', ... } vocabulario propio de tipos
+ *      sinonimos     { campo: ['encabezado', ...] } que se suman a los
+ *                    generales. Van en MINÚSCULA y sin puntuación: se comparan
+ *                    con normalizarEncabezado(), que baja todo a minúscula.
+ *      aliasComprobante  { 'TEXTO': '001', ... } vocabulario propio de tipos.
+ *                    Acá las claves van en MAYÚSCULA, porque se comparan con
+ *                    normalizarTexto(): "N/C" queda como "N C". Si el sistema
+ *                    guarda la clase por un lado ("FAC") y la letra pegada al
+ *                    número, el núcleo reintenta con las dos juntas: "FAC A".
  *      aliasDocumento    { 'TEXTO': '80', ... }
  *      notas         lo que haya que saber al leer archivos de ese origen
  * 3. Sumá una prueba en `pruebas.js` con los encabezados reales: que el
@@ -63,6 +69,51 @@ const PERFILES = [
     notas:
       'Trae el tipo como "1 - Factura A" y el documento escrito ("CUIT"). ' +
       'La hoja con el detalle por alícuota es la que conviene usar.',
+  },
+
+  {
+    id: 'nautical',
+    nombre: 'Nautical',
+    descripcion: 'Exportación de compras del sistema Nautical.',
+    senales: [
+      'fecha emi',
+      'cod prove',
+      'nom prove',
+      'identiftri',
+      't comp',
+      'n comp',
+      'imp neto',
+      'otrosimp',
+    ],
+    sinonimos: {
+      fecha: ['fecha emi'],
+      denominacion: ['nom prove'],
+      documentoNro: ['identiftri'],
+      tipo: ['t comp'],
+      /* Letra, punto de venta y número, todo pegado: "A0255200092533". */
+      comprobanteNro: ['n comp'],
+      neto: ['imp neto'],
+      iva: ['imp iva'],
+      total: ['imp total'],
+      exento: ['imp exento'],
+      otrosTributos: ['otrosimp'],
+      percIva: ['perc iva'],
+    },
+    /* El sistema guarda la clase del comprobante ("FAC", "N/C") separada de la
+       letra, que viaja pegada al número, y recién juntas dicen de qué
+       comprobante se trata. Están solo los que aparecen en la exportación
+       real: si alguna vez sale una nota de débito, el importador la va a
+       marcar como no reconocida y hay que sumar acá el código de la tabla. */
+    aliasComprobante: {
+      'FAC A': '001', 'FAC B': '006', 'FAC C': '011',
+      'N C A': '003', 'N C B': '008', 'N C C': '013',
+    },
+    aliasDocumento: {},
+    notas:
+      'Abre el IVA por alícuota (IVA_21, IVA_10.5, IVA_27) pero no el neto, ' +
+      'así que el neto de cada una se calcula y se ajusta al neto declarado. ' +
+      'Las notas de crédito vienen en negativo. COD_PROVE, COND_IVA, ' +
+      'PORC_IVA y DIF_CTRL no se usan: son datos internos del sistema.',
   },
 
   {

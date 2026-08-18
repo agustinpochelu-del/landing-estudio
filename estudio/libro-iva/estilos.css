@@ -297,7 +297,7 @@ tfoot td, tfoot th { font-weight: 700; color: var(--ink); border-top: 2px solid 
   display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .04em;
   border-radius: 999px; padding: .16rem .6rem; vertical-align: middle;
 }
-.etiqueta.exacta, .etiqueta.declarada { background: var(--bien-fondo); color: var(--bien); }
+.etiqueta.exacta, .etiqueta.declarada, .etiqueta.calculada { background: var(--bien-fondo); color: var(--bien); }
 .etiqueta.sugerida { background: var(--ojo-fondo); color: var(--ojo); }
 .etiqueta.sin_resolver { background: var(--mal-fondo); color: var(--mal); }
 .etiqueta.sin_gravado { background: var(--cream-2); color: var(--muted); }

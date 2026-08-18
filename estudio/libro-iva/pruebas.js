@@ -279,6 +279,169 @@ igual('vacío', resolverTipoDocumento(''), null);
 
 /* ---------- Detección del detalle por alícuota ---------- */
 
+suite('Comprobante partido en una sola columna');
+{
+  const a = partirComprobante('A0255200092533');
+  igual('letra pegada al número', a.letra, 'A');
+  igual('los últimos 8 dígitos son el número', a.numero, '00092533');
+  igual('y lo de antes, el punto de venta', a.puntoVenta, '02552');
+
+  const b = partirComprobante('B1724220000470');
+  igual('punto de venta de cinco dígitos', b.puntoVenta, '17242');
+  igual('número de ocho', b.numero, '20000470');
+
+  const c = partirComprobante('A 0001-00000123');
+  igual('con guion, cada lado ya viene dado', c.puntoVenta, '0001');
+  igual('y el número también', c.numero, '00000123');
+  igual('la letra se toma igual', c.letra, 'A');
+
+  const d = partirComprobante('0001-00000123');
+  igual('sin letra no pasa nada', d.letra, '');
+  igual('y el punto de venta sale igual', d.puntoVenta, '0001');
+
+  const e = partirComprobante('12345678');
+  igual('ocho dígitos son todos número', e.numero, '12345678');
+  igual('y no hay punto de venta', e.puntoVenta, '');
+
+  igual('sin dígitos no devuelve nada', partirComprobante('FACTURA'), null);
+  igual('vacío tampoco', partirComprobante(''), null);
+  igual('nulo tampoco', partirComprobante(null), null);
+}
+
+suite('Perfil Nautical');
+{
+  /* Encabezados textuales de una exportación real del sistema. */
+  const nautical = ['FECHA_EMI', 'COD_PROVE', 'NOM_PROVE', 'COND_IVA', 'IDENTIFTRI',
+    'T_COMP', 'N_COMP', 'PORC_IVA', 'IMP_EXENTO', 'IMP_NETO', 'IMP_IVA', 'IMP_TOTAL',
+    'OTROSIMP', 'IVA_21', 'IVA_10.5', 'IVA_27', 'PERC_IVA', 'DIF_CTRL'];
+
+  igual('reconoce el archivo',
+    detectarPerfil(nautical, normalizarEncabezado).perfil.id, 'nautical');
+
+  /* No se puede confundir con el otro origen. */
+  const misComp = ['Fecha', 'Tipo', 'Punto de Venta', 'Número', 'CUIT',
+    'Denominación Emisor', 'Neto Gravado Total', 'Total IVA', 'Imp. Total'];
+  igual('y no se lo come el otro perfil',
+    detectarPerfil(misComp, normalizarEncabezado).perfil.id, 'mis-comprobantes');
+
+  const perfil = perfilPorId('nautical');
+  const det = detectarAlicuotas(nautical, TABLAS);
+  igual('encuentra las tres alícuotas', det.length, 3);
+  verificar('ninguna trae columna de neto', det.every((d) => d.colNeto == null));
+  verificar('PERC_IVA no se cuela como alícuota',
+    !det.some((d) => nautical[d.colIva] === 'PERC_IVA'));
+
+  const mapa = detectarColumnas(nautical, indicesDeAlicuotas(det), perfil.sinonimos);
+  const col = (campo) => nautical[mapa[campo]];
+  igual('la fecha', col('fecha'), 'FECHA_EMI');
+  igual('la razón social', col('denominacion'), 'NOM_PROVE');
+  igual('el CUIT', col('documentoNro'), 'IDENTIFTRI');
+  igual('el tipo', col('tipo'), 'T_COMP');
+  igual('el comprobante entero', col('comprobanteNro'), 'N_COMP');
+  igual('el neto', col('neto'), 'IMP_NETO');
+  igual('el IVA', col('iva'), 'IMP_IVA');
+  igual('el total', col('total'), 'IMP_TOTAL');
+  igual('el exento', col('exento'), 'IMP_EXENTO');
+  igual('otros tributos', col('otrosTributos'), 'OTROSIMP');
+  igual('la percepción de IVA', col('percIva'), 'PERC_IVA');
+  verificar('DIF_CTRL no se usa',
+    !Object.values(mapa).includes(nautical.indexOf('DIF_CTRL')));
+  verificar('COND_IVA tampoco',
+    !Object.values(mapa).includes(nautical.indexOf('COND_IVA')));
+
+  /* La clase viaja separada de la letra: recién juntas dicen qué comprobante es. */
+  igual('FAC sola no resuelve', resolverTipoComprobante('FAC', perfil.aliasComprobante), null);
+  igual('FAC + A es factura A', resolverTipoComprobante('FAC A', perfil.aliasComprobante), '001');
+  igual('FAC + B es factura B', resolverTipoComprobante('FAC B', perfil.aliasComprobante), '006');
+  igual('FAC + C es factura C', resolverTipoComprobante('FAC C', perfil.aliasComprobante), '011');
+  igual('N/C + A es nota de crédito A',
+    resolverTipoComprobante('N/C A', perfil.aliasComprobante), '003');
+  verificar('y la nota de crédito resta', esNotaDeCredito('003'));
+}
+
+suite('Neto calculado desde el IVA declarado');
+{
+  /* Dos columnas de IVA sueltas, sin la del neto, como las exporta Nautical.
+     Vienen ordenadas por tasa, así que la de 10,5 % queda primera. */
+  const det = detectarAlicuotas(['IVA_21', 'IVA_10.5'], TABLAS);
+  const mapa = { neto: 2, iva: 3, total: 4 };
+  /* Las celdas van en pesos, como en cualquier planilla; los importes del
+     comprobante, en centavos. */
+  const fila = (iva21, iva105, neto, iva, total) => [iva21, iva105, neto, iva, total];
+
+  /* Una sola alícuota: el neto declarado va entero, sin redondear nada.
+     El IVA del proveedor está cuatro centavos abajo del 21 % exacto y eso
+     no lo convierte en un error. */
+  const c1 = { problemas: [], neto: 4224978, iva: 887241 };
+  const r1 = leerAlicuotasDeclaradas(
+    fila(8872.41, 0, 42249.78, 8872.41, 51122.19), det, c1, false, mapa);
+  igual('una alícuota queda en estado calculada', r1.estado, 'calculada');
+  igual('y da una sola línea', r1.lineas.length, 1);
+  igual('con el neto declarado entero', r1.lineas[0].netoCentavos, 4224978);
+  igual('y el IVA tal cual vino', r1.lineas[0].ivaCentavos, 887241);
+  igual('sin inventar ningún ajuste', r1.ajusteNeto, 0);
+
+  /* Dos alícuotas: se reparte el neto declarado y tiene que cerrar exacto. */
+  const c2 = { problemas: [], neto: 37566891, iva: 7233547 };
+  const r2 = leerAlicuotasDeclaradas(
+    fila(65780.46, 6555.01, 375668.91, 72335.47, 471143.09), det, c2, false, mapa);
+  igual('dos alícuotas también resuelven', r2.estado, 'calculada');
+  igual('y dan dos líneas', r2.lineas.length, 2);
+  igual('la suma de los netos da el neto declarado',
+    r2.lineas.reduce((s, l) => s + l.netoCentavos, 0), 37566891);
+  igual('la suma del IVA da el IVA declarado',
+    r2.lineas.reduce((s, l) => s + l.ivaCentavos, 0), 7233547);
+  verificar('lo que se movió al repartir queda anotado', r2.ajusteNeto !== 0,
+    'ajusteNeto: ' + r2.ajusteNeto);
+  verificar('y son centavos, no pesos', Math.abs(r2.ajusteNeto) < 100,
+    'ajusteNeto: ' + r2.ajusteNeto);
+
+  /* IVA sin ninguna base: no es informable y hay que avisar por qué. */
+  const c3 = { problemas: [], neto: 0, iva: 4200000 };
+  const r3 = leerAlicuotasDeclaradas(
+    fila(42000, 0, 0, 42000, 242000), det, c3, false, mapa);
+  igual('IVA sin neto no se escribe', r3.estado, 'sin_resolver');
+  verificar('y el mensaje manda a mirar el exento', /exenta/.test(r3.detalle), r3.detalle);
+
+  /* El IVA no se corresponde con la tasa: los datos discrepan de verdad. */
+  const c4 = { problemas: [], neto: 2484918, iva: 677091 };
+  const r4 = leerAlicuotasDeclaradas(
+    fila(6770.91, 0, 24849.18, 6770.91, 31620.09), det, c4, false, mapa);
+  igual('un IVA que no da con la tasa se marca', r4.estado, 'sin_resolver');
+  igual('y no escribe ninguna línea', r4.lineas.length, 0);
+
+  /* Casi cuatro pesos sobre dos millones y medio es redondeo del proveedor,
+     no un error: el margen es proporcional al importe. */
+  const c5 = { problemas: [], neto: 268463176, iva: 56376879 };
+  const r5 = leerAlicuotasDeclaradas(
+    fila(563768.79, 0, 2684631.76, 563768.79, 3248400.55), det, c5, false, mapa);
+  igual('un desvío de milésimas pasa', r5.estado, 'calculada');
+
+  /* El IVA abierto tiene que dar el IVA del comprobante. */
+  const c6 = { problemas: [], neto: 4224978, iva: 900000 };
+  igual('si el detalle no explica el IVA, no se escribe',
+    leerAlicuotasDeclaradas(fila(8872.41, 0, 42249.78, 9000, 51377.19), det, c6, false, mapa).estado,
+    'sin_resolver');
+
+  /* Sin nada abierto pero con importes, no hay detalle que leer. */
+  const c7 = { problemas: [], neto: 1500000, iva: 0 };
+  igual('devuelve null para que lo deduzca el resolutor',
+    leerAlicuotasDeclaradas(fila(0, 0, 15000, 0, 15000), det, c7, false, mapa), null);
+
+  /* Sin importes de ninguna clase, es un comprobante sin gravado. */
+  const c8 = { problemas: [], neto: 0, iva: 0 };
+  igual('sin gravado se reconoce',
+    leerAlicuotasDeclaradas(fila(0, 0, 0, 0, 531853), det, c8, false, mapa).estado,
+    'sin_gravado');
+
+  /* Con las dos columnas, los netos vienen del comprobante y no se calculan. */
+  const par = detectarAlicuotas(['IVA 21%', 'Neto Grav. IVA 21%'], TABLAS);
+  const c9 = { problemas: [], neto: 10000000, iva: 2100000 };
+  const r9 = leerAlicuotasDeclaradas([21000, 100000], par, c9, false, { neto: 9, iva: 9 });
+  igual('el detalle completo sigue siendo declarado', r9.estado, 'declarada');
+  igual('y el neto sale de su columna', r9.lineas[0].netoCentavos, 10000000);
+}
+
 suite('Detección del detalle por alícuota');
 {
   const encabezados = ['Fecha', 'Tipo', 'Punto de Venta', 'Número', 'CUIT', 'Denominación Emisor',
@@ -303,11 +466,16 @@ suite('Detección del detalle por alícuota');
   igual('detecta el tipo de documento', mapa.documentoTipo, 6);
   igual('el CUIT no se confunde con el tipo de documento', mapa.documentoNro, 4);
 
-  /* Un par incompleto no se toma. */
-  igual('una columna suelta de IVA no alcanza',
-    detectarAlicuotas(['Fecha', 'IVA 21%'], TABLAS).length, 0);
-  igual('con las dos columnas sí',
-    detectarAlicuotas(['Fecha', 'IVA 21%', 'Neto IVA 21%'], TABLAS).length, 1);
+  /* Con la columna del IVA alcanza: el neto de esa alícuota se puede calcular.
+     Al revés no, porque un neto suelto no dice cuánto IVA le corresponde. */
+  const suelta = detectarAlicuotas(['Fecha', 'IVA 21%'], TABLAS);
+  igual('una columna suelta de IVA alcanza', suelta.length, 1);
+  igual('y queda marcada como que no trae el neto', suelta[0].colNeto, null);
+  igual('una columna suelta de neto no alcanza',
+    detectarAlicuotas(['Fecha', 'Neto Grav. IVA 21%'], TABLAS).length, 0);
+  const par = detectarAlicuotas(['Fecha', 'IVA 21%', 'Neto IVA 21%'], TABLAS);
+  igual('con las dos columnas sí', par.length, 1);
+  igual('y ahí sí trae la columna del neto', par[0].colNeto, 2);
   igual('una alícuota que no está en la tabla se ignora',
     detectarAlicuotas(['IVA 13%', 'Neto IVA 13%'], TABLAS).length, 0);
 }
@@ -398,6 +566,112 @@ function prepararHoja(libroExcel, nombre) {
    falla del importador: la planilla tiene datos reales de clientes y por eso
    no se publica junto con la aplicación. */
 class SinPlanilla extends Error {}
+
+/**
+ * Corrida sobre la exportación real de Nautical. Es el otro origen: abre el
+ * IVA por alícuota pero no el neto, trae el comprobante entero en una columna
+ * y las notas de crédito en negativo.
+ *
+ * Devuelve null si la planilla no está, igual que la otra: son datos de un
+ * cliente y no viajan con la aplicación.
+ */
+async function corridaNautical() {
+  let respuesta;
+  try {
+    respuesta = await fetch('Nautical.xlsx');
+  } catch {
+    return null;
+  }
+  if (!respuesta.ok) return null;
+
+  const libroExcel = await leerXlsx(await respuesta.arrayBuffer());
+  const d = prepararHoja(libroExcel, libroExcel.hojas[0].nombre);
+  const { comprobantes, ajustes } = d;
+
+  suite('Corrida sobre el Excel de Nautical');
+  igual('se reconoce el origen', d.perfil.id, 'nautical');
+  igual('se leyeron los 146 comprobantes', comprobantes.length, 146);
+  igual('se detectaron las tres alícuotas', d.columnasAlicuota.length, 3);
+  verificar('ninguna trae la columna del neto',
+    d.columnasAlicuota.every((a) => a.colNeto == null));
+
+  /* El comprobante viene entero en N_COMP y hay que partirlo. */
+  igual('el punto de venta no tiene columna propia', d.mapa.puntoVenta, undefined);
+  verificar('y sin embargo todos tienen punto de venta',
+    comprobantes.every((c) => c.puntoVenta && c.puntoVenta.length <= 5));
+  verificar('y número', comprobantes.every((c) => c.numero));
+
+  /* La clase y la letra recién juntas dicen qué comprobante es. */
+  const tipos = {};
+  for (const c of comprobantes) tipos[c.tipo] = (tipos[c.tipo] || 0) + 1;
+  igual('facturas A', tipos['001'], 109);
+  igual('facturas B', tipos['006'], 20);
+  igual('facturas C', tipos['011'], 14);
+  igual('notas de crédito A', tipos['003'], 3);
+  verificar('ningún tipo quedó sin reconocer',
+    comprobantes.every((c) => c.tipo), 'hay comprobantes sin tipo');
+
+  /* Las notas de crédito vienen en negativo y se informan en positivo. */
+  const notas = comprobantes.filter((c) => c.esNotaCredito);
+  igual('son tres notas de crédito', notas.length, 3);
+  verificar('y ninguna queda en negativo', notas.every((c) => c.total > 0));
+
+  const porEstado = {};
+  for (const c of comprobantes) porEstado[c.alicuotas.estado] = (porEstado[c.alicuotas.estado] || 0) + 1;
+  igual('102 con el neto calculado desde el IVA', porEstado.calculada, 102);
+  igual('31 sin importe gravado', porEstado.sin_gravado, 31);
+  igual('2 con neto sin IVA los deduce al 0 %', porEstado.exacta, 2);
+  igual('11 no se pueden resolver', porEstado.sin_resolver, 11);
+
+  /* Los 11 que no resuelven son inconsistencias del origen, no del lector. */
+  const trabados = comprobantes.filter((c) => c.alicuotas.estado === 'sin_resolver');
+  verificar('todos los trabados explican por qué',
+    trabados.every((c) => c.alicuotas.detalle && c.alicuotas.detalle.length > 20));
+  igual('4 tienen IVA sin ningún neto que lo respalde',
+    trabados.filter((c) => /sin neto gravado/.test(c.alicuotas.detalle)).length, 4);
+  igual('7 tienen un IVA que no da con la tasa',
+    trabados.filter((c) => /no se corresponden/.test(c.alicuotas.detalle)).length, 7);
+
+  /* El criterio de aceptación: el control tiene que dar cero. */
+  const buenos = comprobantes.filter(
+    (c) => !c.problemas.length && c.alicuotas.estado !== 'sin_resolver');
+  igual('quedan 135 escribibles', buenos.length, 135);
+
+  const ctrl = totalesDeControl(buenos);
+  for (const clave of ['neto', 'iva', 'exento', 'noGravado', 'percepciones',
+    'impInternos', 'otrosTributos', 'total']) {
+    igual(`el control de ${clave} da cero`, ctrl.diferencia[clave], 0);
+  }
+  igual('la suma de las partes da el total', ctrl.archivo.descuadre, 0);
+
+  /* Lo que se movió al repartir son centavos, y está listado. */
+  verificar('los ajustes son centavos', ajustes.every((a) => Math.abs(a.centavos) <= 5),
+    ajustes.map((a) => a.centavos).join(', '));
+  verificar('y todos dicen a dónde fueron', ajustes.every((a) => a.destino));
+
+  /* Los archivos, con los largos y la coherencia que pide ARCA. */
+  const salida = generar(buenos, 'compras', CONFIG);
+  const cab = salida.cabecera.split('\r\n').filter(Boolean);
+  const ali = salida.alicuotas.split('\r\n').filter(Boolean);
+  igual('una línea de cabecera por comprobante', cab.length, 135);
+  verificar('todas de 325 posiciones', cab.every((l) => l.length === 325));
+  verificar('las de alícuotas, de 84', ali.every((l) => l.length === 84));
+
+  let declaradas = 0;
+  for (const l of cab) declaradas += Number(l.substring(237, 238));
+  igual('la cantidad de alícuotas coincide con las líneas', declaradas, ali.length);
+
+  /* El punto de venta y el número, tal como quedaron partidos. */
+  const sancor = cab.find((l) => l.substring(74, 104).startsWith('SANCOR SEGUROS'));
+  verificar('el punto de venta sale de la columna única',
+    sancor && sancor.substring(11, 16) === '17242', sancor && sancor.substring(11, 16));
+  verificar('y el número también',
+    sancor && sancor.substring(16, 36) === '00000000000020000470',
+    sancor && sancor.substring(16, 36));
+
+  return d;
+}
+
 
 async function corridaReal() {
   let respuesta;
@@ -847,6 +1121,7 @@ function pintarControl(datos) {
   let faltaPlanilla = false;
   try {
     datos = await corridaReal();
+    await corridaNautical();
   } catch (e) {
     if (e instanceof SinPlanilla) {
       faltaPlanilla = true;

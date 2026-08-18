@@ -170,6 +170,41 @@ function campoTipoCambio(valor) {
   return String(Math.round(v * 1e6)).padStart(10, '0');
 }
 
+/**
+ * Parte un comprobante escrito de corrido en sus tres partes.
+ *
+ * Muchos sistemas exportan una sola columna con la letra, el punto de venta y
+ * el número pegados ("A0255200092533") o separados ("A 0001-00000123"), en vez
+ * de tres columnas. Devuelve { letra, puntoVenta, numero }, o null si no hay
+ * ningún dígito.
+ *
+ * Sin separador, el número son los últimos 8 dígitos —el ancho que usa AFIP— y
+ * lo que queda a la izquierda es el punto de venta. Así, 13 dígitos se parten
+ * en 5 + 8 y 12 en 4 + 8, que son las dos formas que se ven en la práctica.
+ */
+function partirComprobante(valor) {
+  const bruto = String(valor == null ? '' : valor).trim().toUpperCase();
+  if (!bruto) return null;
+
+  /* Una letra sola adelante es la clase del comprobante, no un dígito. */
+  const conLetra = bruto.match(/^([A-Z])[\s.\-]*(\d.*)$/);
+  const letra = conLetra ? conLetra[1] : '';
+  const resto = conLetra ? conLetra[2] : bruto;
+
+  /* Con separador no hay nada que adivinar: cada lado ya viene dado. */
+  const partido = resto.match(/^\D*(\d+)\s*[-–—/]\s*(\d+)\D*$/);
+  if (partido) return { letra, puntoVenta: partido[1], numero: partido[2] };
+
+  const digitos = resto.replace(/\D/g, '');
+  if (!digitos) return null;
+  if (digitos.length <= 8) return { letra, puntoVenta: '', numero: digitos };
+  return {
+    letra,
+    puntoVenta: digitos.slice(0, digitos.length - 8),
+    numero: digitos.slice(-8),
+  };
+}
+
 /* ---------- Resolución de alícuotas ---------- */
 
 /*
@@ -284,52 +319,161 @@ function resolverAlicuotas(netoCentavos, ivaCentavos, tasas) {
 }
 
 /**
- * Lee las alícuotas del detalle abierto de la planilla. No deduce nada:
- * los importes vienen del comprobante.
+ * Cuánto puede desviarse el IVA declarado de una alícuota respecto del que
+ * sale de aplicar la tasa al neto.
  *
- * Si la planilla también trae los totales de neto y de IVA, se controlan
- * contra la suma del detalle. Si no los trae, se calculan desde el detalle.
+ * Una factura real casi nunca da exacto: el proveedor redondea renglón por
+ * renglón y el total queda unos centavos corrido. Ese desvío es proporcional
+ * al importe, así que el margen también: una milésima del IVA esperado, con
+ * un piso de cinco centavos para los importes chicos. Sobre datos reales, lo
+ * que es redondeo queda muy por debajo de ese margen y lo que es un error de
+ * carga lo supera por varios órdenes.
+ */
+function margenDeIva(ivaEsperado) {
+  return Math.max(5, Math.round(Math.abs(ivaEsperado) * 0.001));
+}
+
+/**
+ * Lee las alícuotas del detalle abierto de la planilla. No deduce la
+ * descomposición: sale del comprobante.
+ *
+ * Hay sistemas que abren las dos columnas de cada alícuota —neto e IVA— y
+ * otros que abren solo el IVA. En el segundo caso el detalle dice **a qué
+ * tasa** va cada parte, pero el **neto declarado del comprobante manda**: con
+ * una sola alícuota se le asigna entero, y con varias se reparte en proporción
+ * al IVA de cada una. Así el neto y el IVA del archivo dan siempre los de la
+ * planilla, sin arrastrar el redondeo del proveedor.
+ *
+ * Devuelve null cuando el detalle está vacío pero el comprobante tiene
+ * importes: ahí no hay nada que leer y lo resuelve la deducción.
  */
 function leerAlicuotasDeclaradas(fila, detalle, c, enValorAbsoluto, mapa) {
   const lineas = [];
-  let sumaNeto = 0;
   let sumaIva = 0;
 
   for (const col of detalle) {
-    let neto = aCentavos(fila[col.colNeto]) || 0;
     let iva = aCentavos(fila[col.colIva]) || 0;
-    if (enValorAbsoluto) { neto = Math.abs(neto); iva = Math.abs(iva); }
-    if (neto === 0 && iva === 0) continue;
+    let neto = col.colNeto == null ? null : (aCentavos(fila[col.colNeto]) || 0);
+    if (enValorAbsoluto) {
+      iva = Math.abs(iva);
+      if (neto != null) neto = Math.abs(neto);
+    }
+    if (iva === 0 && (neto == null || neto === 0)) continue;
 
-    lineas.push({ codigo: col.codigo, netoCentavos: neto, ivaCentavos: iva });
-    sumaNeto += neto;
+    lineas.push({
+      codigo: col.codigo,
+      netoCentavos: neto,
+      ivaCentavos: iva,
+      tasa: col.tasa,
+      calculado: neto == null,
+    });
     sumaIva += iva;
   }
 
-  /* Sin totales propios, el detalle es la única fuente. */
-  if (mapa.neto == null) c.neto = sumaNeto;
-  if (mapa.iva == null) c.iva = sumaIva;
+  if (!lineas.length) {
+    if (mapa.neto == null) c.neto = 0;
+    if (mapa.iva == null) c.iva = 0;
+    if (c.neto || c.iva) return null;
+    return { estado: 'sin_gravado', lineas: [], alternativas: [], detalle: 'Sin importe gravado.' };
+  }
 
-  const difNeto = sumaNeto - c.neto;
-  const difIva = sumaIva - c.iva;
-  if (difNeto !== 0 || difIva !== 0) {
+  /* El IVA del detalle tiene que dar el IVA del comprobante, siempre. */
+  if (mapa.iva == null) c.iva = sumaIva;
+  if (sumaIva !== c.iva) {
+    const dif = sumaIva - c.iva;
     return {
       estado: 'sin_resolver', lineas: [], alternativas: [],
-      detalle: `El detalle por alícuota no coincide con los totales: ` +
-        `neto ${difNeto >= 0 ? '+' : ''}${pesos(difNeto)}, IVA ${difIva >= 0 ? '+' : ''}${pesos(difIva)}.`,
+      detalle: `El IVA abierto por alícuota suma ${pesos(sumaIva)} y el del ` +
+        `comprobante es ${pesos(c.iva)}: difieren en ${pesos(Math.abs(dif))}.`,
     };
   }
 
-  if (!lineas.length) {
-    return { estado: 'sin_gravado', lineas: [], alternativas: [], detalle: 'Sin importe gravado.' };
+  const calculadas = lineas.filter((l) => l.calculado);
+  let ajusteNeto = 0;
+
+  if (!calculadas.length) {
+    /* Detalle completo: los netos vienen del comprobante y no se tocan. */
+    const sumaNeto = lineas.reduce((s, l) => s + l.netoCentavos, 0);
+    if (mapa.neto == null) {
+      c.neto = sumaNeto;
+    } else if (sumaNeto !== c.neto) {
+      const dif = sumaNeto - c.neto;
+      return {
+        estado: 'sin_resolver', lineas: [], alternativas: [],
+        detalle: `El neto abierto por alícuota no da el neto del comprobante: ` +
+          `difiere en ${pesos(dif)}.`,
+      };
+    }
+  } else {
+    const declarado = lineas
+      .filter((l) => !l.calculado).reduce((s, l) => s + l.netoCentavos, 0);
+    const estimado = calculadas.map((l) => (l.tasa ? Math.round(l.ivaCentavos / l.tasa) : 0));
+    const totalEstimado = estimado.reduce((a, b) => a + b, 0);
+
+    if (mapa.neto == null) {
+      /* Sin neto declarado, la estimación es lo único que hay. */
+      calculadas.forEach((l, i) => { l.netoCentavos = estimado[i]; });
+      c.neto = declarado + totalEstimado;
+    } else if (calculadas.length === 1) {
+      /* Una sola alícuota: el neto declarado va entero, sin redondear nada. */
+      calculadas[0].netoCentavos = c.neto - declarado;
+    } else {
+      /* Varias: se reparte el neto declarado en proporción al IVA de cada
+         una, y los centavos que sobran caen en la línea más grande. */
+      const aRepartir = c.neto - declarado;
+      let asignado = 0;
+      calculadas.forEach((l, i) => {
+        l.netoCentavos = totalEstimado
+          ? Math.round((aRepartir * estimado[i]) / totalEstimado) : 0;
+        asignado += l.netoCentavos;
+      });
+      const mayor = calculadas.reduce(
+        (a, b) => (Math.abs(b.netoCentavos) > Math.abs(a.netoCentavos) ? b : a));
+      mayor.netoCentavos += aRepartir - asignado;
+      ajusteNeto = aRepartir - totalEstimado;
+    }
+  }
+
+  /* Una línea con IVA pero sin ningún neto que lo respalde no es informable, y
+     casi siempre delata que en el origen la base quedó cargada en otra
+     columna. */
+  const hueca = lineas.find((l) => l.netoCentavos === 0 && l.ivaCentavos !== 0);
+  if (hueca) {
+    return {
+      estado: 'sin_resolver', lineas: [], alternativas: [],
+      detalle: `Hay ${pesos(hueca.ivaCentavos)} de IVA al ` +
+        `${detalle.find((d) => d.codigo === hueca.codigo).etiqueta} ` +
+        `sin neto gravado que lo respalde. Fijate si la base quedó cargada como exenta.`,
+    };
+  }
+
+  /* Coherencia de cada línea cuyo neto salió del total declarado: si el IVA no
+     se corresponde con la tasa, el detalle y los totales están contando cosas
+     distintas y no hay forma de saber cuál vale. */
+  for (const l of calculadas) {
+    if (!l.tasa) continue;
+    const esperado = Math.round(l.netoCentavos * l.tasa);
+    if (Math.abs(esperado - l.ivaCentavos) > margenDeIva(esperado)) {
+      const etiqueta = detalle.find((d) => d.codigo === l.codigo).etiqueta;
+      return {
+        estado: 'sin_resolver', lineas: [], alternativas: [],
+        detalle: `Los ${pesos(l.ivaCentavos)} de IVA al ${etiqueta} no se corresponden ` +
+          `con un neto de ${pesos(l.netoCentavos)}, que daría ${pesos(esperado)}. ` +
+          `Puede haber importes de otra alícuota metidos en el neto.`,
+      };
+    }
   }
 
   const etiquetas = lineas.map((l) => detalle.find((d) => d.codigo === l.codigo).etiqueta);
   return {
-    estado: 'declarada',
+    estado: calculadas.length ? 'calculada' : 'declarada',
     lineas,
     alternativas: [],
-    detalle: `Del detalle de la planilla: ${etiquetas.join(' + ')}.`,
+    ajusteNeto,
+    detalle: calculadas.length
+      ? `La planilla abre el IVA por alícuota (${etiquetas.join(' + ')}) y el neto ` +
+        `de cada una sale del neto del comprobante.`
+      : `Del detalle de la planilla: ${etiquetas.join(' + ')}.`,
   };
 }
 
@@ -425,15 +569,19 @@ function detectarAlicuotas(encabezados, tablas) {
     else if (par.colIva == null) par.colIva = i;
   });
 
-  /* Un par suelto no sirve: hacen falta las dos columnas. */
+  /* Con la columna del IVA alcanza: el neto de esa alícuota se puede calcular
+     dividiendo por la tasa. Una columna de neto suelta, en cambio, no dice
+     cuánto IVA le corresponde, así que se descarta. */
   return [...porTasa.values()]
-    .filter((p) => p.colNeto != null && p.colIva != null)
+    .filter((p) => p.colIva != null)
     .sort((a, b) => a.tasa - b.tasa);
 }
 
 /** Los índices de columna que ocupa el detalle por alícuota. */
 function indicesDeAlicuotas(alicuotas) {
-  return new Set(alicuotas.flatMap((a) => [a.colNeto, a.colIva]));
+  return new Set(
+    alicuotas.flatMap((a) => [a.colNeto, a.colIva]).filter((i) => i != null)
+  );
 }
 
 /**
@@ -520,19 +668,33 @@ function normalizarComprobantes(filas, mapa, config, tablas, columnasAlicuota) {
     if (!c.fecha) problemas.push({ campo: 'fecha', mensaje: 'Fecha ilegible o vacía.' });
     c.periodo = periodoDeFecha(c.fecha);
 
+    /* Hay sistemas que traen la letra, el punto de venta y el número pegados
+       en una sola columna. Si vino así se parte, pero las columnas propias,
+       cuando existen, siguen mandando. */
+    const partes = mapa.comprobanteNro == null
+      ? null : partirComprobante(leer(fila, 'comprobanteNro'));
+    c.letra = partes ? partes.letra : '';
+
     /* Tipo de comprobante */
     const tipoBruto = leer(fila, 'tipo');
     c.tipoBruto = tipoBruto;
     c.tipo = tablas.resolverTipoComprobante(tipoBruto, perfil.aliasComprobante);
-    if (!c.tipo) problemas.push({ campo: 'tipo', mensaje: `Tipo de comprobante no reconocido: "${tipoBruto ?? ''}".` });
+    /* Sistemas que guardan la clase por un lado ("FAC") y la letra pegada al
+       número: recién juntas dicen de qué comprobante se trata. */
+    if (!c.tipo && c.letra && tipoBruto != null && String(tipoBruto).trim() !== '') {
+      c.tipo = tablas.resolverTipoComprobante(`${tipoBruto} ${c.letra}`, perfil.aliasComprobante);
+    }
+    if (!c.tipo) problemas.push({ campo: 'tipo', mensaje: `Tipo de comprobante no reconocido: "${tipoBruto ?? ''}${c.letra ? ' ' + c.letra : ''}".` });
     c.esNotaCredito = c.tipo ? tablas.esNotaDeCredito(c.tipo) : false;
 
     /* Punto de venta y número */
     c.puntoVenta = String(leer(fila, 'puntoVenta') ?? '').replace(/\D/g, '');
+    if (!c.puntoVenta && partes) c.puntoVenta = partes.puntoVenta;
     if (!c.puntoVenta) problemas.push({ campo: 'puntoVenta', mensaje: 'Falta el punto de venta.' });
     else if (c.puntoVenta.length > 5) problemas.push({ campo: 'puntoVenta', mensaje: 'El punto de venta tiene más de 5 dígitos.' });
 
     c.numero = String(leer(fila, 'numero') ?? '').replace(/\D/g, '');
+    if (!c.numero && partes) c.numero = partes.numero;
     if (!c.numero) problemas.push({ campo: 'numero', mensaje: 'Falta el número de comprobante.' });
     else if (c.numero.length > 20) problemas.push({ campo: 'numero', mensaje: 'El número tiene más de 20 dígitos.' });
 
@@ -582,9 +744,12 @@ function normalizarComprobantes(filas, mapa, config, tablas, columnasAlicuota) {
 
     /* Las alícuotas van acá porque el crédito computable y el total
        reconstruido dependen del neto y del IVA. */
+    /* Con detalle en la planilla se lee; si esa fila no tiene nada abierto,
+       leerAlicuotasDeclaradas devuelve null y la descomposición se deduce. */
     c.alicuotas = detalle.length
       ? leerAlicuotasDeclaradas(fila, detalle, c, enValorAbsoluto, mapa)
-      : resolverAlicuotas(c.neto, c.iva, tasas);
+      : null;
+    if (!c.alicuotas) c.alicuotas = resolverAlicuotas(c.neto, c.iva, tasas);
 
     const creditoBruto = mapa.creditoComputable != null ? tomar('creditoComputable') : null;
     c.creditoComputable = creditoBruto != null && creditoBruto !== 0 ? creditoBruto : c.iva;
@@ -652,6 +817,17 @@ function cuadrar(comprobantes, toleranciaCentavos = 5) {
     }
     delete c.ajustado;
     c.problemas = c.problemas.filter((p) => p.campo !== 'total');
+
+    /* Los centavos que se movieron al calcular el neto de cada alícuota
+       también se informan: nada se corrige en silencio. */
+    if (c.alicuotas && c.alicuotas.ajusteNeto && !c.confirmado) {
+      ajustes.push({
+        filaPlanilla: c.filaPlanilla,
+        denominacion: c.denominacion,
+        centavos: c.alicuotas.ajusteNeto,
+        destino: 'neto calculado desde el IVA',
+      });
+    }
 
     c.diferencia = c.total - sumaPartes(c);
     if (c.diferencia === 0) continue;
@@ -889,6 +1065,6 @@ if (typeof module !== 'undefined' && module.exports) {
     resolverAlicuotas, armarTasas, detectarColumnas, detectarAlicuotas,
     indicesDeAlicuotas, leerAlicuotasDeclaradas, normalizarEncabezado,
     normalizarComprobantes, cuadrar, sumaPartes, fijarLineas, generar, totalesDeControl,
-    nombreArchivo, LARGOS, SINONIMOS,
+    nombreArchivo, LARGOS, SINONIMOS, partirComprobante,
   };
 }
