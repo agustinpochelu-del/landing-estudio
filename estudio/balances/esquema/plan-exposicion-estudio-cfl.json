@@ -604,17 +604,17 @@
     },
     {
      "id": "eepn.distribucion.reservas",
-     "concepto": "Distribución de resultados: a reserva legal / otras reservas",
+     "concepto": "Distribución a reservas",
      "aprobacion": true
     },
     {
      "id": "eepn.distribucion.dividendos_efectivo",
-     "concepto": "Distribución de resultados: dividendos en efectivo",
+     "concepto": "Dividendos en efectivo",
      "aprobacion": true
     },
     {
      "id": "eepn.distribucion.dividendos_acciones",
-     "concepto": "Distribución de resultados: dividendos en acciones",
+     "concepto": "Dividendos en acciones",
      "aprobacion": true
     },
     {

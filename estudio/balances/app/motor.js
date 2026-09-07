@@ -339,14 +339,47 @@
        puntas mostraría un movimiento que no existió. Lo que se movió lo dice el
        diario, y son sólo los asientos del ejercicio. */
     const mov = this.d.saldos.eepn_movimientos || {};
-    const movimientos = {};
+    const enColumnas = (fuente) => {
+      const o = {};
+      columnas.forEach((x) => {
+        if (x.rol || x.id === "resultados_no_asignados") return;
+        o[x.id] = -(fuente["eepn." + x.id] || 0);
+      });
+      return subtotales(o);
+    };
+    const movimientos = enColumnas(mov);
+
+    /* La distribución de resultados que la planilla declaró, un renglón por
+       clase. El concepto lo pone el plan; el orden, también. Lo que no se
+       declara no se inventa: sigue cayendo en el ajuste de ejercicios
+       anteriores, que es donde estaba antes de que esto existiera. */
+    const dist = this.d.saldos.eepn_distribucion || {};
+    const orden = (def.filas || []).map((f) => f.id)
+      .filter((id) => id.indexOf("eepn.distribucion.") === 0);
+    const clases = Object.keys(dist).sort((a, b) =>
+      orden.indexOf("eepn.distribucion." + a) - orden.indexOf("eepn.distribucion." + b));
+    const distribuciones = clases.map((k) => {
+      const f = (def.filas || []).find((x) => x.id === "eepn.distribucion." + k);
+      const o = enColumnas(dist[k]);
+      o.id = "distribucion." + k;
+      o.concepto = f ? f.concepto : "Distribución de utilidades";
+      o.resultados_no_asignados = -(dist[k]["eepn.resultados_no_asignados"] || 0);
+      o.total_actual = totalColumnas(o) + o.resultados_no_asignados;
+      o.total_anterior = 0;
+      return o;
+    });
+    /* El renglón del ajuste de ejercicios anteriores es lo que queda: todo lo
+       que los resultados no asignados se movieron sin ser el resultado del
+       ejercicio, menos lo que se declaró como distribución. */
+    const area = modificacion - distribuciones.reduce(
+      (t, o) => t + o.resultados_no_asignados, 0);
+
     const aportesInicio = {};
     columnas.forEach((x) => {
       if (x.rol || x.id === "resultados_no_asignados") return;
-      movimientos[x.id] = -(mov["eepn." + x.id] || 0);
-      aportesInicio[x.id] = aportesCierre[x.id] - movimientos[x.id];
+      aportesInicio[x.id] = aportesCierre[x.id] - movimientos[x.id] -
+        distribuciones.reduce((t, o) => t + (o[x.id] || 0), 0);
     });
-    subtotales(movimientos);
     subtotales(aportesInicio);
 
     /* Los renglones del estado están siempre, aunque den cero. Que un ejercicio
@@ -362,15 +395,15 @@
       }, aportesInicio),
       {
         id: "area", concepto: "AREA",
-        ref: Math.abs(modificacion) > TOL ? "modificacion_ejercicios_anteriores" : null,
-        resultados_no_asignados: modificacion,
-        total_actual: modificacion,
+        ref: Math.abs(area) > TOL ? "modificacion_ejercicios_anteriores" : null,
+        resultados_no_asignados: area,
+        total_actual: area,
         total_anterior: 0,
       },
       Object.assign({
         concepto: "Saldos al inicio modificados", rol: "subtotal",
-        resultados_no_asignados: inicio + modificacion,
-        total_actual: totalColumnas(aportesInicio) + inicio + modificacion,
+        resultados_no_asignados: inicio + area,
+        total_actual: totalColumnas(aportesInicio) + inicio + area,
         total_anterior: pnAnteriorCierre - resultadoAnterior,
       }, aportesInicio),
       Object.assign({
@@ -379,10 +412,10 @@
         total_actual: totalColumnas(aportesCierre) - totalColumnas(aportesInicio),
         total_anterior: 0,
       }, movimientos),
-      {
+      ...(distribuciones.length ? distribuciones : [{
         concepto: "Distribución de utilidades",
         resultados_no_asignados: 0, total_actual: 0, total_anterior: 0,
-      },
+      }]),
       {
         id: "resultado_ejercicio", concepto: "Resultado del ejercicio",
         resultados_no_asignados: resultado,

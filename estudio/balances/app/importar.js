@@ -471,7 +471,20 @@
        algo que no hay que asentar —una cuota fuera del ejercicio, un pago a
        cuenta que ya entró por el volante—. Ahí «no» es no: un renglón sin marca
        en una hoja que tiene la columna no se pega. */
-    const cuentasDeAjuste = [], descartados = [];
+    const cuentasDeAjuste = [], descartados = [], pnSinEntender = [];
+    /* Lo que se escribe en la columna del patrimonio, con las vueltas que se le
+       dan a la misma palabra. Lo que no se entiende no se adivina: se avisa. */
+    const renglonPN = (v) => {
+      const t = texto(v);
+      if (!t) return null;
+      const x = t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+      if (/accion/.test(x)) return "dividendos_acciones";
+      if (/dividendo|efectivo/.test(x)) return "dividendos_efectivo";
+      if (/reserva/.test(x)) return "reservas";
+      if (/^(area|ajuste)/.test(x)) return null;
+      pnSinEntender.push(t);
+      return null;
+    };
     const aMano = (nombreHoja) => {
       const hoja = buscarHoja(libro, nombreHoja);
       const filas = registros(hoja);
@@ -489,6 +502,12 @@
           glosa: texto(alguno(r, ["glosa", "descripcion asiento", "descripcion",
                                   "detalle", "concepto"])),
           cuenta: cuenta, debe: numero(r["debe"]), haber: numero(r["haber"]),
+          /* Un ajuste contra los resultados no asignados puede ser una
+             distribución aprobada por la asamblea o una corrección de
+             ejercicios anteriores, y por la contrapartida no se distinguen: los
+             dos van contra un activo o un pasivo. Lo dice esta columna. */
+          patrimonio: renglonPN(alguno(r, ["patrimonio", "distribucion",
+                                           "renglon pn", "destino"])),
           pega: pega, porque: texto(alguno(r, ["por que no", "porque no"])),
           observacion: texto(r["observacion"]),
         };
@@ -500,7 +519,15 @@
     const manuales = todosAMano.filter((x) => x.pega).map((x) => ({
       asiento: x.asiento, fecha: x.fecha, nombre: x.nombre, glosa: x.glosa,
       cuenta: x.cuenta, debe: x.debe, haber: x.haber,
+      patrimonio: x.patrimonio,
     }));
+    if (pnSinEntender.length) {
+      avisos.push("A-I08 · la columna del patrimonio de «Ajustes» dice " +
+        Array.from(new Set(pnSinEntender)).map((x) => `«${x}»`).join(", ") +
+        ", y no sé a qué renglón va. Se entienden «dividendos», «dividendos en " +
+        "acciones» y «reservas»; vacío va al ajuste de ejercicios anteriores. " +
+        "Por ahora quedó como ajuste de ejercicios anteriores.");
+    }
 
     /* Las observaciones que la aplicación de Mis Facilidades dejó escritas sobre
        asientos que sí se pegan: son cosas que vio y no pudo resolver sola. */

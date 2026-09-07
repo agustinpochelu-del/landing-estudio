@@ -522,6 +522,9 @@
         nombre: l.map((x) => x.nombre).filter(Boolean)[0] || a.nombre,
         fecha: l[0].fecha,
         glosa: glosa || "Ajuste registrado a mano.",
+        /* A qué renglón del patrimonio va: alcanza con marcarlo en un renglón
+           del asiento, que es como se escribe en la planilla. */
+        renglon_pn: l.map((x) => x.patrimonio).filter(Boolean)[0] || null,
       }), l.map((x) => [x.cuenta, (x.debe || 0) - (x.haber || 0)]));
     });
   });
@@ -1803,20 +1806,65 @@
          normales**. La apertura no es un movimiento, y la reexpresión del
          capital nominal tampoco —esa va a la cuenta de ajuste del capital—. Cada
          uno se reexpresa desde su mes. */
-      eepn_movimientos: (() => {
-        const mov = {};
-        this.asientos.forEach((a) => {
-          if (a.rol !== "normal") return;
-          const coef = this.historico ? 1 : this.coef(a.fecha);
-          a.lineas.forEach((l) => {
-            const mm = this.d.mapeo.cuentas[l.cuenta];
-            if (!mm || mm.linea.indexOf("eepn.") !== 0) return;
-            mov[mm.linea] = (mov[mm.linea] || 0) + (l.debe - l.haber) * coef;
-          });
-        });
-        return mov;
-      })(),
+      eepn_movimientos: this.movimientosPN(false),
+      /* La distribución de resultados aprobada por la asamblea, por renglón.
+         Sale aparte de los movimientos porque en el estado va en su propia
+         línea: un débito a los resultados no asignados que no se declara acaba
+         en el ajuste de ejercicios anteriores, que es otra cosa y lleva nota. */
+      eepn_distribucion: this.movimientosPN(true),
     };
+  };
+
+  /* La cuenta del ajuste de resultados de ejercicios anteriores: se llama AREA,
+     y es una subcuenta de los resultados no asignados. Tenerla en el plan de
+     cuentas es lo que separa las dos cosas sin adivinar: **lo que pasa por AREA
+     es AREA, y lo que mueve los resultados no asignados por cualquier otra
+     cuenta es distribución**. Si el ente no la tiene, todo movimiento de los
+     resultados no asignados que no sea el resultado del año se expone como
+     distribución. */
+  const esArea = (cuenta) => sinAcentos(cuenta).indexOf("area") === 0;
+
+  /* A qué renglón del patrimonio va un asiento entero. La planilla manda; si no
+     dice nada, mover los resultados no asignados por fuera de AREA es una
+     distribución. Va el asiento entero y no cada línea, porque la distribución a
+     reservas mueve las dos columnas y tiene que salir en el mismo renglón. */
+  Diario.prototype.clasePN = function (a) {
+    if (a.renglon_pn) return a.renglon_pn;
+    let hay = false;
+    a.lineas.forEach((l) => {
+      const mm = this.d.mapeo.cuentas[l.cuenta];
+      if (!mm || mm.linea !== "eepn.resultados_no_asignados") return;
+      if (!esArea(l.cuenta)) hay = true;
+    });
+    return hay ? "utilidades" : null;
+  };
+
+  /* Los movimientos del patrimonio durante el ejercicio: **sólo los asientos
+     normales**. La apertura no es un movimiento, y la reexpresión del capital
+     nominal tampoco —esa va a la cuenta de ajuste del capital—. Cada uno se
+     reexpresa desde su mes.
+
+     Con `porRenglon`, en vez de un solo juego de movimientos devuelve uno por
+     cada renglón del patrimonio declarado en la planilla; sin él, todo lo que no
+     está declarado. Los dos lados se excluyen, así que ningún importe se cuenta
+     dos veces. */
+  Diario.prototype.movimientosPN = function (porRenglon) {
+    const salida = {};
+    this.asientos.forEach((a) => {
+      if (a.rol !== "normal") return;
+      const clase = this.clasePN(a);
+      if (!clase !== !porRenglon) return;
+      const donde = porRenglon
+        ? (salida[clase] || (salida[clase] = {}))
+        : salida;
+      const coef = this.historico ? 1 : this.coef(a.fecha);
+      a.lineas.forEach((l) => {
+        const mm = this.d.mapeo.cuentas[l.cuenta];
+        if (!mm || mm.linea.indexOf("eepn.") !== 0) return;
+        donde[mm.linea] = (donde[mm.linea] || 0) + (l.debe - l.haber) * coef;
+      });
+    });
+    return salida;
   };
 
   /* A08: cuentas con movimiento que no están en el mapeo de exposición. */
