@@ -11,3 +11,9 @@ Memoria.md
 *.xlsx
 *.xls
 *.csv
+
+# Una sola excepcion, y con nombre y apellido: el modelo vacio que se baja desde
+# la aplicacion de estados contables. Es una plantilla en blanco, sin un dato de
+# nadie adentro, y sin ella el boton "Descargar el modelo vacio" queda roto.
+# La ruta va completa a proposito: no abre la puerta a ningun otro .xlsx.
+!estudio/balances/plantilla/modelo-importacion.xlsx

@@ -1,0 +1,744 @@
+/* El papel. Se entrega en digital, así que usa la paleta del estudio:
+   los mismos colores que estudiopochelu.com. */
+
+/* El margen no lo pone la página: lo pone la hoja, con su `padding`.
+
+   Es la misma medida en pantalla y en el papel —para que la vista previa no
+   mienta— y, sobre todo, no depende de lo que el navegador tenga elegido en
+   «Márgenes» al guardar el PDF. Por eso `@page` va en cero: si además pusiera
+   margen, se sumarían los dos. */
+@page { size: A4 portrait; margin: 0; }
+@page apaisada { size: A4 landscape; margin: 0; }
+
+:root {
+  /* marca */
+  --verde-900: #082622;
+  --verde-800: #0E3B34;
+  --verde-700: #145046;
+  --verde-600: #1B6B5C;
+  --oro: #C9A227;
+  --oro-suave: #D9BC6A;
+  /* neutros */
+  --tinta: #0C1A17;
+  --cuerpo: #445350;
+  --apagado: #6B7B77;
+  --linea: #E1E4DF;
+  --crema: #F6F5F0;
+  --crema-2: #EFEEE7;
+
+  --marco: var(--verde-700);
+  --divisor: #cdd6d2;
+
+  /* Las dos bandas fuertes del papel —el encabezado de cada cuadro y el
+     renglón de total— tienen sus propios tokens y no el verde de la marca.
+     Así una paleta puede aclararlas sin tocar el verde de los títulos, que es
+     el mismo color usado como tinta. */
+  --banda-fondo: var(--verde-800);
+  --banda-texto: var(--crema);
+  --banda-divisor: var(--banda-divisor);
+  --total-fondo: var(--verde-800);
+  --total-texto: #fff;
+  --total-divisor: var(--banda-divisor);
+  --total-linea: var(--verde-700);
+  --total-pe: var(--oro-suave);
+  /* El acento: las barras de cierre de la balanza y la banda de grupo de los
+     anexos. Es el verde más oscuro de todos, y una paleta clara también lo
+     tiene que poder aclarar o queda un bloque negro suelto. */
+  --acento-fondo: var(--verde-900);
+  --acento-texto: #fff;
+  --acento-realce: var(--oro-suave);
+  --serif: "Source Serif 4", Georgia, serif;
+  --sans: Inter, system-ui, "Segoe UI", sans-serif;
+}
+
+
+/* --- paletas alternativas ---------------------------------------------------
+
+   Las tres respetan la marca —verde profundo, oro y crema—; lo que cambia es
+   cuánto pesan. Se eligen desde la barra de pantalla o con `?paleta=`, y la
+   elección queda guardada en el navegador.
+
+   Acá abajo **sólo se mueven variables**: ninguna regla se repite. Si una
+   paleta necesitara una regla propia, la que está mal es la regla, que debería
+   estar apoyada en una variable.
+
+   El selector va también sin `:root` para que una paleta se pueda aplicar a un
+   pedazo de página: así `paletas.html` muestra las cuatro juntas. */
+
+/* Salvia — la misma estructura, un paso menos de saturación. Las bandas siguen
+   llenas y verdes, pero dejan de ser casi negras. */
+:root[data-paleta="salvia"], [data-paleta="salvia"] {
+  --verde-900: #1D403A;
+  --verde-800: #2C544C;
+  --verde-700: #3B6459;
+  --verde-600: #4E7C6F;
+  --oro: #BFA24E;
+  --oro-suave: #D6C08A;
+  --tinta: #16302B;
+  --cuerpo: #4C5B57;
+  --apagado: #74837F;
+  --linea: #E4E8E3;
+  --crema: #F8F7F3;
+  --crema-2: #F0F2ED;
+  --divisor: #D5DDD8;
+  --marco: #6F8C84;
+  --banda-fondo: #2C544C;
+  --banda-texto: #F8F7F3;
+  --total-fondo: #2C544C;
+  --total-linea: #3B6459;
+  --total-pe: #D6C08A;
+  --acento-fondo: #1D403A;
+  --acento-realce: #D6C08A;
+}
+
+/* Bruma — sin bandas oscuras. El encabezado pasa a ser un tono claro con la
+   tinta verde encima, y el total se distingue por la regla y el peso más que
+   por el contraste. Es la más liviana de las tres. */
+:root[data-paleta="bruma"], [data-paleta="bruma"] {
+  --verde-900: #1F473F;
+  --verde-800: #2A564C;
+  --verde-700: #3A6559;
+  --verde-600: #4F7D70;
+  --oro: #B69A4B;
+  --oro-suave: #C4AC74;
+  --tinta: #1A322D;
+  --cuerpo: #4F5D59;
+  --apagado: #7A8884;
+  --linea: #E6EAE5;
+  --crema: #F8F8F4;
+  --crema-2: #EFF3EF;
+  --divisor: #D5DEDA;
+  --marco: #A9BDB6;
+
+  --banda-fondo: #E4EDE8;
+  --banda-texto: #2A564C;
+  --banda-divisor: #C9D8D2;
+  --total-fondo: #D8E5DF;
+  --total-texto: #1F473F;
+  --total-divisor: #BACCC5;
+  --total-linea: #6F958A;
+  --total-pe: #8E7A42;
+  --acento-fondo: #3A6559;
+  --acento-realce: #D9C68F;
+}
+
+/* Arena — la más cálida. Mantiene la banda verde, más clara, y corre los cremas
+   hacia el oro: el papel deja de ser gris. */
+:root[data-paleta="arena"], [data-paleta="arena"] {
+  --verde-900: #21453D;
+  --verde-800: #33594F;
+  --verde-700: #446B5F;
+  --verde-600: #587F72;
+  --oro: #B99A47;
+  --oro-suave: #CBB07A;
+  --tinta: #1E2E29;
+  --cuerpo: #4F5A55;
+  --apagado: #7B837C;
+  --linea: #E7E3D8;
+  --crema: #FAF7EF;
+  --crema-2: #F2EDE0;
+  --divisor: #DAD5C7;
+  --marco: #93A79E;
+  --banda-fondo: #33594F;
+  --banda-texto: #FAF7EF;
+  --total-fondo: #33594F;
+  --total-linea: #446B5F;
+  --total-pe: #CBB07A;
+  --acento-fondo: #21453D;
+  --acento-realce: #CBB07A;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0; background: #46524f;
+  font-family: var(--sans); color: var(--tinta); font-size: 10pt; line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+
+/* --- barra de pantalla --- */
+
+.barra {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--verde-800); color: #fff;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .6rem 1.2rem; font-size: .9rem;
+}
+.barra .acciones { display: flex; gap: .6rem; align-items: center; }
+.barra a, .barra button {
+  color: #fff; background: transparent; text-decoration: none; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.4); border-radius: 999px;
+  padding: .3rem .9rem; font: inherit; font-size: .85rem;
+}
+.barra button {
+  background: var(--oro-suave); color: var(--verde-900);
+  border-color: var(--oro-suave); font-weight: 600;
+}
+
+/* --- la hoja --- */
+
+.hoja {
+  background: #fff; margin: 1.2rem auto; padding: 20mm;
+  width: 210mm; min-height: 297mm;
+  box-shadow: 0 2px 14px rgba(0,0,0,.3);
+  display: flex; flex-direction: column;
+}
+/* 10 mm arriba y abajo en las apaisadas, contra los 20 de las derechas: éstas
+   van al límite del A4 y no tienen de dónde sacarlos. Los 15 de los costados
+   son los que importan si la hoja se abrocha. */
+.hoja.apaisada { width: 297mm; min-height: 210mm; padding: 10mm 15mm; }
+.hoja .contenido { flex: 1 0 auto; }
+
+/* --- encabezados de estado --- */
+
+.entidad {
+  font-size: 8.2pt; color: var(--apagado); text-transform: uppercase; letter-spacing: .1em;
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 2px solid var(--oro-suave); padding-bottom: .35rem; margin-bottom: 1.1rem;
+}
+.entidad strong { color: var(--verde-800); letter-spacing: .06em; }
+.titulo-estado {
+  font-family: var(--serif); font-size: 15pt; font-weight: 700; color: var(--verde-800);
+  text-align: center; margin: 0 0 .2rem; letter-spacing: .02em;
+}
+.subtitulo-estado {
+  text-align: center; font-size: 8.6pt; color: var(--apagado); margin: 0 0 1.1rem; font-style: italic;
+}
+
+/* --- números --- */
+
+.pe { color: var(--apagado); font-weight: 400; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.num .pe { float: left; padding-left: .1rem; }
+
+/* --- el marco que rodea cada cuadro --- */
+
+.cuadro { border: 1px solid var(--marco); background: #fff; overflow: hidden; }
+
+/* --- tablas de estados --- */
+
+table.estado { width: 100%; border-collapse: collapse; font-size: 9.4pt; }
+table.estado th, table.estado td {
+  padding: .2rem .5rem; vertical-align: baseline;
+  border-right: 1px solid var(--divisor);
+}
+table.estado th:last-child, table.estado td:last-child { border-right: 0; }
+table.estado thead th {
+  font-size: 7.4pt; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--banda-fondo); color: var(--banda-texto);
+  text-align: right; font-weight: 600; padding: .35rem .5rem;
+  border-right-color: var(--banda-divisor);
+}
+table.estado thead th.concepto { text-align: left; }
+table.estado td.concepto { width: 58%; }
+table.estado tr.titulo td {
+  font-weight: 700; color: var(--verde-700); background: var(--crema-2);
+  font-size: 8pt; letter-spacing: .09em; text-transform: uppercase;
+  border-top: 1px solid var(--divisor); border-bottom: 1px solid var(--divisor);
+  padding: .3rem .5rem;
+}
+table.estado tr.subtotal td {
+  border-top: 1px solid var(--divisor); background: var(--crema);
+  font-weight: 600; color: var(--verde-800);
+}
+table.estado tr.total td {
+  border-top: 1px solid var(--total-linea);
+  background: var(--total-fondo); color: var(--total-texto); font-weight: 700;
+  border-right-color: var(--total-divisor);
+}
+table.estado tr.total .pe { color: var(--total-pe); }
+table.estado td .ref { color: var(--apagado); font-size: 8pt; }
+table.estado tr.sangria td.concepto { padding-left: 1.2rem; }
+
+/* --- situación patrimonial: la caja de dos mitades iguales --- */
+
+/* 106 mm y no 108: con 108 la hoja terminaba midiendo 211,7 mm y se pasaba de
+   A4 apaisada por 1,7 mm, así que al imprimir soltaba una segunda página casi
+   vacía. Las dos mitades siguen midiendo lo mismo, que es lo que importa. */
+/* 100 mm y no más: la hoja apaisada del estado de situación patrimonial va
+   justo al límite del A4, y los 6 mm que le sacamos acá son los que ganó el
+   hueco de la firma. La balanza los tenía de sobra —el alto mínimo sólo
+   estira los renglones vacíos—. */
+.balanza { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; min-height: 100mm; }
+.balanza .mitad { display: flex; flex-direction: column; }
+.balanza .mitad:first-child { border-right: 1px solid var(--marco); }
+.balanza table.estado { height: 100%; }
+/* Media hoja para el concepto y media para los dos importes. En el resto de los
+   estados el concepto se lleva el 58 %, pero acá la tabla mide la mitad de la
+   hoja y los totales son los números más largos del balance. */
+.balanza table.estado td.concepto, .balanza table.estado th.concepto { width: 50%; }
+/* Los dos lados tienen distinta cantidad de renglones, y una tabla al 100 % de
+   alto reparte el sobrante entre todos: el lado del pasivo, que tiene menos,
+   quedaba con los renglones casi al doble de alto que el del activo. Con una
+   altura mínima en los renglones de datos, todo el sobrante se va al hueco, que
+   es el único que tiene que crecer. */
+.balanza table.estado tbody tr:not(.hueco):not(.cierre) td { height: 1px; }
+.balanza tr.hueco td { border-bottom: 0; height: 100%; }
+/* Los dos lados cierran con una caja de la misma altura. «Total del pasivo y
+   patrimonio neto» se parte en dos renglones y «Total del activo» no, así que
+   sin una altura fija una barra quedaba más alta que la otra y el estado se veía
+   torcido. El hueco de arriba absorbe la diferencia. */
+/* El signo pesos flota a la izquierda y el importe va alineado a la derecha: en
+   una celda angosta se encuentran en el medio y se tocan. Los totales del cierre
+   son los números más largos del estado y entraban por dos píxeles, así que van
+   un punto más chicos y con menos aire a los costados. */
+.balanza tr.cierre td {
+  background: var(--acento-fondo); color: var(--acento-texto); font-weight: 700; font-size: 8.8pt;
+  padding: .42rem .35rem; border-right-color: var(--banda-divisor);
+  height: 14mm; vertical-align: middle;
+}
+.balanza tr.cierre .pe { color: var(--acento-realce); }
+.rotulo-lado {
+  font-family: var(--serif); font-size: 11pt; font-weight: 700;
+  background: var(--acento-fondo); color: var(--acento-realce);
+  letter-spacing: .18em; text-align: center; padding: .35rem 0;
+}
+
+/* --- anexos --- */
+
+table.anexo { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+table.anexo th, table.anexo td {
+  padding: .26rem .4rem; border-right: 1px solid var(--divisor);
+  border-bottom: 1px solid var(--linea);
+}
+/* El anexo de bienes de uso tiene pocos renglones y una hoja apaisada entera
+   para él: con el interlineado del anexo de gastos, que trae diez, el cuadro
+   quedaba flaco. */
+table.anexo.holgado td { padding: .55rem .4rem; }
+table.anexo.holgado thead th { padding: .4rem .4rem; }
+table.anexo th:last-child, table.anexo td:last-child { border-right: 0; }
+table.anexo tbody tr:last-child td { border-bottom: 0; }
+table.anexo thead th {
+  font-size: 7.2pt; text-transform: uppercase; letter-spacing: .07em;
+  background: var(--banda-fondo); color: var(--banda-texto);
+  text-align: right; vertical-align: bottom; font-weight: 600;
+  border-right-color: var(--banda-divisor); border-bottom-color: var(--banda-divisor);
+}
+table.anexo thead th.grupo {
+  text-align: center; background: var(--acento-fondo); color: var(--acento-realce);
+  letter-spacing: .14em; padding: .3rem .4rem;
+}
+table.anexo thead th:first-child { text-align: left; }
+table.anexo tbody td:first-child { text-align: left; }
+/* El rayado no toca los renglones de total ni de subtotal: `:nth-child` suma
+   especificidad y le ganaba al fondo del total, que quedaba blanco sobre
+   blanco —el total estaba, pero no se veía—. */
+table.anexo tbody tr:nth-child(even):not(.total):not(.subtotal) td { background: #fafbfa; }
+table.anexo tr.total td {
+  font-weight: 700; background: var(--total-fondo); color: var(--total-texto);
+  border-top: 1px solid var(--total-linea); border-right-color: var(--total-divisor);
+}
+table.anexo tr.total .pe { color: var(--oro-suave); }
+table.anexo .separa { border-left: 1px solid var(--marco); }
+table.anexo thead th.separa { border-left-color: rgba(255,255,255,.35); }
+table.anexo tr.total td.separa { border-left-color: rgba(255,255,255,.35); }
+
+/* --- notas --- */
+
+.nota { margin-bottom: 1.5rem; break-inside: avoid; }
+.nota h3 {
+  font-family: var(--serif); font-size: 11pt; color: var(--verde-800); margin: 0 0 .4rem;
+  border-bottom: 1.5px solid var(--oro-suave); padding-bottom: .18rem;
+}
+.nota h4 { font-size: 9.4pt; margin: .7rem 0 .25rem; color: var(--verde-700); }
+.nota p { margin: 0 0 .5rem; text-align: justify; color: var(--tinta); }
+.nota p.vineta { padding-left: 1rem; }
+/* Los cuadros de las notas van centrados en la hoja: son el detalle de un
+   renglón, no una columna de texto. */
+.nota .cuadro { margin: .5rem auto 0; width: 74%; }
+table.composicion { width: 100%; border-collapse: collapse; font-size: 9.2pt; }
+table.composicion th, table.composicion td {
+  padding: .22rem .5rem; border-right: 1px solid var(--divisor);
+}
+table.composicion th:last-child, table.composicion td:last-child { border-right: 0; }
+table.composicion thead th {
+  font-size: 7.4pt; text-transform: uppercase; letter-spacing: .08em;
+  background: var(--banda-fondo); color: var(--banda-texto); text-align: right;
+  border-right-color: var(--banda-divisor);
+}
+table.composicion thead th:first-child { text-align: left; }
+/* El rayado no toca los renglones de total ni de subtotal: `:nth-child` suma
+   especificidad y le ganaba al fondo del total, que quedaba blanco sobre
+   blanco —el total estaba, pero no se veía—. */
+table.composicion tbody tr:nth-child(even):not(.total):not(.subtotal) td { background: #fafbfa; }
+table.composicion tr.total td {
+  border-top: 1px solid var(--verde-700); font-weight: 700;
+  background: var(--total-fondo); color: var(--total-texto); border-right-color: var(--banda-divisor);
+}
+table.composicion tr.total .pe { color: var(--oro-suave); }
+
+/* --- carátula --- */
+
+.caratula { display: flex; flex-direction: column; flex: 1; text-align: center; padding-top: 6mm; }
+.caratula .rotulo {
+  font-family: var(--serif); font-size: 13pt; letter-spacing: .5em; text-transform: uppercase;
+  color: var(--verde-600); margin: 0 0 5mm; padding-left: .5em;
+}
+.caratula .filete { border: 0; border-top: 2px solid var(--oro); width: 42mm; margin: 0 auto 8mm; }
+.caratula .denominacion {
+  font-family: var(--serif); font-size: 34pt; line-height: 1.1; font-weight: 700;
+  color: var(--verde-800); margin: 0 0 3mm; letter-spacing: .005em;
+}
+.caratula .cuit {
+  font-size: 9.5pt; color: var(--apagado); margin: 0 0 3mm;
+  letter-spacing: .22em; text-transform: uppercase;
+}
+.caratula .actividad {
+  font-family: var(--serif); font-size: 12pt; font-style: italic;
+  color: var(--verde-600); margin: 0 0 12mm;
+}
+.caratula .ejercicio {
+  background: var(--crema);
+  border-top: 2px solid var(--oro-suave); border-bottom: 2px solid var(--oro-suave);
+  padding: 5mm 0; margin: 0 0 12mm;
+}
+.caratula .ejercicio .n {
+  font-family: var(--serif); font-size: 13pt; font-weight: 700; color: var(--verde-800);
+  letter-spacing: .06em; display: block; margin-bottom: 2mm;
+}
+.caratula .ejercicio .fechas { font-size: 10pt; color: var(--tinta); display: block; }
+.caratula .ejercicio .moneda {
+  font-size: 8.4pt; color: var(--apagado); letter-spacing: .12em; text-transform: uppercase;
+  display: block; margin-top: 2.5mm;
+}
+.caratula .fichas {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 9mm 12mm;
+  text-align: left; margin: 0 auto; width: 100%; max-width: 158mm;
+}
+.caratula .ficha.ancha { grid-column: 1 / -1; }
+.caratula .ficha dt {
+  font-size: 7.4pt; letter-spacing: .16em; text-transform: uppercase; color: var(--verde-600);
+  border-bottom: 1px solid var(--oro-suave); padding-bottom: 1.5mm; margin-bottom: 2mm;
+}
+.caratula .ficha dd { margin: 0; font-size: 10pt; line-height: 1.5; color: var(--tinta); }
+.caratula .ficha dd .destacado {
+  font-family: var(--serif); font-size: 13pt; font-weight: 700; color: var(--verde-800);
+}
+
+/* El aviso de las hojas que no entran: pantalla, nunca papel. */
+.aviso-hojas {
+  max-width: 210mm; margin: 1.2rem auto -.4rem; padding: .7rem 1rem;
+  background: #fff5f2; border-left: 3px solid var(--mal, #a8321f);
+  font-family: var(--sans); font-size: .85rem; color: var(--tinta); line-height: 1.55;
+}
+.aviso-hojas ul { margin: .3rem 0 0; padding-left: 1.1rem; }
+
+/* --- informe del auditor --- */
+
+.auditor h2 {
+  font-family: var(--serif); font-size: 13pt; text-align: center; color: var(--verde-800);
+  letter-spacing: .1em; margin: 0 0 1.2rem; padding-bottom: .5rem;
+  border-bottom: 2px solid var(--oro-suave);
+}
+.auditor h3 { font-size: 10pt; margin: 1.1rem 0 .35rem; color: var(--verde-700); }
+/* El informe se lee corrido, no se consulta como un cuadro: márgenes laterales
+   más anchos que el resto de las hojas —6 mm de más por lado sobre los 15 mm de
+   la hoja— e interlineado abierto. */
+.auditor { padding: 0 6mm; line-height: 1.5; }
+
+/* Sangría de primera línea en los párrafos del informe. No la llevan el
+   destinatario, que es un bloque de datos, ni el lugar y la fecha, que es una
+   línea suelta: sangrar una dirección sería un error de composición. */
+.auditor p { margin: 0 0 .6rem; text-align: justify; text-indent: 2.4rem; }
+.auditor .destinatario { margin-bottom: 1.4rem; }
+.auditor .destinatario p { margin: 0; text-align: left; text-indent: 0; }
+.auditor .lugar { margin-top: 1.6rem; text-indent: 0; }
+
+/* --- la leyenda del dictamen: pegada abajo a la izquierda del cuadro --- */
+
+.dictamen {
+  font-size: 8.2pt; color: var(--apagado); font-style: italic; letter-spacing: .04em;
+  margin: 2.5mm 0 0; text-align: left;
+}
+
+/* --- sellos de cierre de hoja, sin recuadro --- */
+
+/* El hueco de la firma se reserva siempre, firmado o no, y sale del blanco
+   que ya había arriba de los nombres: 2 mm de aire + 20 mm de hueco. Así el
+   balance ocupa las mismas hojas y los mismos folios antes y después de firmar
+   —firmar no puede correr la paginación—. Los 6 mm que el hueco creció sobre
+   los 16 de antes salen del alto mínimo de la balanza, que los tenía de sobra. */
+.cierre-hoja { margin-top: auto; padding-top: 2mm; break-inside: avoid; }
+.cierre-hoja .dictamen { margin: 0 0 10mm; }
+.sellos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14mm; }
+.sellos.uno { justify-content: flex-start; }
+/* 2 mm y no 4: con los márgenes de 20 mm, dos sellos de firma ancha entraban
+   justos justos en la hoja derecha. */
+.sello { min-width: 62mm; text-align: center; line-height: 1.5; padding: 0 2mm; }
+.sello .nombre {
+  font-family: var(--serif); font-size: 10pt; font-weight: 700; color: var(--verde-800);
+  letter-spacing: .03em; display: block; margin-bottom: .8mm;
+}
+.sello .detalle {
+  font-size: 8pt; color: var(--cuerpo); letter-spacing: .09em; text-transform: uppercase;
+  display: block;
+}
+.sello .detalle + .detalle { color: var(--apagado); }
+
+/* La firma escaneada. El alto lo trae cada firma desde `datos/firmas/`; acá
+   sólo se la apoya sobre el renglón del nombre. El hueco está aunque no haya
+   firma: es el que se firma a mano cuando el balance sale en papel. */
+.sello .hueco-firma {
+  display: flex; align-items: flex-end; justify-content: center; height: 20mm;
+}
+/* `object-fit` es lo que impide que una firma ancha salga aplastada: el alto
+   que se le dio manda, y si por ancho no entra, se achica entera en vez de
+   estirarse. */
+.sello .rubrica { max-height: 100%; max-width: 70mm; object-fit: contain; }
+/* 70 mm es lo que dos firmas y su separación dejan entrar en el ancho útil de
+   la hoja derecha (180 mm). Una firma real es ancha: si el tope fuera más
+   chico, pedir 20 mm de alto daría 15. */
+.folio { text-align: center; font-size: 8pt; color: var(--apagado); margin-top: 6mm; }
+
+/* --- los libros: diario, mayor y sumas y saldos --- */
+
+/* El libro no es una hoja por sección: es un corrido que el navegador pagina. */
+.hoja.continua { display: block; }
+.hoja.continua .contenido { display: block; }
+.hoja.continua .cierre-hoja { margin-top: 12mm; padding-top: 0; }
+
+table.libro { width: 100%; border-collapse: collapse; font-size: 8.8pt; }
+table.libro th, table.libro td {
+  padding: .18rem .45rem; vertical-align: baseline;
+  border-right: 1px solid var(--divisor); border-bottom: 1px solid var(--linea);
+}
+table.libro th:last-child, table.libro td:last-child { border-right: 0; }
+table.libro tbody:last-child tr:last-child td { border-bottom: 0; }
+table.libro thead th {
+  font-size: 7.2pt; text-transform: uppercase; letter-spacing: .08em;
+  background: var(--banda-fondo); color: var(--banda-texto); text-align: right;
+  font-weight: 600; padding: .3rem .45rem;
+  border-right-color: var(--banda-divisor); border-bottom-color: var(--banda-divisor);
+}
+table.libro thead th.izq { text-align: left; }
+table.libro thead th.grupo {
+  text-align: center; background: var(--acento-fondo); color: var(--acento-realce);
+  letter-spacing: .14em;
+}
+table.libro td.concepto { width: 100%; }
+table.libro td.concepto.sangra { padding-left: 1.8rem; }
+table.libro td.fecha, table.libro td.asiento-n {
+  white-space: nowrap; color: var(--apagado); font-size: 8pt;
+}
+/* el $ va flotado al borde izquierdo de la celda: la columna tiene que dar
+   lugar para los dos, si no el signo se pega al número más largo */
+table.libro td.num, table.libro th.num { min-width: 32mm; }
+table.libro td.fecha, table.libro td.asiento-n { min-width: 0; }
+/* el saldo del mayor no lleva signo: lleva la letra del saldo, D o A */
+table.libro .da {
+  float: left; padding-left: .1rem; font-size: 7.4pt; font-weight: 600;
+  color: var(--apagado); letter-spacing: .06em;
+}
+table.libro tr.suma .da { color: var(--verde-600); }
+table.libro .separa { border-left: 1px solid var(--marco); }
+table.libro thead th.separa { border-left-color: rgba(255,255,255,.35); }
+
+/* la cabecera de cada asiento del diario */
+table.libro tr.asiento td {
+  background: var(--crema-2); color: var(--verde-700); font-weight: 700;
+  font-size: 8.2pt; letter-spacing: .05em;
+  border-top: 1px solid var(--divisor); border-bottom: 1px solid var(--divisor);
+  padding: .28rem .45rem;
+}
+table.libro tr.asiento td.fecha { color: var(--verde-700); font-weight: 600; }
+table.libro tr.asiento .n { font-family: var(--serif); letter-spacing: 0; }
+table.libro tr.glosa td {
+  color: var(--apagado); font-style: italic; font-size: 7.8pt;
+  padding-top: .3rem; padding-left: 1.8rem;
+}
+table.libro tr.suma td {
+  background: var(--crema); font-weight: 600; color: var(--verde-800);
+  border-top: 1px solid var(--divisor);
+}
+table.libro tr.total td {
+  background: var(--total-fondo); color: var(--total-texto); font-weight: 700;
+  border-top: 1px solid var(--total-linea); border-right-color: var(--total-divisor);
+}
+table.libro tr.total .pe { color: var(--oro-suave); }
+/* El rayado no toca los renglones de total ni de subtotal: `:nth-child` suma
+   especificidad y le ganaba al fondo del total, que quedaba blanco sobre
+   blanco —el total estaba, pero no se veía—. */
+table.libro.sumas tbody tr:nth-child(even):not(.total):not(.suma):not(.grupo-jerarquia) td { background: #fafbfa; }
+table.libro.sumas tr.total td, table.libro.saldos tr.total td { background: var(--total-fondo); }
+/* Una sola columna de importes: el concepto se queda con el resto. */
+table.libro.saldos td.concepto, table.libro.saldos th.izq { width: auto; }
+
+/* una cuenta del mayor: título y su cuadro, sin partirse al medio */
+.cuenta-mayor { break-inside: avoid; page-break-inside: avoid; margin-bottom: 5mm; }
+.cuenta-mayor h3 {
+  font-family: var(--serif); font-size: 10.5pt; font-weight: 700; color: var(--verde-800);
+  margin: 0 0 .3rem; display: flex; justify-content: space-between; align-items: baseline;
+  gap: 1rem; border-bottom: 1.5px solid var(--oro-suave); padding-bottom: .15rem;
+}
+.cuenta-mayor h3 .rubro {
+  font-family: var(--sans); font-size: 7.4pt; font-weight: 400; white-space: nowrap;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--apagado);
+}
+
+/* el control de los libros: se ve en pantalla, no se imprime */
+.control-libros {
+  max-width: 210mm; margin: 1.2rem auto -.4rem; padding: .7rem 1rem;
+  background: var(--crema); border-left: 3px solid var(--oro);
+  font-family: var(--sans); font-size: .85rem; color: var(--cuerpo); line-height: 1.55;
+}
+.barra .elige { display: flex; align-items: center; gap: .4rem; font-size: .85rem; }
+.barra .elige select {
+  font: inherit; font-size: .85rem; color: #fff; background: transparent;
+  border: 1px solid rgba(255,255,255,.4); border-radius: 999px; padding: .25rem .6rem;
+}
+.barra .elige select option { color: var(--tinta); }
+.barra .elige input[type="search"] {
+  font: inherit; font-size: .85rem; color: #fff; background: transparent;
+  border: 1px solid rgba(255,255,255,.4); border-radius: 999px;
+  padding: .25rem .7rem; width: 15ch;
+}
+.barra .elige input::placeholder { color: rgba(255,255,255,.55); }
+.barra .cuantas { font-size: .78rem; opacity: .8; min-width: 6ch; }
+/* Una cuenta escondida por el filtro no se imprime: el mayor no tiene totales
+   que dependan de las demás, así que filtrar y mandar a imprimir es válido. */
+.cuenta-mayor[hidden] { display: none; }
+
+/* el selector de la barra decide qué libro se ve y qué se imprime */
+body[data-libro="diario"] .hoja:not(.diario),
+body[data-libro="mayor"] .hoja:not(.mayor),
+body[data-libro="sumas"] .hoja:not(.sumas),
+body[data-libro="saldos"] .hoja:not(.saldos),
+body[data-libro="axi"] .hoja:not(.axi),
+body[data-libro="resultado"] .hoja:not(.resultado),
+body[data-libro="gastos"] .hoja:not(.gastos),
+body[data-libro="conciliacion"] .hoja:not(.conciliacion),
+body[data-libro="ganancias"] .hoja:not(.ganancias) { display: none; }
+
+/* conciliación bancaria: los rubros que ya entran por otra fuente se leen como
+   parte del saldo, no como algo que asiente este papel */
+table.libro tr.ya td { color: var(--apagado); background: #f6f7f5; }
+.resumen-conciliacion { margin-top: 5mm; width: 62%; }
+.resumen-conciliacion table.libro td:first-child { width: 70%; }
+.ayuda-papel { font-size: 8.8pt; color: var(--cuerpo); margin-top: 3mm; }
+
+/* el papel de trabajo del resultado abre cada renglón en las cuentas que lo
+   forman: se leen como detalle, no como otro renglón del estado */
+table.estado tr.detalle td {
+  color: var(--cuerpo);
+  font-size: 8.6pt;
+  border-bottom-color: #eef0ed;
+}
+table.estado tr.detalle td.concepto { padding-left: 1.6rem; }
+
+/* el papel de trabajo del ajuste por inflación: una partida por bloque, con el
+   renglón de cada origen y el coeficiente con el que se reexpresa */
+.partida-axi { break-inside: avoid; page-break-inside: avoid; margin-bottom: 4mm; }
+.partida-axi h3 {
+  font-family: var(--serif); font-size: 10pt; font-weight: 700; color: var(--verde-800);
+  margin: 0 0 .3rem; display: flex; justify-content: space-between; align-items: baseline;
+  gap: 1rem; border-bottom: 1.5px solid var(--oro-suave); padding-bottom: .15rem;
+}
+.partida-axi h3 .destino {
+  font-family: var(--sans); font-size: 7.4pt; font-weight: 400; white-space: nowrap;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--apagado);
+}
+table.libro .coef { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* --- impresión --- */
+
+@media print {
+  body { background: #fff; }
+  .no-imprimir { display: none !important; }
+  /* La hoja impresa es la hoja de la pantalla: mismo alto, mismo margen. Antes
+     acá se ponían el `padding` y el `min-height` en cero y el margen lo daba
+     `@page`; con las apaisadas eso salía mal, porque `.hoja.apaisada` pesa más
+     que `.hoja` y se quedaba con su `min-height: 210mm` dentro de una caja de
+     190 mm. Resultado: cada hoja apaisada salía en dos páginas, la segunda con
+     las firmas solas. Ahora la hoja mide exactamente la página —`height`, no
+     `min-height`, para que el pie se apoye abajo— y `@page` no pone nada. */
+  /* Medio milímetro menos que la página, a propósito: una hoja que mide
+     exactamente lo que la caja se pasa con cualquier redondeo, y pasarse
+     significa una página más. Medio milímetro no se ve. */
+  .hoja {
+    margin: 0; box-shadow: none; width: auto; height: 296.5mm; min-height: 0;
+    break-after: page; page-break-after: always;
+  }
+  .hoja:last-child { break-after: auto; page-break-after: auto; }
+  .hoja.apaisada { page: apaisada; width: auto; height: 209.5mm; min-height: 0; }
+  .folio { display: none; }
+  thead { display: table-header-group; }
+  /* el corrido de los libros se pagina solo; el encabezado de columnas se repite */
+  /* el corte va antes del libro siguiente, no después del anterior: así elegir
+     un solo libro en la barra no deja una página en blanco al final */
+  /* El libro no es una hoja por página: es un corrido que el navegador parte
+     solo, así que no lleva alto fijo. */
+  .hoja.continua { break-after: auto; page-break-after: auto; height: auto; }
+  .hoja.continua + .hoja.continua { break-before: page; page-break-before: always; }
+  /* la primera hoja visible nunca lleva corte adelante: si no, imprimir un
+     solo libro empieza con una hoja en blanco */
+  .hoja.continua.primera { break-before: auto; page-break-before: auto; }
+  table.libro tr.asiento { break-after: avoid; page-break-after: avoid; }
+  table.libro tr.suma { break-before: avoid; page-break-before: avoid; }
+  table.libro tr { break-inside: avoid; page-break-inside: avoid; }
+}
+
+/* ---- el papel de la determinación del impuesto ---- */
+h2.titulo-bloque {
+  font-family: var(--sans); font-size: 8.4pt; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--verde-800); margin: 5mm 0 1.5mm;
+  border-bottom: 1px solid var(--oro-suave); padding-bottom: .8mm;
+}
+table.determinacion tr.grupo td {
+  background: var(--crema); font-weight: 600; color: var(--verde-800);
+  border-top: 1px solid var(--divisor);
+}
+table.determinacion tr.subtotal td {
+  font-weight: 600; border-top: 1px solid var(--divisor); background: #fafbfa;
+}
+table.determinacion tr.subtotal.fuerte td {
+  background: var(--crema); color: var(--verde-900);
+}
+table.determinacion tr.sangra td.concepto { padding-left: 1.8rem; color: var(--apagado); }
+table.determinacion td.concepto.vacio { color: var(--apagado); font-style: italic; }
+table.determinacion .nota-art {
+  font-family: var(--sans); font-size: 7.2pt; color: var(--apagado); font-style: italic;
+}
+.pie-papel { font-size: 8pt; color: var(--apagado); font-style: italic; margin: 1.5mm 0 0; }
+.avisos-papel {
+  margin: 3mm 0; padding: 2mm 3mm; border-left: 2px solid var(--oro);
+  background: var(--crema); font-size: 8.4pt; color: var(--cuerpo);
+}
+.avisos-papel ul { margin: 1mm 0 0; padding-left: 4mm; }
+
+/* El cuadro de amortizaciones tiene seis columnas: con el ancho mínimo del
+   libro (32 mm por columna numérica) se pasaba del ancho de la hoja y en
+   pantalla quedaba corrido. */
+table.determinacion td.num, table.determinacion th.num { min-width: 21mm; }
+table.determinacion { table-layout: auto; font-size: 8.2pt; }
+table.determinacion td.concepto { width: auto; }
+/* El encabezado de una columna numérica puede partirse en dos renglones; el
+   importe no. Sin esto, «Amortización deducible» empujaba la columna al ancho
+   del título y el cuadro se salía de la hoja. */
+table.determinacion thead th.num { white-space: normal; }
+
+/* El balance de sumas y saldos, agrupado por naturaleza de cuenta. */
+table.libro tr.grupo-jerarquia td {
+  background: var(--banda-fondo); color: var(--banda-texto); font-weight: 600;
+  font-size: 7.8pt; letter-spacing: .1em; text-transform: uppercase;
+  padding: .3rem .5rem; border-right-color: var(--banda-divisor);
+}
+table.libro tr.grupo-jerarquia .sigla {
+  color: var(--oro-suave); font-weight: 700; letter-spacing: .06em;
+  display: inline-block; min-width: 4.5em;
+}
+
+/* --- el botón de firmar, en la barra de pantalla ---
+
+   Aparece plegado: se despliega el campo de la clave sólo cuando se pide
+   firmar. Nada de esto se imprime. */
+.barra .firma { display: inline-flex; align-items: center; gap: .4rem; }
+.barra .firma input[type="password"] {
+  font: inherit; font-size: .85rem; color: #fff; background: transparent;
+  border: 1px solid rgba(255,255,255,.4); border-radius: 999px;
+  padding: .25rem .7rem; width: 12ch;
+}
+.barra .firma input::placeholder { color: rgba(255,255,255,.55); }
+.barra .firma[hidden] { display: none; }
+.barra .dice-firma { font-size: .78rem; opacity: .85; }
+.barra .dice-firma.mal { color: #ffd7cf; opacity: 1; }

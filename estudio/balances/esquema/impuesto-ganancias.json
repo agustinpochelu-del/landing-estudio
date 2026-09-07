@@ -1,0 +1,171 @@
+{
+ "norma": "Ley de Impuesto a las Ganancias, t.o. 2019 (Dto. 824/2019) y su decreto reglamentario",
+ "nota": "Lo que cambia todos los años son los tramos de la escala del artículo 73. Lo demás es estructura de la ley y no se toca sin que cambie la ley.",
+ "escalas": {
+  "nota": "Artículo 73 inciso a). La escala la fija la ley, no una resolución de ARCA: el esquema de tres tramos está en el artículo 73 de la Ley de Impuesto a las Ganancias, con las alícuotas del 25 %, 30 % y 35 % que estableció la ley 27.630. Los montos en pesos de los escalones se actualizan solos, todos los años, por la variación del IPC del INDEC. **Manda la escala que trae la planilla del ejercicio** —la tabla `Esc_Impuesto` de la hoja `Bases Ganancias`—, que se guarda con el ejercicio: un balance se reimprime dentro de dos años con la escala que le correspondía. Lo que hay acá es el respaldo, para cuando la planilla no la traiga.",
+  "2026": {
+   "periodo_fiscal": "2026",
+   "base_legal": "Art. 73 inc. a) de la Ley de Impuesto a las Ganancias (t.o. 2019), alícuotas según ley 27.630",
+   "actualizacion": "Los montos se actualizan anualmente por la variación del IPC del INDEC.",
+   "fuente": "Tabla de la escala 2026 aportada por el estudio.",
+   "tramos": [
+    {
+     "desde": 0,
+     "hasta": 133514185.74,
+     "fijo": 0,
+     "alicuota": 0.25
+    },
+    {
+     "desde": 133514185.74,
+     "hasta": 1335141857.38,
+     "fijo": 33378546.43,
+     "alicuota": 0.3
+    },
+    {
+     "desde": 1335141857.38,
+     "hasta": null,
+     "fijo": 393866847.93,
+     "alicuota": 0.35
+    }
+   ]
+  }
+ },
+ "ajuste_por_inflacion": {
+  "norma": "Título VI, artículos 105 y 106",
+  "procede_si": "La variación del IPC supera el 100 % en los treinta y seis meses anteriores al cierre.",
+  "fase_i": {
+   "nombre": "Estática",
+   "que_hace": "Toma la posición al inicio del ejercicio y la reexpresa punta a punta.",
+   "coeficiente": "índice de cierre / índice del cierre anterior − 1",
+   "cuenta": "activo computable al inicio − pasivo computable al inicio",
+   "signo": "Si el activo computable supera al pasivo, el ajuste es NEGATIVO (pérdida): la sociedad estuvo expuesta. Si el pasivo supera al activo, es POSITIVO (ganancia).",
+   "activo_no_computable": {
+    "norma": "Artículo 106 inciso a)",
+    "puntos": [
+     {
+      "punto": 1,
+      "concepto": "Inmuebles y obras en curso sobre inmuebles"
+     },
+     {
+      "punto": 2,
+      "concepto": "Inversiones en materiales con destino a esas obras"
+     },
+     {
+      "punto": 3,
+      "concepto": "Bienes muebles amortizables"
+     },
+     {
+      "punto": 4,
+      "concepto": "Bienes muebles en curso de elaboración con destino a activo fijo"
+     },
+     {
+      "punto": 5,
+      "concepto": "Bienes inmateriales"
+     },
+     {
+      "punto": 7,
+      "concepto": "Acciones, cuotas y participaciones sociales, y cuotas partes de fondos comunes de inversión"
+     },
+     {
+      "punto": 8,
+      "concepto": "Inversiones en el exterior que no originen resultados de fuente argentina"
+     },
+     {
+      "punto": 9,
+      "concepto": "Bienes muebles no amortizables, excepto títulos valores y bienes de cambio"
+     },
+     {
+      "punto": 11,
+      "concepto": "Aportes y anticipos a cuenta de futuras integraciones de capital, salvo que devenguen intereses o actualizaciones de mercado"
+     },
+     {
+      "punto": 12,
+      "concepto": "Saldos pendientes de integración de los accionistas"
+     },
+     {
+      "punto": 13,
+      "concepto": "Saldos deudores del titular, dueño o socios que provengan de integraciones pendientes o de operaciones efectuadas en condiciones distintas a las que pudieran pactarse entre partes independientes"
+     }
+    ]
+   }
+  },
+  "fase_ii": {
+   "nombre": "Dinámica",
+   "que_hace": "Corrige por los movimientos del ejercicio que cambiaron la exposición. Cada uno se reexpresa desde su mes.",
+   "coeficiente": "índice de cierre / índice del mes de la operación − 1",
+   "positivos": {
+    "norma": "Artículo 106 inciso d) apartado I",
+    "conceptos": [
+     "Retiros de cualquier origen o naturaleza —incluidos los imputables a las cuentas particulares— efectuados durante el ejercicio por el titular, dueño o socios",
+     "Fondos o bienes dispuestos en favor de terceros",
+     "Dividendos distribuidos",
+     "Honorarios al directorio que excedan el tope deducible",
+     "Adquisiciones o incorporaciones de bienes no computables",
+     "Fondos o bienes que pasen a generar resultados de fuente extranjera"
+    ],
+    "excepcion": "No se computan las sumas que devenguen intereses o actualizaciones, ni las que tengan origen en operaciones realizadas en iguales condiciones a las que pudieran pactarse entre partes independientes."
+   },
+   "negativos": {
+    "norma": "Artículo 106 inciso d) apartado II",
+    "conceptos": [
+     "Aportes y aumentos de capital",
+     "Sumas obtenidas por la venta de bienes no computables",
+     "Inversiones en el exterior que pasen a generar resultados de fuente argentina"
+    ]
+   },
+   "como_se_deduce": {
+    "nota": "La fase dinámica no es una segunda decisión: es la misma. Un activo que no computa, cuando se compra o se retira hace subir la cuenta y saca exposición —ajuste positivo—; cuando se vende o se rescata la hace bajar y devuelve exposición —ajuste negativo—. Los retiros de socios son ese mismo caso.",
+    "regla": "Se toman los movimientos del ejercicio de cada cuenta de activo marcada como no computable, agrupados por mes. El mes que queda deudor es ajuste positivo y el que queda acreedor, negativo.",
+    "no_son_movimiento": [
+     "apertura",
+     "valuacion",
+     "amortizaciones",
+     "axi",
+     "neteo_axi",
+     "impuesto"
+    ],
+    "por_que_no": "La apertura no es un movimiento del ejercicio; la valuación al cierre y la amortización no son ni una compra ni una venta, y la reexpresión y el impuesto tampoco."
+   }
+  }
+ },
+ "honorarios_directorio": {
+  "norma": "Artículo 91 inciso i)",
+  "tope": "El mayor entre el 25 % de las utilidades contables del ejercicio y $ 12.500 por cada perceptor.",
+  "condicion": "Para deducirse en el ejercicio, tienen que estar asignados individualmente por la asamblea antes del vencimiento de la declaración jurada. Si se asignan después, se deducen en el ejercicio de la asignación.",
+  "excedente": "Lo que supera el tope no es deducible para la sociedad y vuelve al resultado impositivo.",
+  "criterios": {
+   "utilidad_antes_de_honorarios_neta_de_impuesto": {
+    "que_toma_como_utilidad_contable": "El resultado del ejercicio antes de los honorarios y después del impuesto.",
+    "formula": "tope = 0,25 × (U − 0,35 × (U − tope)), con U = resultado antes del impuesto + honorarios",
+    "resuelta": "tope = U × 0,1625 / 0,9125",
+    "nota": "Es el criterio del papel del estudio. La circularidad —los honorarios cambian el impuesto, el impuesto cambia la utilidad, la utilidad cambia el tope— queda resuelta en la fórmula."
+   }
+  }
+ },
+ "presunciones": {
+  "dividendos": {
+   "norma": "Artículo 50 de la ley y artículo 49 del decreto reglamentario",
+   "regla": "Los retiros de fondos de los socios, por cualquier causa, se presumen dividendos hasta el límite de las utilidades acumuladas al cierre del ejercicio inmediato anterior.",
+   "consecuencia": "El saldo deudor que responde a esa presunción no es un crédito de la sociedad: es activo no computable a los fines del ajuste por inflación, y para el socio es un dividendo alcanzado por la retención del artículo 97."
+  },
+  "disposicion_de_fondos": {
+   "norma": "Artículo 76",
+   "regla": "La disposición de fondos o bienes a favor de terceros, sin que devenguen intereses de mercado, hace presumir sin admitir prueba en contrario una ganancia gravada.",
+   "consecuencia": "El saldo es activo computable y devenga intereses presuntos, que son renta gravada de la sociedad.",
+   "no_aplica_a": "Los retiros ya alcanzados por la presunción de dividendos, ni los anticipos a cuenta de honorarios efectivamente asignados, mientras no superen lo asignado."
+  }
+ },
+ "computo_del_impuesto": {
+  "orden": [
+   "Impuesto determinado según la escala",
+   "menos retenciones y percepciones sufridas",
+   "menos anticipos ingresados",
+   "menos crédito por impuesto sobre débitos y créditos (ley 25.413), con el tope y el tratamiento del remanente que declara impuesto-ley-25413.json"
+  ]
+ },
+ "amortizaciones": {
+  "norma": "Artículo 93",
+  "regla": "El costo de los bienes adquiridos en ejercicios iniciados a partir del 1° de enero de 2018 se actualiza por el IPC hasta el cierre del ejercicio, y la amortización se calcula sobre ese valor actualizado.",
+  "relacion_con_el_titulo_vi": "No se superponen: el ajuste del Título VI corrige la posición monetaria y la actualización del artículo 93 corrige el costo de los bienes no computables. Por eso los bienes de uso quedan fuera del activo computable."
+ }
+}

@@ -1,0 +1,294 @@
+{
+  "id": "cfl",
+  "nombre": "Entidades con fines de lucro",
+  "norma": "RT 54 (t.o. RT 59) - FACPCE, aprobada por el CPCE del Chubut",
+  "fuente": "Modelos 1.1 a 1.7 RT54 - Entidades con fines de lucro",
+  "version": "1.0",
+
+  "encabezado_estados": "Por el ejercicio finalizado el {cierre} comparativo con el ejercicio anterior. Cifras expresadas en {unidad} ({ref:nota:unidad_medida})",
+
+  "estados": {
+    "esp": {
+      "titulo": "ESTADO DE SITUACIÓN PATRIMONIAL",
+      "orientacion": "apaisada",
+      "layout": "dos_columnas",
+      "columnas": ["actual", "anterior"],
+      "bloques": [
+        {
+          "lado": "izquierda",
+          "lineas": [
+            { "id": "esp.activo", "concepto": "ACTIVO", "rol": "titulo" },
+
+            { "id": "esp.ac", "concepto": "ACTIVO CORRIENTE", "rol": "titulo" },
+            { "id": "esp.ac.caja_bancos", "concepto": "Caja y bancos", "refs": ["nota:caja_bancos"] },
+            { "id": "esp.ac.inversiones_financieras", "concepto": "Inversiones financieras", "refs": ["nota:inversiones_financieras"] },
+            { "id": "esp.ac.ctas_cobrar_clientes_moneda", "concepto": "Cuentas por cobrar a clientes en moneda", "refs": ["nota:ctas_cobrar_clientes_moneda"] },
+            { "id": "esp.ac.ctas_cobrar_clientes_especie", "concepto": "Cuentas por cobrar a clientes en especie", "refs": ["nota:ctas_cobrar_clientes_especie"] },
+            { "id": "esp.ac.creditos_impositivos", "concepto": "Créditos impositivos", "refs": ["nota:creditos_impositivos"] },
+            { "id": "esp.ac.creditos_partes_relacionadas", "concepto": "Créditos con partes relacionadas", "refs": ["nota:creditos_partes_relacionadas"] },
+            { "id": "esp.ac.otras_ctas_cobrar_moneda", "concepto": "Otras cuentas por cobrar en moneda", "refs": ["nota:otras_ctas_cobrar_moneda"] },
+            { "id": "esp.ac.otras_ctas_cobrar_especie", "concepto": "Otras cuentas por cobrar en especie", "refs": ["nota:otras_ctas_cobrar_especie"] },
+            { "id": "esp.ac.bienes_cambio", "concepto": "Bienes de cambio", "refs": ["nota:bienes_cambio"] },
+            { "id": "esp.ac.otras_inversiones", "concepto": "Otras inversiones", "refs": ["nota:otras_inversiones"] },
+            { "id": "esp.ac.otros_activos", "concepto": "Otros activos", "refs": ["nota:otros_activos"] },
+            { "id": "esp.ac.total", "concepto": "Total del activo corriente", "rol": "subtotal", "siempre": true,
+              "suma": ["esp.ac.*"] },
+
+            { "id": "esp.anc", "concepto": "ACTIVO NO CORRIENTE", "rol": "titulo" },
+            { "id": "esp.anc.inversiones_financieras", "concepto": "Inversiones financieras", "refs": ["nota:inversiones_financieras"] },
+            { "id": "esp.anc.ctas_cobrar_clientes_moneda", "concepto": "Cuentas por cobrar a clientes en moneda", "refs": ["nota:ctas_cobrar_clientes_moneda"] },
+            { "id": "esp.anc.ctas_cobrar_clientes_especie", "concepto": "Cuentas por cobrar a clientes en especie", "refs": ["nota:ctas_cobrar_clientes_especie"] },
+            { "id": "esp.anc.creditos_impositivos", "concepto": "Créditos impositivos", "refs": ["nota:creditos_impositivos"] },
+            { "id": "esp.anc.creditos_partes_relacionadas", "concepto": "Créditos con partes relacionadas", "refs": ["nota:creditos_partes_relacionadas"] },
+            { "id": "esp.anc.otras_ctas_cobrar_moneda", "concepto": "Otras cuentas por cobrar en moneda", "refs": ["nota:otras_ctas_cobrar_moneda"] },
+            { "id": "esp.anc.otras_ctas_cobrar_especie", "concepto": "Otras cuentas por cobrar en especie", "refs": ["nota:otras_ctas_cobrar_especie"] },
+            { "id": "esp.anc.bienes_cambio", "concepto": "Bienes de cambio", "refs": ["nota:bienes_cambio"] },
+            { "id": "esp.anc.bienes_uso", "concepto": "Bienes de uso", "refs": ["nota:bienes_uso", "anexo:bienes_uso"] },
+            { "id": "esp.anc.propiedades_inversion", "concepto": "Propiedades de inversión", "refs": ["nota:propiedades_inversion", "anexo:propiedades_inversion"] },
+            { "id": "esp.anc.otras_inversiones", "concepto": "Otras inversiones", "refs": ["nota:otras_inversiones"] },
+            { "id": "esp.anc.intangibles", "concepto": "Activos intangibles", "refs": ["nota:intangibles", "anexo:intangibles"] },
+            { "id": "esp.anc.otros_activos", "concepto": "Otros activos", "refs": ["nota:otros_activos"] },
+            { "id": "esp.anc.total", "concepto": "Total del activo no corriente", "rol": "subtotal", "siempre": true,
+              "suma": ["esp.anc.*"] },
+
+            { "id": "esp.activo.total", "concepto": "Total del activo", "rol": "total", "siempre": true,
+              "suma": ["esp.ac.total", "esp.anc.total"] }
+          ]
+        },
+        {
+          "lado": "derecha",
+          "lineas": [
+            { "id": "esp.pasivo", "concepto": "PASIVO", "rol": "titulo" },
+
+            { "id": "esp.pc", "concepto": "PASIVO CORRIENTE", "rol": "titulo" },
+            { "id": "esp.pc.proveedores", "concepto": "Proveedores de bienes y servicios", "refs": ["nota:proveedores"] },
+            { "id": "esp.pc.prestamos", "concepto": "Préstamos y otros pasivos financieros", "refs": ["nota:prestamos"] },
+            { "id": "esp.pc.deudas_fiscales", "concepto": "Deudas fiscales", "refs": ["nota:deudas_fiscales"] },
+            { "id": "esp.pc.deudas_laborales", "concepto": "Deudas laborales y previsionales", "refs": ["nota:deudas_laborales"] },
+            { "id": "esp.pc.deudas_especie", "concepto": "Deudas en especie", "refs": ["nota:deudas_especie"] },
+            { "id": "esp.pc.deudas_partes_relacionadas", "concepto": "Deudas con partes relacionadas", "refs": ["nota:deudas_partes_relacionadas"] },
+            { "id": "esp.pc.otras_deudas", "concepto": "Otras deudas", "refs": ["nota:otras_deudas"] },
+            { "id": "esp.pc.subsidios", "concepto": "Subsidios y otras ayudas gubernamentales", "refs": ["nota:subsidios"] },
+            { "id": "esp.pc.previsiones", "concepto": "Previsiones", "refs": ["nota:previsiones", "anexo:previsiones"] },
+            { "id": "esp.pc.total", "concepto": "Total del pasivo corriente", "rol": "subtotal", "siempre": true,
+              "suma": ["esp.pc.*"] },
+
+            { "id": "esp.pnc", "concepto": "PASIVO NO CORRIENTE", "rol": "titulo" },
+            { "id": "esp.pnc.proveedores", "concepto": "Proveedores de bienes y servicios", "refs": ["nota:proveedores"] },
+            { "id": "esp.pnc.prestamos", "concepto": "Préstamos y otros pasivos financieros", "refs": ["nota:prestamos"] },
+            { "id": "esp.pnc.deudas_fiscales", "concepto": "Deudas fiscales", "refs": ["nota:deudas_fiscales"] },
+            { "id": "esp.pnc.deudas_laborales", "concepto": "Deudas laborales y previsionales", "refs": ["nota:deudas_laborales"] },
+            { "id": "esp.pnc.deudas_especie", "concepto": "Deudas en especie", "refs": ["nota:deudas_especie"] },
+            { "id": "esp.pnc.deudas_partes_relacionadas", "concepto": "Deudas con partes relacionadas", "refs": ["nota:deudas_partes_relacionadas"] },
+            { "id": "esp.pnc.otras_deudas", "concepto": "Otras deudas", "refs": ["nota:otras_deudas"] },
+            { "id": "esp.pnc.subsidios", "concepto": "Subsidios y otras ayudas gubernamentales", "refs": ["nota:subsidios"] },
+            { "id": "esp.pnc.impuesto_diferido", "concepto": "Pasivo neto por impuesto diferido", "refs": ["nota:impuesto_ganancias"] },
+            { "id": "esp.pnc.previsiones", "concepto": "Previsiones", "refs": ["nota:previsiones", "anexo:previsiones"] },
+            { "id": "esp.pnc.total", "concepto": "Total del pasivo no corriente", "rol": "subtotal", "siempre": true,
+              "suma": ["esp.pnc.*"] },
+
+            { "id": "esp.pasivo.total", "concepto": "TOTAL DEL PASIVO", "rol": "total", "siempre": true,
+              "suma": ["esp.pc.total", "esp.pnc.total"] },
+
+            { "id": "esp.pn", "concepto": "PATRIMONIO NETO (según estado correspondiente)", "rol": "total", "siempre": true,
+              "vinculo": "eepn.cierre.total" },
+
+            { "id": "esp.pasivo_pn.total", "concepto": "Total del pasivo y patrimonio neto", "rol": "total", "siempre": true,
+              "suma": ["esp.pasivo.total", "esp.pn"] }
+          ]
+        }
+      ]
+    },
+
+    "er": {
+      "titulo": "ESTADO DE RESULTADOS",
+      "orientacion": "vertical",
+      "columnas": ["actual", "anterior"],
+      "lineas": [
+        { "id": "er.ingresos", "concepto": "Ingresos netos por la venta de bienes y prestación de servicios", "refs": ["nota:ingresos"] },
+        { "id": "er.costo_ventas", "concepto": "Costo de los bienes vendidos y servicios prestados", "refs": ["nota:costo_ventas", "anexo:costo_ventas"], "signo": -1 },
+        { "id": "er.ganancia_bruta", "concepto": "Ganancia (pérdida) bruta", "rol": "subtotal",
+          "suma": ["er.ingresos", "er.costo_ventas"] },
+
+        { "id": "er.gastos_comercializacion", "concepto": "Gastos de comercialización", "refs": ["anexo:gastos_naturaleza"], "signo": -1 },
+        { "id": "er.gastos_administracion", "concepto": "Gastos de administración", "refs": ["anexo:gastos_naturaleza"], "signo": -1 },
+        { "id": "er.otros_gastos_operativos", "concepto": "Otros gastos operativos", "refs": ["anexo:gastos_naturaleza"], "signo": -1 },
+        { "id": "er.cambios_vr_propiedades_inversion", "concepto": "Cambios en el valor razonable de propiedades de inversión", "refs": ["anexo:propiedades_inversion"] },
+        { "id": "er.desvalorizaciones", "concepto": "Pérdidas por desvalorización (reversión de pérdidas por desvalorización)", "refs": ["nota:desvalorizaciones"] },
+        { "id": "er.resultado_operaciones", "concepto": "Resultado de las operaciones", "rol": "subtotal",
+          "suma": ["er.ganancia_bruta", "er.gastos_comercializacion", "er.gastos_administracion", "er.otros_gastos_operativos", "er.cambios_vr_propiedades_inversion", "er.desvalorizaciones"] },
+
+        { "id": "er.rfyt", "concepto": "Otros resultados financieros y por tenencia (incluyendo el resultado por los cambios en el poder adquisitivo de la moneda)", "refs": ["nota:rfyt"] },
+        { "id": "er.otros_ingresos", "concepto": "Otros ingresos", "refs": ["nota:otros_ingresos_egresos"] },
+        { "id": "er.otros_egresos", "concepto": "Otros egresos", "refs": ["nota:otros_ingresos_egresos"], "signo": -1 },
+        { "id": "er.antes_impuesto", "concepto": "Ganancia (pérdida) antes del impuesto a las ganancias de operaciones que continúan", "rol": "subtotal", "siempre": true,
+          "suma": ["er.resultado_operaciones", "er.rfyt", "er.otros_ingresos", "er.otros_egresos"] },
+
+        { "id": "er.impuesto_ganancias", "concepto": "Impuesto a las ganancias", "refs": ["nota:impuesto_ganancias"], "signo": -1 },
+        { "id": "er.operaciones_continuan", "concepto": "Ganancia (pérdida) de las operaciones que continúan", "rol": "subtotal",
+          "suma": ["er.antes_impuesto", "er.impuesto_ganancias"] },
+
+        { "id": "er.discontinuadas", "concepto": "Resultado por actividades u operaciones discontinuadas (o en discontinuación)", "refs": ["nota:discontinuadas"] },
+        { "id": "er.resultado_ejercicio", "concepto": "Ganancia (pérdida) del ejercicio", "rol": "total", "siempre": true,
+          "suma": ["er.operaciones_continuan", "er.discontinuadas"] }
+      ]
+    },
+
+    "eepn": {
+      "titulo": "ESTADO DE EVOLUCIÓN DEL PATRIMONIO NETO",
+      "orientacion": "apaisada",
+      "variante": "comparativo_en_una_columna",
+      "columnas": [
+        { "id": "capital_suscripto", "grupo": "Aportes de los propietarios", "titulo": "Capital suscripto" },
+        { "id": "ajuste_capital", "grupo": "Aportes de los propietarios", "titulo": "Ajuste del capital" },
+        { "id": "aportes_irrevocables", "grupo": "Aportes de los propietarios", "titulo": "Aportes irrevocables" },
+        { "id": "primas_emision", "grupo": "Aportes de los propietarios", "titulo": "Primas de emisión" },
+        { "id": "aportes_total", "grupo": "Aportes de los propietarios", "titulo": "Total", "rol": "subtotal",
+          "suma": ["capital_suscripto", "ajuste_capital", "aportes_irrevocables", "primas_emision"] },
+        { "id": "reserva_legal", "grupo": "Resultados acumulados", "titulo": "Ganancias reservadas / Reserva legal" },
+        { "id": "otras_reservas", "grupo": "Resultados acumulados", "titulo": "Ganancias reservadas / Otras reservas" },
+        { "id": "resultados_no_asignados", "grupo": "Resultados acumulados", "titulo": "Resultados no asignados" },
+        { "id": "resultados_diferidos", "grupo": "Resultados acumulados", "titulo": "Resultados diferidos" },
+        { "id": "acumulados_total", "grupo": "Resultados acumulados", "titulo": "Total", "rol": "subtotal",
+          "suma": ["reserva_legal", "otras_reservas", "resultados_no_asignados", "resultados_diferidos"] },
+        { "id": "total_actual", "grupo": "Totales", "titulo": "Actual", "rol": "total",
+          "suma": ["aportes_total", "acumulados_total"] },
+        { "id": "total_anterior", "grupo": "Totales", "titulo": "Comparativo", "rol": "total" }
+      ],
+      "filas": [
+        { "id": "eepn.inicio", "concepto": "Saldos al inicio del ejercicio", "rol": "apertura", "siempre": true },
+        { "id": "eepn.modificacion", "concepto": "Modificación de saldos al inicio del ejercicio", "refs": ["nota:modificacion_ejercicios_anteriores"] },
+        { "id": "eepn.inicio_modificado", "concepto": "Saldos al inicio del ejercicio modificados", "rol": "subtotal", "siempre": true,
+          "suma": ["eepn.inicio", "eepn.modificacion"] },
+        { "id": "eepn.suscripcion_capital", "concepto": "Suscripción de capital social", "aprobacion": true },
+        { "id": "eepn.distribucion", "concepto": "Distribución de resultados no asignados", "aprobacion": true, "rol": "titulo" },
+        { "id": "eepn.distribucion.reservas", "concepto": "a Reserva legal / Otras reservas" },
+        { "id": "eepn.distribucion.dividendos_efectivo", "concepto": "a Dividendos en efectivo" },
+        { "id": "eepn.distribucion.dividendos_acciones", "concepto": "a Dividendos en acciones" },
+        { "id": "eepn.resultado_ejercicio", "concepto": "Ganancia (pérdida) del ejercicio", "siempre": true,
+          "vinculo": "er.resultado_ejercicio", "columna": "resultados_no_asignados" },
+        { "id": "eepn.cierre", "concepto": "Saldos al cierre del ejercicio", "rol": "total", "siempre": true,
+          "suma": ["eepn.inicio_modificado", "eepn.suscripcion_capital", "eepn.distribucion.*", "eepn.resultado_ejercicio"] }
+      ]
+    },
+
+    "efe": {
+      "titulo": "ESTADO DE FLUJO DE EFECTIVO",
+      "subtitulo": "(Método indirecto)",
+      "orientacion": "vertical",
+      "columnas": ["actual", "anterior"],
+      "lineas": [
+        { "id": "efe.variacion", "concepto": "VARIACIÓN NETA DEL EFECTIVO", "rol": "titulo" },
+        { "id": "efe.inicio", "concepto": "Efectivo al inicio del ejercicio", "siempre": true, "vinculo": "esp.efectivo.anterior" },
+        { "id": "efe.modificacion", "concepto": "Modificación de ejercicios anteriores", "refs": ["nota:modificacion_ejercicios_anteriores"] },
+        { "id": "efe.inicio_modificado", "concepto": "Efectivo modificado al inicio del ejercicio", "rol": "subtotal", "siempre": true,
+          "suma": ["efe.inicio", "efe.modificacion"] },
+        { "id": "efe.cierre", "concepto": "Efectivo al cierre del ejercicio", "siempre": true, "vinculo": "esp.efectivo.actual" },
+        { "id": "efe.aumento", "concepto": "Aumento (disminución) neto(a) del efectivo", "rol": "total", "siempre": true,
+          "resta": ["efe.cierre", "efe.inicio_modificado"] },
+
+        { "id": "efe.causas", "concepto": "CAUSAS DE LAS VARIACIONES DEL EFECTIVO", "rol": "titulo" },
+
+        { "id": "efe.op", "concepto": "ACTIVIDADES OPERATIVAS", "rol": "titulo" },
+        { "id": "efe.op.resultado", "concepto": "Ganancia (pérdida) ordinaria del ejercicio antes del impuesto a las ganancias", "siempre": true, "vinculo": "er.antes_impuesto" },
+        { "id": "efe.op.impuesto", "concepto": "Impuesto a las ganancias devengado en el ejercicio", "vinculo": "er.impuesto_ganancias" },
+        { "id": "efe.op.ajustes", "concepto": "Ajustes para arribar al flujo neto de efectivo por las actividades operativas", "rol": "titulo" },
+        { "id": "efe.op.ajustes.depreciaciones", "concepto": "Depreciación de bienes de uso", "vinculo": "anexo.bienes_uso.depreciacion_ejercicio" },
+        { "id": "efe.op.ajustes.amortizaciones", "concepto": "Amortización de activos intangibles", "vinculo": "anexo.intangibles.amortizacion_ejercicio" },
+        { "id": "efe.op.ajustes.previsiones", "concepto": "Constitución (recupero) de previsiones", "vinculo": "anexo.previsiones.neto_ejercicio" },
+        { "id": "efe.op.ajustes.resultados_financieros", "concepto": "Resultados financieros y por tenencia que no generaron movimiento de efectivo" },
+        { "id": "efe.op.variaciones", "concepto": "Variaciones de los activos y pasivos operativos", "rol": "titulo" },
+        { "id": "efe.op.var.creditos_clientes", "concepto": "(Aumento) disminución en cuentas por cobrar a clientes", "derivado_de": "esp.*.ctas_cobrar_clientes_*" },
+        { "id": "efe.op.var.otros_creditos", "concepto": "(Aumento) disminución en otras cuentas por cobrar", "derivado_de": "esp.*.otras_ctas_cobrar_*|esp.*.creditos_*" },
+        { "id": "efe.op.var.bienes_cambio", "concepto": "(Aumento) disminución en bienes de cambio", "derivado_de": "esp.*.bienes_cambio" },
+        { "id": "efe.op.var.proveedores", "concepto": "Aumento (disminución) en proveedores de bienes y servicios", "derivado_de": "esp.*.proveedores" },
+        { "id": "efe.op.var.deudas_laborales", "concepto": "Aumento (disminución) en deudas laborales y previsionales", "derivado_de": "esp.*.deudas_laborales" },
+        { "id": "efe.op.var.deudas_fiscales", "concepto": "Aumento (disminución) en deudas fiscales", "derivado_de": "esp.*.deudas_fiscales" },
+        { "id": "efe.op.var.prestamos", "concepto": "Aumento (disminución) en préstamos y otros pasivos financieros", "derivado_de": "esp.*.prestamos" },
+        { "id": "efe.op.var.otras_deudas", "concepto": "Aumento (disminución) en otras deudas", "derivado_de": "esp.*.otras_deudas" },
+        { "id": "efe.op.total", "concepto": "Flujo neto de efectivo generado por (aplicado en) actividades operativas", "rol": "subtotal", "siempre": true,
+          "suma": ["efe.op.resultado", "efe.op.impuesto", "efe.op.ajustes.*", "efe.op.var.*"] },
+
+        { "id": "efe.inv", "concepto": "ACTIVIDADES DE INVERSIÓN", "rol": "titulo" },
+        { "id": "efe.inv.bienes_uso", "concepto": "Pagos por compra de bienes de uso", "derivado_de": "anexo.bienes_uso.altas", "signo": -1 },
+        { "id": "efe.inv.bienes_uso_bajas", "concepto": "Cobros por venta de bienes de uso" },
+        { "id": "efe.inv.intangibles", "concepto": "Pagos por incorporación de activos intangibles", "derivado_de": "anexo.intangibles.altas", "signo": -1 },
+        { "id": "efe.inv.inversiones", "concepto": "Pagos (cobros) por inversiones" },
+        { "id": "efe.inv.total", "concepto": "Flujo neto de efectivo generado por (aplicado en) actividades de inversión", "rol": "subtotal", "siempre": true,
+          "suma": ["efe.inv.*"] },
+
+        { "id": "efe.fin", "concepto": "ACTIVIDADES DE FINANCIACIÓN", "rol": "titulo" },
+        { "id": "efe.fin.aportes", "concepto": "Aportes de los propietarios", "derivado_de": "eepn.suscripcion_capital" },
+        { "id": "efe.fin.dividendos", "concepto": "Dividendos pagados", "derivado_de": "eepn.distribucion.dividendos_efectivo", "signo": -1 },
+        { "id": "efe.fin.prestamos_tomados", "concepto": "Préstamos obtenidos" },
+        { "id": "efe.fin.prestamos_cancelados", "concepto": "Cancelación de préstamos", "signo": -1 },
+        { "id": "efe.fin.total", "concepto": "Flujo neto de efectivo generado por (aplicado en) actividades de financiación", "rol": "subtotal", "siempre": true,
+          "suma": ["efe.fin.*"] },
+
+        { "id": "efe.total", "concepto": "Aumento (disminución) neto(a) del efectivo", "rol": "total", "siempre": true,
+          "suma": ["efe.op.total", "efe.inv.total", "efe.fin.total"],
+          "control": "C07" }
+      ]
+    }
+  },
+
+  "anexos": [
+    { "id": "moneda_extranjera", "numero_romano": "I", "titulo": "ACTIVOS Y PASIVOS EN MONEDA EXTRANJERA" },
+    { "id": "vencimientos", "numero_romano": "II", "titulo": "ACTIVOS Y PASIVOS POR VENCIMIENTO" },
+    { "id": "bienes_uso", "numero_romano": "III", "titulo": "BIENES DE USO" },
+    { "id": "propiedades_inversion", "numero_romano": "IV", "titulo": "PROPIEDADES DE INVERSIÓN" },
+    { "id": "intangibles", "numero_romano": "V", "titulo": "ACTIVOS INTANGIBLES" },
+    { "id": "previsiones", "numero_romano": "VI", "titulo": "PREVISIONES" },
+    { "id": "costo_ventas", "numero_romano": "VII", "titulo": "COSTO DE LOS BIENES VENDIDOS Y SERVICIOS PRESTADOS" },
+    { "id": "gastos_naturaleza", "numero_romano": "VIII", "titulo": "COSTO DE PRODUCCIÓN Y GASTOS CLASIFICADOS POR SU NATURALEZA" },
+    { "id": "partes_relacionadas", "numero_romano": "IX", "titulo": "TRANSACCIONES Y SALDOS DE PARTES RELACIONADAS" }
+  ],
+
+  "notas": [
+    { "id": "bases_preparacion", "grupo": "generales", "titulo": "Bases de preparación de los estados contables" },
+    { "id": "clasificacion_entidad", "grupo": "generales", "titulo": "Clasificación de la entidad" },
+    { "id": "unidad_medida", "grupo": "generales", "titulo": "Unidad de medida" },
+    { "id": "uso_estimaciones", "grupo": "generales", "titulo": "Uso de estimaciones" },
+    { "id": "comparabilidad", "grupo": "generales", "titulo": "Circunstancias que afectan la comparabilidad" },
+    { "id": "modificacion_ejercicios_anteriores", "grupo": "generales", "titulo": "Modificación a la información de ejercicios anteriores" },
+    { "id": "empresa_en_marcha", "grupo": "generales", "titulo": "Empresa en marcha" },
+    { "id": "informacion_general", "grupo": "generales", "titulo": "Información general" },
+
+    { "id": "caja_bancos", "grupo": "esp", "titulo": "Caja y bancos" },
+    { "id": "inversiones_financieras", "grupo": "esp", "titulo": "Inversiones financieras" },
+    { "id": "ctas_cobrar_clientes_moneda", "grupo": "esp", "titulo": "Cuentas por cobrar a clientes en moneda" },
+    { "id": "ctas_cobrar_clientes_especie", "grupo": "esp", "titulo": "Cuentas por cobrar a clientes en especie" },
+    { "id": "creditos_impositivos", "grupo": "esp", "titulo": "Créditos impositivos" },
+    { "id": "creditos_partes_relacionadas", "grupo": "esp", "titulo": "Créditos con partes relacionadas" },
+    { "id": "otras_ctas_cobrar_moneda", "grupo": "esp", "titulo": "Otras cuentas por cobrar en moneda" },
+    { "id": "otras_ctas_cobrar_especie", "grupo": "esp", "titulo": "Otras cuentas por cobrar en especie" },
+    { "id": "bienes_cambio", "grupo": "esp", "titulo": "Bienes de cambio" },
+    { "id": "bienes_uso", "grupo": "esp", "titulo": "Bienes de uso" },
+    { "id": "propiedades_inversion", "grupo": "esp", "titulo": "Propiedades de inversión" },
+    { "id": "otras_inversiones", "grupo": "esp", "titulo": "Otras inversiones" },
+    { "id": "intangibles", "grupo": "esp", "titulo": "Activos intangibles" },
+    { "id": "otros_activos", "grupo": "esp", "titulo": "Otros activos" },
+    { "id": "proveedores", "grupo": "esp", "titulo": "Proveedores de bienes y servicios" },
+    { "id": "prestamos", "grupo": "esp", "titulo": "Préstamos y otros pasivos financieros" },
+    { "id": "deudas_fiscales", "grupo": "esp", "titulo": "Deudas fiscales" },
+    { "id": "deudas_laborales", "grupo": "esp", "titulo": "Deudas laborales y previsionales" },
+    { "id": "deudas_especie", "grupo": "esp", "titulo": "Deudas en especie" },
+    { "id": "deudas_partes_relacionadas", "grupo": "esp", "titulo": "Deudas con partes relacionadas" },
+    { "id": "otras_deudas", "grupo": "esp", "titulo": "Otras deudas" },
+    { "id": "subsidios", "grupo": "esp", "titulo": "Subsidios y otras ayudas gubernamentales" },
+    { "id": "previsiones", "grupo": "esp", "titulo": "Previsiones" },
+    { "id": "arrendamientos", "grupo": "esp", "titulo": "Arrendamientos" },
+    { "id": "gravamenes_sobre_activos", "grupo": "esp", "titulo": "Gravámenes sobre activos" },
+
+    { "id": "ingresos", "grupo": "er", "titulo": "Ingresos netos por la venta de bienes y prestación de servicios" },
+    { "id": "costo_ventas", "grupo": "er", "titulo": "Costo de los bienes vendidos y servicios prestados" },
+    { "id": "otros_ingresos_egresos", "grupo": "er", "titulo": "Otros ingresos y otros egresos" },
+    { "id": "rfyt", "grupo": "er", "titulo": "Otros resultados financieros y por tenencia" },
+    { "id": "desvalorizaciones", "grupo": "er", "titulo": "Pérdidas por desvalorización" },
+    { "id": "discontinuadas", "grupo": "er", "titulo": "Actividades u operaciones discontinuadas" },
+
+    { "id": "impuesto_ganancias", "grupo": "otras", "titulo": "Impuesto a las ganancias" },
+    { "id": "hechos_posteriores", "grupo": "otras", "titulo": "Hechos posteriores al cierre" },
+    { "id": "restricciones_distribucion", "grupo": "otras", "titulo": "Restricciones a la distribución de utilidades" }
+  ]
+}

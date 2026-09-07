@@ -1,0 +1,89 @@
+{
+ "version": "1.0",
+ "nota": "Catálogo de textos. Los huecos van entre llaves y los completa el render con los datos del ente y del ejercicio. Ningún texto se redacta de cero cada año.",
+ "notas": {
+  "rt54/bases": [
+   "Los presentes estados contables han sido preparados de conformidad con la Resolución Técnica N° 54, emitida por la Federación Argentina de Consejos Profesionales de Ciencias Económicas (FACPCE), tal y como fue aprobada por el Consejo Profesional de Ciencias Económicas de {consejo}."
+  ],
+  "rt54/clasificacion": [
+   "De acuerdo con lo establecido por la referida norma, la Sociedad reviste el carácter de {clasificacion}."
+  ],
+  "rt54/unidad-medida": [
+   "@Información general",
+   "Los presentes estados contables han sido preparados en moneda homogénea (pesos del {cierre_largo}), reconociendo en forma integral los efectos de la inflación de conformidad con lo establecido en la RT 54, en virtud de haberse determinado la existencia de un contexto de alta inflación.",
+   "Con fines comparativos, se incluyen cifras patrimoniales al {cierre_anterior_corto} y de resultados, de evolución del patrimonio neto y de flujos de efectivo por el ejercicio económico finalizado en esa fecha. Dichas cifras han sido expresadas en moneda de cierre del presente ejercicio, de acuerdo con lo señalado en el párrafo siguiente, a fin de permitir su comparabilidad y sin que el ajuste practicado modifique las decisiones tomadas con base en la información contable correspondiente al ejercicio comparativo.",
+   "@Descripción del proceso de expresión a moneda de cierre",
+   "A efectos de expresar las diferentes partidas y rubros que integran los estados contables, la Entidad deberá, entre otras cosas:",
+   "· Determinar el momento de origen de las partidas, o el momento de su último ajuste, según corresponda.",
+   "· Calcular los coeficientes de ajuste aplicables. A tal efecto se utiliza la serie de índices definida por la FACPCE en la Resolución JG N° 539/2018 y sus modificatorias. La variación del índice utilizado para el ajuste de los estados contables ha sido del {variacion_actual} en el ejercicio económico finalizado el {cierre_corto} y del {variacion_anterior} en el ejercicio comparativo.",
+   "· Aplicar los coeficientes de ajuste a los importes de las partidas anticuadas para expresarlas en moneda de cierre. A este respecto, las partidas que deberán ajustarse serán aquellas que no estén expresadas en moneda de cierre.",
+   "La aplicación del proceso de ajuste por inflación establecido en la RT 54 permite el reconocimiento de las ganancias y pérdidas derivadas del mantenimiento de activos y pasivos expuestos a los cambios en el poder adquisitivo de la moneda a lo largo del ejercicio. Tales ganancias y pérdidas se exponen en el rubro «Resultados Financieros y por Tenencia, incluyendo RECPAM» del estado de resultados."
+  ],
+  "estudio/criterios-valuacion": [
+   "Los criterios de valuación utilizados para la preparación de los estados contables responden a los principios establecidos en la RT 54 de la FACPCE. Los bienes de uso en su conjunto no superan su valor recuperable.",
+   "Los bienes de uso se amortizan por el método de línea recta, aplicando la tasa anual completa en el ejercicio de incorporación."
+  ],
+  "rt54/composicion": [],
+  "rt54/impuesto": [
+   "El cargo por impuesto a las ganancias del ejercicio se determinó aplicando la alícuota vigente sobre el resultado impositivo, computando el ajuste por inflación impositivo previsto en la Ley de Impuesto a las Ganancias."
+  ],
+  "estudio/remite-anexo": [
+   "La composición del rubro y su movimiento durante el ejercicio se exponen en el {remite}."
+  ]
+ },
+ "informe_auditoria": {
+  "rt37/favorable-sin-salvedades": {
+   "titulo": "INFORME DEL AUDITOR INDEPENDIENTE",
+   "destinatario": [
+    "{tratamiento_firmante} de",
+    "{denominacion}",
+    "CUIT N° {cuit}",
+    "Domicilio legal: {domicilio_legal}"
+   ],
+   "secciones": [
+    {
+     "titulo": "Opinión",
+     "parrafos": [
+      "He auditado los estados contables adjuntos de {denominacion}, que comprenden el estado de situación patrimonial al {cierre_largo}, el estado de resultados, el estado de evolución del patrimonio neto y el estado de flujo de efectivo correspondientes al ejercicio económico terminado en dicha fecha, así como un resumen de las políticas contables significativas y otra información explicativa incluidas en las notas {notas_rango} y los anexos {anexos_lista}.",
+      "Las cifras y otra información correspondientes al ejercicio económico terminado el {cierre_anterior_largo} son parte integrante de los estados contables mencionados precedentemente y se las presenta con el propósito de que se interpreten exclusivamente en relación con las cifras y con la información del ejercicio económico actual.",
+      "En mi opinión, los estados contables adjuntos presentan razonablemente, en todos sus aspectos significativos, la situación patrimonial de {denominacion} al {cierre_largo}, así como sus resultados, la evolución de su patrimonio neto y el flujo de su efectivo, correspondiente al ejercicio económico terminado en esa fecha, de conformidad con las normas contables profesionales argentinas."
+     ]
+    },
+    {
+     "titulo": "Fundamento de la opinión",
+     "parrafos": [
+      "He llevado a cabo mi auditoría de conformidad con las normas de auditoría establecidas en la sección III.A de la Resolución Técnica N° 37 de la Federación Argentina de Consejos Profesionales de Ciencias Económicas (FACPCE). Mis responsabilidades de acuerdo con dichas normas se describen más adelante en la sección \"Responsabilidades del auditor en relación con la auditoría de los estados contables\" de mi informe. Soy independiente de {denominacion} y he cumplido las demás responsabilidades de ética de conformidad con los requerimientos del Código de Ética del Consejo Profesional de Ciencias Económicas de {consejo} y de la Resolución Técnica N° 37 de la FACPCE. Considero que los elementos de juicio que he obtenido proporcionan una base suficiente y adecuada para mi opinión."
+     ]
+    },
+    {
+     "titulo": "Responsabilidad de la dirección en relación con los estados contables",
+     "parrafos": [
+      "La dirección es responsable de la preparación y presentación razonable de los estados contables adjuntos de conformidad con las normas contables profesionales argentinas, y del control interno que la dirección considere necesario para permitir la preparación de estados contables libres de incorrecciones significativas."
+     ]
+    },
+    {
+     "titulo": "Responsabilidad del auditor",
+     "parrafos": [
+      "Mis objetivos son obtener una seguridad razonable de que los estados contables en su conjunto están libres de incorrección significativa, debida a fraude o error, y emitir un informe de auditoría que contenga mi opinión. Seguridad razonable es un alto grado de seguridad, pero no garantiza que una auditoría realizada de conformidad con la Resolución Técnica N° 37 de la FACPCE siempre detecte una incorrección significativa cuando exista. Las incorrecciones pueden deberse a fraude o error y se consideran significativas si, individualmente o de forma agregada, puede preverse razonablemente que influyan en las decisiones económicas que los usuarios toman basándose en los estados contables.",
+      "Como parte de una auditoría de conformidad con la Resolución Técnica N° 37 de la FACPCE, aplico mi juicio profesional y mantengo una actitud de escepticismo profesional durante toda la auditoría. También:",
+      "a) Identifico y evalúo los riesgos de incorrección significativa en los estados contables, diseño y aplico procedimientos de auditoría para responder a dichos riesgos y obtengo elementos de juicio suficientes y adecuados para proporcionar una base para mi opinión.",
+      "b) Obtengo conocimiento del control interno relevante para la auditoría con el fin de diseñar procedimientos de auditoría que sean apropiados en función de las circunstancias y no con la finalidad de expresar una opinión sobre la eficacia del control interno de la Sociedad.",
+      "c) Evalúo si las políticas contables aplicadas son adecuadas, así como la razonabilidad de las estimaciones contables y la correspondiente información revelada por la Dirección de {denominacion}.",
+      "d) Concluyo sobre lo adecuado de la utilización por la Dirección de {denominacion} del principio contable de empresa en funcionamiento y, basándome en los elementos de juicio obtenidos, concluyo sobre si existe o no una incertidumbre significativa relacionada con hechos o con condiciones que pueden generar dudas importantes sobre la capacidad de {denominacion} para continuar como empresa en funcionamiento. Si concluyo que existe una incertidumbre significativa, se requiere que llame la atención en mi informe de auditoría sobre la información expuesta en los estados contables o, si dicha información expuesta no es adecuada, que exprese una opinión modificada. Mis conclusiones se basan en los elementos de juicio obtenidos hasta la fecha de mi informe de auditoría. Sin embargo, hechos o condiciones futuros pueden ser causa de que la Sociedad deje de ser una empresa en funcionamiento.",
+      "e) Evalúo la presentación general, la estructura y el contenido de los estados contables, incluida la información revelada, y si los estados contables representan las transacciones y hechos subyacentes de un modo que logren una presentación razonable.",
+      "Me comunico con la Dirección de {denominacion} en relación con, entre otras cuestiones, la estrategia general de la auditoría y los hallazgos significativos de la auditoría, así como cualquier deficiencia significativa del control interno identificada en el transcurso de la auditoría."
+     ]
+    }
+   ]
+  }
+ },
+ "otros_requerimientos": {
+  "titulo": "Informe sobre otros requerimientos legales y reglamentarios",
+  "parrafos": {
+   "sipa_sin_deuda": "a) Según surge de los registros contables de la entidad, no existe pasivo devengado al {cierre_largo} a favor del Sistema Integrado Previsional Argentino en concepto de aportes y contribuciones previsionales a esa fecha.",
+   "sipa_con_deuda": "a) Según surge de los registros contables de la entidad, al {cierre_largo} existe un pasivo devengado a favor del Sistema Integrado Previsional Argentino en concepto de aportes y contribuciones previsionales de {deuda_previsional}, no siendo exigible a esa fecha.",
+   "libros_no_transcriptos": "b) Los presentes estados contables cerrados al {cierre_largo} surgen de registraciones contables, las que no han sido transcriptas a los libros legales pertinentes a la fecha de la presente auditoría."
+  },
+  "nota": "El apartado a) lo elige la aplicación: si no hay deuda previsional al cierre va el texto sin deuda, y si la hay va el que la declara con su importe. El apartado b) es siempre el mismo."
+ }
+}

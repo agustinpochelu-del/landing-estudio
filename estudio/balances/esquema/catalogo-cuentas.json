@@ -1,0 +1,643 @@
+{
+ "version": "2026-09-02",
+ "nota": "El reservorio de cuentas del estudio. Cuando una cuenta del papel de trabajo está acá, ya se sabe a qué línea del balance va, con qué texto sale en la nota y qué papel juega en los asientos: no hay que volver a decidirlo por cada ente ni por cada ejercicio. Un ente puede apartarse en su propio mapeo-cuentas.json, que es el que manda.",
+ "nota_nombres": "«Crédito» se reserva para el activo. Lo que un banco o un tercero nos presta es pasivo y se llama «Préstamos», que además es como lo nombra la RT 54: «Préstamos y otros pasivos financieros». Decisión de Agustín del 02/09/2026, para que el nombre no dependa de mirar el rubro.",
+ "equivalencias": [
+  {
+   "rubro": "Activo",
+   "subrubro": "1 - Corriente",
+   "clasificacion": "4 - Inversiones",
+   "linea": "esp.ac.inversiones_financieras"
+  },
+  {
+   "rubro": "Activo",
+   "subrubro": "2 - No Corriente",
+   "clasificacion": "1 - Bs Us",
+   "linea": "esp.anc.bienes_uso"
+  },
+  {
+   "rubro": "Activo",
+   "subrubro": "2 - No Corriente",
+   "clasificacion": "3 - Otros Activos",
+   "linea": "esp.anc.intangibles"
+  },
+  {
+   "rubro": "Pasivo",
+   "subrubro": "1 - Corriente",
+   "clasificacion": "2 - Deudas Fiscales",
+   "linea": "esp.pc.deudas_fiscales"
+  },
+  {
+   "rubro": "Pasivo",
+   "subrubro": "1 - Corriente",
+   "clasificacion": "3 - Otras Deudas",
+   "linea": "esp.pc.deudas_partes_relacionadas"
+  },
+  {
+   "rubro": "PN",
+   "subrubro": "2 - Res NA",
+   "clasificacion": "2 - Res NA",
+   "linea": "eepn.resultados_no_asignados"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "1 - Positivos",
+   "clasificacion": "1 - Ventas",
+   "linea": "er.ingresos.servicios"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "1 - Positivos",
+   "clasificacion": "2 - Financieros",
+   "linea": "er.rfyt"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "1 - Positivos",
+   "clasificacion": "3 - Otros Ingresos",
+   "linea": "er.otros_ingresos"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "2 - Negativos",
+   "clasificacion": "3 - Imp y Tasas",
+   "linea": "anexo.gastos_naturaleza",
+   "columna": "fiscales"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "1 - Positivos",
+   "clasificacion": "4 - Ajuste",
+   "linea": "er.rfyt"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "2 - Negativos",
+   "clasificacion": "4 - Ajuste",
+   "linea": "er.rfyt"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "1 - Positivos",
+   "clasificacion": "4 - Ajuste +",
+   "linea": "er.rfyt"
+  },
+  {
+   "rubro": "Resultado",
+   "subrubro": "2 - Negativos",
+   "clasificacion": "4 - Ajuste -",
+   "linea": "er.rfyt"
+  }
+ ],
+ "nota_equivalencias": "La clasificación del papel de trabajo llega hasta el rubro; la línea de la RT 54 es más fina. Estas son las combinaciones que la determinan solas. Las que no están son ambiguas: esas cuentas se resuelven por nombre, contra `cuentas`.",
+ "ambiguas": [
+  {
+   "clasificacion": "Activo / 1 - Corriente / 1 - Disponibilidades",
+   "porque": "caja y bancos o inversiones financieras"
+  },
+  {
+   "clasificacion": "Activo / 1 - Corriente / 2 - Creditos",
+   "porque": "deudores por venta, créditos impositivos o créditos con partes relacionadas"
+  },
+  {
+   "clasificacion": "Pasivo / 1 - Corriente / 1 - Deudas Comerciales",
+   "porque": "proveedores u otras deudas"
+  },
+  {
+   "clasificacion": "PN / 1 - Capital / 1 - Capital",
+   "porque": "capital suscripto, ajuste del capital o aportes irrevocables"
+  },
+  {
+   "clasificacion": "Resultado / 2 - Negativos / 1 - Comerciales",
+   "porque": "la columna del anexo de gastos, o el impuesto a las ganancias"
+  },
+  {
+   "clasificacion": "Resultado / 2 - Negativos / 2 - Financieros",
+   "porque": "la columna financiera del anexo, o el resultado por exposición a la inflación"
+  }
+ ],
+ "compensaciones": {
+  "intereses resarcitorios": "Intereses cedidos"
+ },
+ "nota_compensaciones": "La exportación de compensaciones de ARCA dice a qué subconcepto se aplica el saldo, no a qué cuenta. Acá va la equivalencia. La clave es el subconcepto sin su número, en minúscula y sin acentos.",
+ "cuentas": {
+  "AAAA Equipos Informaticos": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Amortización acumulada equipos informáticos",
+   "anexo_rubro": "Equipos informáticos",
+   "anexo_campo": "amortizacion"
+  },
+  "AAAA Herramientas": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Amortización acumulada herramientas",
+   "anexo_rubro": "Herramientas",
+   "anexo_campo": "amortizacion"
+  },
+  "AAAA Muebles y Utiles": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Amortización acumulada muebles y útiles",
+   "anexo_rubro": "Muebles y útiles",
+   "anexo_campo": "amortizacion"
+  },
+  "AACC Embarcaciones": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Amortización acumulada embarcaciones",
+   "anexo_rubro": "Embarcaciones",
+   "anexo_campo": "amortizacion"
+  },
+  "AACC Herramientas": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Amortización acumulada herramientas",
+   "anexo_rubro": "Herramientas",
+   "anexo_campo": "amortizacion"
+  },
+  "Ajuste Capital": {
+   "linea": "eepn.ajuste_capital",
+   "rol": "ajuste_capital"
+  },
+  "Ajuste por Inflacion": {
+   "linea": "er.rfyt",
+   "concepto": "Resultado por cambios en el poder adquisitivo de la moneda",
+   "rol": "recpam"
+  },
+  "Amortizaciones": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Amortizaciones",
+   "columna": "comercializacion",
+   "rol": "amortizaciones_gasto"
+  },
+  "Anticipo Clientes": {
+   "linea": "esp.pc.otras_deudas",
+   "concepto": "Anticipos de clientes"
+  },
+  "Anticipo Director": {
+   "linea": "esp.ac.creditos_partes_relacionadas",
+   "concepto": "Anticipo al director",
+   "rol": "anticipo_honorarios"
+  },
+  "Anticipo Dividendos Socios": {
+   "linea": "esp.ac.creditos_partes_relacionadas",
+   "concepto": "Anticipo de dividendos a los socios"
+  },
+  "Anticipo Honorarios Directorio": {
+   "linea": "esp.ac.creditos_partes_relacionadas",
+   "concepto": "Anticipo de honorarios del directorio",
+   "rol": "anticipo_honorarios"
+  },
+  "Anticipo Impuesto a las Ganancias": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Anticipos del impuesto a las ganancias"
+  },
+  "Anticipos de Ganancias": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Anticipos del impuesto a las ganancias",
+   "rol": "anticipos_ganancias"
+  },
+  "Aportes Irrevocables": {
+   "linea": "eepn.aportes_irrevocables"
+  },
+  "AXI": {
+   "linea": "er.rfyt",
+   "concepto": "Resultado por cambios en el poder adquisitivo de la moneda",
+   "jubilada": "Reemplazada por RECPAM + y RECPAM - el 02/09/2026."
+  },
+  "AXI Negativo": {
+   "linea": "er.rfyt",
+   "concepto": "Resultado por cambios en el poder adquisitivo de la moneda",
+   "jubilada": "Renombrada «RECPAM -» el 02/09/2026."
+  },
+  "AXI Positivo": {
+   "linea": "er.rfyt",
+   "concepto": "Resultado por cambios en el poder adquisitivo de la moneda",
+   "jubilada": "Renombrada «RECPAM +» el 02/09/2026."
+  },
+  "Bco Santander Cta Cte": {
+   "linea": "esp.ac.caja_bancos",
+   "concepto": "Banco Santander cuenta corriente",
+   "rol": "banco"
+  },
+  "Capital": {
+   "linea": "eepn.capital_suscripto",
+   "rol": "capital"
+  },
+  "Capital Social": {
+   "linea": "eepn.capital_suscripto",
+   "rol": "capital"
+  },
+  "Comunicaciones": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Comunicaciones",
+   "columna": "administracion"
+  },
+  "comunicación": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Comunicaciones",
+   "columna": "administracion"
+  },
+  "Credito Fiscal": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Crédito fiscal IVA",
+   "rol": "credito_fiscal"
+  },
+  "Credito Fiscal IVA": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Crédito fiscal IVA",
+   "rol": "credito_fiscal"
+  },
+  "Credito Imp Ley 25413": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Crédito por impuesto sobre débitos y créditos",
+   "rol": "credito_ley_25413"
+  },
+  "Debito Fiscal": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Débito fiscal IVA",
+   "rol": "debito_fiscal"
+  },
+  "Debito fiscal IVA": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Débito fiscal IVA",
+   "rol": "debito_fiscal"
+  },
+  "Deudores por Venta": {
+   "linea": "esp.ac.ctas_cobrar_clientes_moneda",
+   "concepto": "Deudores por ventas",
+   "rol": "clientes"
+  },
+  "Embarcaciones": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Embarcaciones",
+   "anexo_rubro": "Embarcaciones",
+   "anexo_campo": "valor"
+  },
+  "Equipos Informaticos": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Equipos informáticos",
+   "anexo_rubro": "Equipos informáticos",
+   "anexo_campo": "valor"
+  },
+  "Fideicomiso Financiero": {
+   "linea": "esp.ac.inversiones_financieras",
+   "concepto": "Fideicomiso financiero"
+  },
+  "Fondo Comun de Inversion": {
+   "linea": "esp.ac.inversiones_financieras",
+   "concepto": "Fondo común de inversión"
+  },
+  "Gastos Bancarios": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Gastos bancarios",
+   "columna": "financieros"
+  },
+  "gastos varios": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Gastos varios",
+   "columna": "comercializacion"
+  },
+  "Herramientas": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Herramientas",
+   "anexo_rubro": "Herramientas",
+   "anexo_campo": "valor"
+  },
+  "Hon Diretor": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Honorarios del director",
+   "columna": "administracion"
+  },
+  "Honorairos Directorio a Pagar": {
+   "linea": "esp.pc.deudas_partes_relacionadas",
+   "concepto": "Honorarios del directorio a pagar",
+   "rol": "honorarios_a_pagar"
+  },
+  "Honorarios": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Honorarios profesionales",
+   "columna": "administracion"
+  },
+  "Honorarios Administrativos": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Honorarios administrativos",
+   "columna": "administracion"
+  },
+  "Honorarios Director": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Honorarios del director",
+   "columna": "administracion",
+   "rol": "honorarios_gasto"
+  },
+  "Honorarios Director a pagar": {
+   "linea": "esp.pc.deudas_partes_relacionadas",
+   "concepto": "Honorarios del director a pagar",
+   "rol": "honorarios_a_pagar"
+  },
+  "Honorarios Directorio": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Honorarios del directorio",
+   "columna": "administracion",
+   "rol": "honorarios_gasto"
+  },
+  "Honorarios Profesionales": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Honorarios profesionales",
+   "columna": "administracion"
+  },
+  "IIBB PM a Pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Ingresos brutos a pagar",
+   "rol": "iibb_a_pagar"
+  },
+  "IIBB R-": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Impuesto sobre los ingresos brutos",
+   "columna": "fiscales",
+   "rol": "iibb_gasto"
+  },
+  "impuesto a las Ganancias": {
+   "linea": "er.impuesto_ganancias",
+   "rol": "impuesto_gasto"
+  },
+  "Impuesto a las ganancias": {
+   "linea": "er.impuesto_ganancias",
+   "rol": "impuesto_gasto"
+  },
+  "Impuesto a las ganancias a pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Impuesto a las ganancias a pagar",
+   "rol": "ganancias_a_pagar"
+  },
+  "Impuesto a las Gs a pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Impuesto a las ganancias a pagar",
+   "rol": "ganancias_a_pagar"
+  },
+  "Impuesto ley 25.413": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Impuesto sobre débitos y créditos",
+   "columna": "fiscales",
+   "rol": "ley_25413_gasto"
+  },
+  "ingreso por ventas": {
+   "linea": "er.ingresos.servicios",
+   "concepto": "Ingresos por servicios",
+   "rol": "ventas"
+  },
+  "Ingresos Brutos": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Impuesto sobre los ingresos brutos",
+   "columna": "fiscales",
+   "rol": "iibb_gasto"
+  },
+  "Int no devengados": {
+   "linea": "esp.ac.ctas_cobrar_clientes_moneda",
+   "concepto": "Intereses no devengados"
+  },
+  "intereses": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Intereses cedidos",
+   "columna": "financieros"
+  },
+  "Intereses cedidos": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Intereses cedidos",
+   "columna": "financieros"
+  },
+  "Intereses Ganados": {
+   "linea": "er.rfyt",
+   "concepto": "Intereses ganados",
+   "rol": "resultado_inversiones"
+  },
+  "IVA a pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "IVA a pagar",
+   "rol": "iva_a_pagar"
+  },
+  "IVA a Pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "IVA a pagar",
+   "rol": "iva_a_pagar"
+  },
+  "mantenimiento equipos inf": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Mantenimiento de equipos informáticos",
+   "columna": "comercializacion"
+  },
+  "mantenimiento herram": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Mantenimiento de herramientas",
+   "columna": "comercializacion"
+  },
+  "Manual de Gestion": {
+   "linea": "esp.anc.intangibles",
+   "concepto": "Manual de gestión"
+  },
+  "MF a pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "MF a pagar"
+  },
+  "mpuesto a als Gs Saldo a F": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Saldo a favor del impuesto a las ganancias",
+   "rol": "ganancias_saldo_favor"
+  },
+  "Muebles y Utiles": {
+   "linea": "esp.anc.bienes_uso",
+   "concepto": "Muebles y útiles",
+   "anexo_rubro": "Muebles y útiles",
+   "anexo_campo": "valor"
+  },
+  "Otros Impuestos y Tasas": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Otros impuestos y tasas",
+   "columna": "fiscales"
+  },
+  "Otros Ingresos": {
+   "linea": "er.otros_ingresos",
+   "concepto": "Otros ingresos"
+  },
+  "Plazo Fijo": {
+   "linea": "esp.ac.inversiones_financieras",
+   "concepto": "Plazo fijo"
+  },
+  "Prestamo de Socio": {
+   "linea": "esp.pc.deudas_partes_relacionadas",
+   "concepto": "Préstamo del socio"
+  },
+  "Proveedores": {
+   "linea": "esp.pc.proveedores",
+   "concepto": "Proveedores",
+   "rol": "proveedores"
+  },
+  "Provicion Impuesto a las Ganancias": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Provisión impuesto a las ganancias",
+   "rol": "provision_ganancias"
+  },
+  "Provision Imp a las Ganancias": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "Provisión impuesto a las ganancias",
+   "rol": "provision_ganancias"
+  },
+  "Publicidad": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Publicidad",
+   "columna": "administracion"
+  },
+  "Resultados Acumulados": {
+   "linea": "eepn.resultados_no_asignados"
+  },
+  "Resultados no asignados": {
+   "linea": "eepn.resultados_no_asignados",
+   "rol": "resultados_acumulados"
+  },
+  "Retenciones de Ganancias": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Retenciones del impuesto a las ganancias",
+   "rol": "retenciones_ganancias"
+  },
+  "retenciones de IVA": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Retenciones de IVA",
+   "rol": "retenciones_iva"
+  },
+  "Retenciones ganancias": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Retenciones del impuesto a las ganancias",
+   "rol": "retenciones_ganancias"
+  },
+  "Retiro de socios": {
+   "linea": "esp.ac.creditos_partes_relacionadas",
+   "concepto": "Retiro de socios",
+   "rol": "contrapartida"
+  },
+  "Seguros pagados": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Seguros",
+   "columna": "comercializacion"
+  },
+  "SIFERE a Pagar": {
+   "linea": "esp.pc.deudas_fiscales",
+   "concepto": "SIFERE a pagar"
+  },
+  "SLD Ganancias": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Saldo a favor del impuesto a las ganancias"
+  },
+  "SLD IVA": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Saldo de libre disponibilidad de IVA",
+   "rol": "iva_libre_disponibilidad"
+  },
+  "tasas": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Tasas",
+   "columna": "fiscales",
+   "revisar": "En Mordor está en la columna de comercialización. Hace falta confirmar cuál es el criterio del estudio."
+  },
+  "Tasas": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Tasas",
+   "columna": "fiscales"
+  },
+  "Ventas": {
+   "linea": "er.ingresos.servicios",
+   "concepto": "Ingresos por servicios",
+   "rol": "ventas"
+  },
+  "viaticos": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Viáticos",
+   "columna": "comercializacion"
+  },
+  "RECPAM +": {
+   "linea": "er.rfyt",
+   "rol": "axi_positivo",
+   "concepto": "Resultado por cambios en el poder adquisitivo de la moneda"
+  },
+  "RECPAM -": {
+   "linea": "er.rfyt",
+   "rol": "axi_negativo",
+   "concepto": "Resultado por cambios en el poder adquisitivo de la moneda"
+  },
+  "Saldos a Imputar ARCA": {
+   "linea": "esp.ac.creditos_impositivos",
+   "concepto": "Saldos a imputar en ARCA",
+   "nota": "Crédito impositivo: el pago quedó a favor en ARCA, pendiente de imputación. Confirmado por Agustín el 02/09/2026."
+  },
+  "Prestamos": {
+   "linea": "esp.pc.prestamos",
+   "concepto": "Préstamos bancarios"
+  },
+  "Prestamos Bancarios": {
+   "linea": "esp.pc.prestamos",
+   "concepto": "Préstamos bancarios"
+  },
+  "Servicios Publicos": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Servicios públicos",
+   "columna": "comercializacion"
+  },
+  "Gastos Generales": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Gastos generales",
+   "columna": "comercializacion"
+  },
+  "Mantenimiento": {
+   "linea": "anexo.gastos_naturaleza",
+   "concepto": "Mantenimiento",
+   "columna": "comercializacion"
+  }
+ },
+ "nota_rubros_bancarios": "El extracto del banco viene con un rubro escrito a mano que dice la naturaleza de cada movimiento. Aca se dice contra que cuenta va: un nombre de rol si es una cuenta que todos los entes tienen, o el nombre de la cuenta. Un rubro con `ya_asentado` no se asienta desde el extracto porque ya entra por otra fuente: el banco no puede salir dos veces. Con `si_dice` un rubro se afina por lo que dice la descripcion del banco, que es lo que distingue una percepcion de un credito fiscal cuando las dos llegan con el mismo rubro. La clave se compara sin acentos, sin mayusculas y sin espacios de mas.",
+ "rubros_bancarios": {
+  "cobranza": {
+   "cuenta": "clientes"
+  },
+  "impuestos": {
+   "ya_asentado": "los volantes electronicos de pago, las cuotas de los planes de facilidades y la declaracion jurada de ingresos brutos"
+  },
+  "anticipo socio": {
+   "cuenta": "Anticipo Dividendos Socios"
+  },
+  "honorarios director": {
+   "cuenta": "anticipo_honorarios",
+   "nota": "Lo que se le paga al director mientras la asamblea no trate sus honorarios es un anticipo, no un gasto. El gasto se devenga aparte, contra la cuenta a pagar."
+  },
+  "honorarios gerente": {
+   "cuenta": "anticipo_honorarios",
+   "nota": "Mismo caso que «honorarios director»: es como algunos papeles de trabajo rotulan al director."
+  },
+  "honorarios profesionales": {
+   "cuenta": "proveedores"
+  },
+  "administracion": {
+   "cuenta": "proveedores"
+  },
+  "banco - comisiones": {
+   "cuenta": "Gastos Bancarios"
+  },
+  "banco - iva": {
+   "cuenta": "credito_fiscal",
+   "si_dice": [
+    {
+     "contiene": "percepcion",
+     "cuenta": "retenciones_iva"
+    }
+   ],
+   "nota": "El IVA que factura el banco es credito fiscal computable, pero no siempre entra al libro de IVA compras: si la declaracion jurada no lo tomo, queda en la cuenta esperando la proxima. Las percepciones van con las retenciones."
+  },
+  "banco - imp ley debitos": {
+   "cuenta": "ley_25413_gasto",
+   "nota": "El impuesto se asienta entero como gasto cuando sale del banco. Cuánto es pago a cuenta del impuesto a las ganancias lo decide la categoría MiPyME de la empresa, y eso lo hace el asiento `credito_ley_25413` al cierre: ver `esquema/impuesto-ley-25413.json`."
+  },
+  "banco - imp ley creditos": {
+   "cuenta": "ley_25413_gasto"
+  },
+  "banco - otros": {
+   "cuenta": "Fondo Comun de Inversion"
+  },
+  "otros": {
+   "cuenta": "Otros Ingresos"
+  }
+ }
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Informe de situación</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E3B34'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23D9BC6A' text-anchor='middle'%3EAP%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="impresion.css?v=48">
+<link rel="stylesheet" href="situacion.css?v=4">
+<script>
+  /* La paleta se aplica antes de pintar, para que no haya un parpadeo del
+     color anterior. Sale de `?paleta=` o de lo último que se eligió. */
+  (function () {
+    var q = new URLSearchParams(location.search).get("paleta");
+    var p = q !== null ? q : (localStorage.getItem("paleta") || "");
+    if (p) document.documentElement.dataset.paleta = p;
+  })();
+</script>
+</head>
+<body data-libro="todos">
+
+<div class="barra no-imprimir">
+  <span id="titulo-barra">Informe de situación</span>
+  <span class="acciones">
+    <label class="elige paleta">Paleta
+      <select id="paleta">
+        <option value="">Actual</option>
+        <option value="salvia">Salvia</option>
+        <option value="bruma">Bruma</option>
+        <option value="arena">Arena</option>
+      </select>
+    </label>
+    <a href="index.html">Volver</a>
+    <button type="button" onclick="window.print()">Imprimir o guardar en PDF</button>
+  </span>
+</div>
+
+<main id="paquete"></main>
+
+<script src="bolsa.js?v=1"></script>
+<script src="motor.js?v=27"></script>
+<script src="diario.js?v=38"></script>
+<script src="situacion.js?v=7"></script>
+<script>
+  (function () {
+    var s = document.getElementById("paleta");
+    if (!s) return;
+    s.value = document.documentElement.dataset.paleta || "";
+    s.onchange = function () {
+      if (this.value) {
+        document.documentElement.dataset.paleta = this.value;
+        localStorage.setItem("paleta", this.value);
+      } else {
+        delete document.documentElement.dataset.paleta;
+        localStorage.removeItem("paleta");
+      }
+    };
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E3B34">
+<title>Estados contables — Estudio Pochelú</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E3B34'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23D9BC6A' text-anchor='middle'%3EAP%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css?v=16">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="https://www.estudiopochelu.com/estudio" aria-label="Agustín Pochelú, estudio contable">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="38" height="38"><rect width="64" height="64" rx="14" fill="currentColor"/><text x="32" y="43" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#D9BC6A" text-anchor="middle">AP</text></svg>
+      </span>
+      <span class="brand-text"><strong>Agustín Pochelú</strong><small>Estudio contable</small></span>
+    </a>
+    <a class="btn-volver" href="https://www.estudiopochelu.com/estudio">Volver al Área del Estudio</a>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+  <header class="principal">
+    <p class="eyebrow"><span class="dot"></span> Uso interno</p>
+    <h1>Estados contables</h1>
+    <p>
+      Arma el balance según la RT 54 a partir de los papeles de trabajo del ejercicio.
+      Los datos no salen de esta computadora: todo el cálculo pasa en el navegador.
+    </p>
+  </header>
+
+  <section class="paso" id="paso-importar">
+    <h2><span class="numero">0</span> Los datos</h2>
+    <div class="cuerpo">
+      <p class="ayuda">
+        El plan de cuentas, la apertura y los comprobantes se cargan desde un archivo de
+        Excel. Ahí también se baja el modelo para completarlo.
+      </p>
+      <p class="accesos">
+        <a class="btn tenue" href="importar.html">Importar datos de un ejercicio</a>
+        <a class="btn tenue" href="cuentas.html">Ver el plan de cuentas</a>
+        <a class="btn tenue" href="../plantilla/modelo-importacion.xlsx" download>Descargar el modelo</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-ente">
+    <h2><span class="numero">1</span> El ejercicio</h2>
+    <div class="cuerpo">
+      <div class="campos">
+        <label>Ente
+          <select id="ente"></select>
+        </label>
+        <label>Ejercicio
+          <select id="ejercicio"></select>
+        </label>
+        <label>Origen de los saldos
+          <select id="archivo">
+            <option value="diario">Diario generado por el sistema</option>
+            <option value="saldos-generado.json">Diario congelado en un archivo</option>
+            <option value="saldos.json">Sumas y saldos del papel de trabajo</option>
+          </select>
+        </label>
+      </div>
+      <p class="ayuda" id="resumen-ente"></p>
+      <p class="ayuda" id="dice-bolsa" hidden></p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-camino">
+    <h2><span class="numero">2</span> El camino</h2>
+    <div class="cuerpo">
+      <ol class="camino" id="camino"></ol>
+      <p class="accesos">
+        <a class="btn tenue" id="ver-libros" href="#" target="_blank" rel="noopener">Ver los libros: diario, mayor y sumas y saldos</a>
+        <a class="btn tenue" id="ver-caratula" href="#" target="_blank" rel="noopener">Ver la carátula</a>
+        <a class="btn tenue" id="ver-historicos" href="#" target="_blank" rel="noopener">Ver los estados a valores históricos<small>sin ajuste por inflación, para el impuesto</small></a>
+        <a class="btn tenue" id="ver-situacion" href="#" target="_blank" rel="noopener">Ver el informe de situación<small>no integra los estados contables</small></a>
+        <a class="btn tenue" id="ver-ganancias" href="#" target="_blank" rel="noopener">Ver la determinación del impuesto a las ganancias<small>papel de trabajo</small></a>
+      </p>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-controles">
+    <h2><span class="numero">3</span> Los controles</h2>
+    <div class="cuerpo">
+      <p class="ayuda">
+        Nada se emite sin que estos den cero. El margen es de cinco centavos:
+        las cifras arrastran decimales del ajuste por inflación.
+      </p>
+      <div id="tablero"></div>
+      <div id="avisos"></div>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-informe">
+    <h2><span class="numero">4</span> El informe</h2>
+    <div class="cuerpo">
+      <p class="ayuda">
+        Carátula, los cuatro estados, los anexos, las notas y el informe del auditor.
+        Se imprime desde el navegador o se guarda como PDF. Sale sin firmas: las firmas
+        se aplican desde la barra del informe, con la clave.
+      </p>
+      <p class="accesos">
+        <a class="btn" id="ver-informe" href="#" target="_blank" rel="noopener">Ver el informe imprimible</a>
+        <a class="btn tenue" id="ver-firmado" href="#" target="_blank" rel="noopener" hidden>Ver el informe para firmar<small>pide la clave y pone las dos firmas</small></a>
+        <a class="btn tenue" id="ir-firmas" href="firmas.html" hidden>Cargar las firmas<small>la del estudio y la de cada representante</small></a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <p>Los datos de los clientes viven en <code>datos/entes/</code> y no se publican.</p>
+  </footer>
+</div>
+
+<script src="bolsa.js?v=1"></script>
+<script src="motor.js?v=27"></script>
+<script src="diario.js?v=38"></script>
+<script src="app.js?v=15"></script>
+</body>
+</html>

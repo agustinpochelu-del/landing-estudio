@@ -1,0 +1,284 @@
+:root {
+  --alto-cabecera: 62px;
+  --verde: #0E3B34;
+  --verde-claro: #16544a;
+  --oro: #D9BC6A;
+  --tinta: #16211f;
+  --gris: #5c6b68;
+  --linea: #dfe4e2;
+  --papel: #f7f8f7;
+  --ok: #1c7c54;
+  --mal: #a8321f;
+  --serif: "Source Serif 4", Georgia, serif;
+  --sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+/* `hidden` lo pone el navegador como `display: none`, pero cualquier regla de
+   acá con más peso —un `.fila { display: flex }`— se lo lleva puesta y el
+   bloque escondido se ve igual. Ya pasó en el paso de la clave: se veían a la
+   vez el formulario de poner una y el de cambiarla. Escondido es escondido. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--tinta);
+  background: var(--papel);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- encabezado del sitio --- */
+
+/* La cabecera queda flotando: volver al Área del Estudio o al tablero no puede
+   depender de haber vuelto arriba de todo. El semáforo de la importación, que
+   también se pega, se apoya justo abajo —de ahí `--alto-cabecera`—. */
+.site-header {
+  background: var(--verde); color: #fff;
+  position: sticky; top: 0; z-index: 20;
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto; padding: .8rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.brand { display: flex; align-items: center; gap: .7rem; color: #fff; text-decoration: none; }
+.brand-mark { color: #0a2a25; display: flex; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-text strong { font-family: var(--serif); font-size: 1.05rem; }
+.brand-text small { font-size: .78rem; opacity: .75; }
+.btn-volver {
+  color: #fff; text-decoration: none; font-size: .85rem;
+  border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: .35rem .9rem;
+}
+.btn-volver:hover { background: rgba(255,255,255,.1); }
+
+/* --- cuerpo --- */
+
+.envoltorio { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+.principal { margin-bottom: 2.2rem; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gris); margin: 0 0 .5rem;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--oro); }
+.principal h1 { font-family: var(--serif); font-size: 2.1rem; margin: 0 0 .5rem; color: var(--verde); }
+.principal p { margin: 0; max-width: 62ch; color: var(--gris); }
+
+.paso {
+  background: #fff; border: 1px solid var(--linea); border-radius: 12px;
+  margin-bottom: 1.1rem; overflow: clip;
+}
+.paso h2 {
+  font-family: var(--serif); font-size: 1.15rem; margin: 0;
+  padding: .9rem 1.25rem; border-bottom: 1px solid var(--linea);
+  display: flex; align-items: center; gap: .7rem; color: var(--verde);
+}
+.numero {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--verde); color: var(--oro);
+  font-family: var(--sans); font-size: .82rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+}
+.cuerpo { padding: 1.1rem 1.25rem 1.3rem; }
+
+.ayuda { color: var(--gris); font-size: .9rem; margin: 0 0 1rem; max-width: 70ch; }
+.ayuda:last-child { margin-bottom: 0; }
+
+.campos { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.campos label {
+  display: flex; flex-direction: column; gap: .3rem;
+  font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--gris);
+}
+.campos select {
+  font-family: var(--sans); font-size: .95rem; color: var(--tinta);
+  padding: .5rem .7rem; border: 1px solid var(--linea); border-radius: 8px; background: #fff;
+  text-transform: none; letter-spacing: 0; min-width: 15rem;
+}
+
+/* --- el camino --- */
+
+.camino { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.camino li {
+  display: grid; grid-template-columns: 1.4rem 1fr auto; gap: .8rem; align-items: baseline;
+  padding: .6rem .8rem; border: 1px solid var(--linea); border-radius: 8px; background: #fcfdfc;
+}
+.camino .marca { color: var(--ok); font-weight: 700; }
+.camino .marca.pendiente { color: var(--gris); }
+.camino .que { font-weight: 500; }
+.camino .detalle { display: block; font-size: .84rem; color: var(--gris); font-weight: 400; }
+.camino .dato { font-variant-numeric: tabular-nums; font-size: .85rem; color: var(--gris); }
+
+/* --- tablero de controles --- */
+
+.resumen-control {
+  display: flex; gap: .6rem; align-items: center; flex-wrap: wrap;
+  margin-bottom: 1rem; font-size: .92rem;
+}
+.chapa {
+  border-radius: 999px; padding: .3rem .85rem; font-weight: 600; font-size: .85rem;
+  border: 1px solid transparent;
+}
+.chapa.bien { background: #e7f3ec; color: var(--ok); border-color: #bfe0cd; }
+.chapa.mal { background: #fbeae7; color: var(--mal); border-color: #f0c4bb; }
+
+table.planilla { width: 100%; border-collapse: collapse; font-size: .88rem; }
+table.planilla th, table.planilla td {
+  padding: .42rem .6rem; border-bottom: 1px solid var(--linea); text-align: left;
+}
+table.planilla th {
+  font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gris); font-weight: 600; border-bottom: 1px solid var(--verde);
+}
+table.planilla td.num, table.planilla th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.planilla td.id { font-weight: 600; color: var(--verde); width: 3.2rem; }
+table.planilla tr.falla td { background: #fdf3f1; }
+table.planilla tr.falla td.num:last-child { color: var(--mal); font-weight: 600; }
+.envuelve { overflow-x: auto; }
+
+.aviso {
+  margin-top: 1rem; padding: .7rem .9rem; border-left: 3px solid var(--oro);
+  background: #fcf8ee; font-size: .88rem;
+}
+
+/* --- botón --- */
+
+.btn {
+  display: inline-block; background: var(--verde); color: #fff; text-decoration: none;
+  padding: .65rem 1.4rem; border-radius: 8px; font-weight: 600; font-size: .95rem;
+}
+.btn:hover { background: var(--verde-claro); }
+.btn[aria-disabled="true"] { background: #b7c0be; pointer-events: none; }
+.btn.tenue {
+  background: transparent; color: var(--verde); border: 1px solid var(--verde);
+  padding: .55rem 1.2rem; font-size: .9rem;
+}
+.btn.tenue:hover { background: #edf1ef; }
+.accesos { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+.pie { margin-top: 2rem; font-size: .82rem; color: var(--gris); }
+.pie code { background: #eceeed; padding: .1rem .35rem; border-radius: 4px; }
+
+.error {
+  background: #fbeae7; border: 1px solid #f0c4bb; color: var(--mal);
+  padding: .9rem 1.1rem; border-radius: 10px; margin-bottom: 1rem; font-size: .9rem;
+}
+
+/* --- importación --- */
+
+.zona {
+  border: 2px dashed #b9c6c2; border-radius: 12px; background: #fbfcfb;
+  padding: 2.2rem 1.2rem; text-align: center; cursor: pointer;
+  display: flex; flex-direction: column; gap: .35rem;
+  transition: border-color .15s, background .15s;
+}
+.zona:hover, .zona.encima { border-color: var(--verde); background: #edf1ef; }
+.zona strong { font-size: 1.05rem; color: var(--verde); }
+.zona span { font-size: .88rem; color: var(--gris); }
+
+.fichas-dato {
+  display: grid; gap: .7rem; margin: 1rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+.ficha-dato {
+  background: #fbfcfb; border: 1px solid var(--linea); border-radius: 10px;
+  padding: .6rem .8rem; display: flex; flex-direction: column; gap: .12rem;
+}
+.ficha-dato .et {
+  font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gris);
+}
+.ficha-dato strong { font-size: 1.05rem; color: var(--verde); }
+.ficha-dato .de { font-size: .78rem; color: var(--gris); }
+
+#descargas .btn { display: inline-flex; flex-direction: column; align-items: flex-start; }
+#descargas .btn small { font-weight: 400; opacity: .75; font-size: .74rem; }
+
+/* --- el plan de cuentas --- */
+
+.campos input[type="search"] {
+  font-family: var(--sans); font-size: .95rem; color: var(--tinta);
+  padding: .5rem .7rem; border: 1px solid var(--linea); border-radius: 8px; background: #fff;
+  text-transform: none; letter-spacing: 0; min-width: 15rem;
+}
+table.cuentas td { vertical-align: top; }
+table.cuentas td.cuenta { font-weight: 600; width: 18rem; }
+table.cuentas td.cuenta small {
+  display: block; font-weight: 400; font-size: .76rem; color: var(--gris);
+}
+table.cuentas td.cuenta small.ojo { color: #9a6b12; }
+table.cuentas tr.sub td.cuenta { padding-left: 1.6rem; font-weight: 500; }
+table.cuentas select, table.cuentas input {
+  font-family: var(--sans); font-size: .84rem; color: var(--tinta); width: 100%;
+  padding: .35rem .45rem; border: 1px solid var(--linea); border-radius: 6px; background: #fff;
+}
+table.cuentas select:focus, table.cuentas input:focus {
+  outline: 2px solid var(--oro-suave); outline-offset: 1px;
+}
+table.cuentas th.marca, table.cuentas td.marca { text-align: center; width: 5.5rem; }
+table.cuentas td.marca input { width: auto; accent-color: var(--verde); }
+
+/* La casilla de conservar: la decisión se toma con la lista a la vista, no a
+   ciegas. */
+.conservar-opcion { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+.conservar-opcion label { display: inline-flex; align-items: center; gap: .4rem;
+  font-weight: 600; white-space: nowrap; }
+.conservar-opcion .ayuda { margin: 0; flex: 1 1 22rem; min-width: 0; }
+
+/* El plan de cuentas, agrupado por naturaleza. */
+table.cuentas tr.grupo-plan td {
+  background: var(--verde-800, #14504a); color: #fff; font-weight: 600;
+  font-size: .78rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: .4rem .6rem;
+}
+table.cuentas tr.grupo-plan .sigla {
+  color: var(--oro-suave, #d9bc6a); font-weight: 700; letter-spacing: .04em;
+  display: inline-block; min-width: 3.2em;
+}
+table.cuentas tr.grupo-plan small {
+  float: right; font-weight: 400; letter-spacing: .04em; opacity: .8;
+  text-transform: none;
+}
+
+/* Lo que la planilla todavía no dice: no es un aviso más. */
+.aviso.falta { border-left-color: #9A3B2F; }
+.aviso.falta ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+.aviso.falta li { margin-bottom: .3rem; }
+
+/* --- el semáforo de la importación --- */
+
+/* Se queda pegada arriba: el botón de guardar no tiene que quedar nunca a
+   media página de distancia. El detalle vive abajo, plegado. */
+.tablero-cierre {
+  position: sticky; top: var(--alto-cabecera); z-index: 5;
+  display: flex; align-items: center; gap: .9rem; flex-wrap: wrap;
+  background: #fff; border: 1px solid var(--linea); border-left: 5px solid var(--luz);
+  border-radius: 10px; padding: .8rem 1rem; margin: 0 0 1rem;
+  box-shadow: 0 3px 12px rgba(14, 59, 52, .08);
+}
+.tablero-cierre[data-luz="verde"] { --luz: var(--ok); --luz-suave: #e7f3ec; }
+.tablero-cierre[data-luz="amarilla"] { --luz: #B4801A; --luz-suave: #fcf4e3; }
+.tablero-cierre[data-luz="roja"] { --luz: var(--mal); --luz-suave: #fbeae7; }
+.tablero-cierre .foco {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--luz); flex: none;
+  box-shadow: 0 0 0 4px var(--luz-suave);
+}
+.tablero-cierre .dice { display: flex; flex-direction: column; gap: .15rem; flex: 1 1 20rem; }
+.tablero-cierre .dice strong { font-size: 1rem; color: var(--luz); }
+.tablero-cierre .de { font-size: .82rem; color: var(--gris); }
+.tablero-cierre .de code { background: #eceeed; padding: .05rem .3rem; border-radius: 4px; }
+.tablero-cierre .senales { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .25rem; }
+.tablero-cierre .hace { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+
+.senal {
+  font-family: inherit; font-size: .78rem; font-weight: 600; line-height: 1.4;
+  border-radius: 999px; padding: .16rem .65rem; border: 1px solid transparent;
+}
+button.senal { cursor: pointer; }
+button.senal:hover { filter: brightness(.96); }
+.senal.roja { background: #fbeae7; color: var(--mal); border-color: #f0c4bb; }
+.senal.amarilla { background: #fcf4e3; color: #8a6212; border-color: #e8d5a8; }
+.senal.verde { background: #e7f3ec; color: var(--ok); border-color: #bfe0cd; }
+
+#detalle[hidden] { display: none; }

@@ -1,0 +1,58 @@
+/* El informe de situación. No es parte de los estados contables: es lectura, y
+   por eso se permite color y gráficos, cosa que el papel del balance no. */
+
+.hoja.situacion { padding: 14mm 13mm; }
+.rotulo-informe {
+  font-family: var(--sans); font-size: 8pt; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--oro); margin: 0 0 2mm;
+}
+.aclaracion {
+  font-size: 8.6pt; color: var(--cuerpo); font-style: italic;
+  border-left: 2px solid var(--oro); padding-left: 3mm; margin: 0 0 6mm;
+}
+
+.tarjetas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-bottom: 7mm; }
+.tarjeta { border: 1px solid var(--linea); border-top: 3px solid var(--verde-700); padding: 3mm 3.5mm; }
+.tarjeta .rot { font-family: var(--sans); font-size: 7.6pt; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--apagado); display: block; margin-bottom: 1.5mm; }
+.tarjeta .val { font-family: var(--serif); font-size: 13pt; font-weight: 600; color: var(--verde-900);
+  display: block; line-height: 1.15; }
+.tarjeta .var { font-family: var(--sans); font-size: 8pt; display: block; margin-top: 1.5mm; }
+.tarjeta .sube { color: #1B6B5C; }
+.tarjeta .baja { color: #9A3B2F; }
+
+.bloque { margin-bottom: 7mm; break-inside: avoid; page-break-inside: avoid; }
+.bloque > h2 {
+  font-family: var(--sans); font-size: 9.4pt; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--verde-800); margin: 0 0 1mm;
+  border-bottom: 1px solid var(--linea); padding-bottom: 1.5mm;
+}
+.bloque > p.lectura { font-size: 9pt; color: var(--cuerpo); margin: 2mm 0 3mm; text-align: justify; }
+
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; align-items: start; }
+svg.grafico { width: 100%; height: auto; display: block; }
+svg.grafico text { font-family: Inter, system-ui, sans-serif; }
+.leyenda { display: flex; gap: 5mm; flex-wrap: wrap; font-family: var(--sans);
+  font-size: 8pt; color: var(--cuerpo); margin-top: 2mm; }
+.leyenda span { display: inline-flex; align-items: center; gap: 1.5mm; }
+.leyenda i { width: 9px; height: 9px; display: inline-block; border-radius: 2px; }
+
+table.indicadores { width: 100%; border-collapse: collapse; font-size: 9pt; }
+table.indicadores th, table.indicadores td {
+  border-bottom: 1px solid var(--linea); padding: 1.6mm 2mm; text-align: right; }
+table.indicadores th { font-family: var(--sans); font-size: 8pt; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--apagado); font-weight: 600; }
+table.indicadores th:first-child, table.indicadores td:first-child { text-align: left; }
+table.indicadores td.formula { color: var(--apagado); font-size: 8.2pt; font-style: italic; }
+table.indicadores tr:last-child td { border-bottom: 0; }
+
+@media print { .hoja.situacion { break-after: page; page-break-after: always; } }
+
+/* La serie: una columna por ejercicio, así que la tabla se achica y la fórmula
+   se alinea a la izquierda para no confundirse con los números. */
+table.indicadores td.formula { text-align: left; }
+table.indicadores.serie { font-size: 8.2pt; }
+table.indicadores.serie th, table.indicadores.serie td { padding: 1.4mm 1.4mm; }
+table.indicadores.serie td.formula { font-size: 7.6pt; }
+.pie-cuadro { font-size: 8pt; color: var(--apagado); font-style: italic;
+  margin: 2mm 0 0; text-align: justify; }

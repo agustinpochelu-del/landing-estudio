@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E3B34">
+<title>Importar datos — Estudio Pochelú</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E3B34'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23D9BC6A' text-anchor='middle'%3EAP%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css?v=16">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="index.html" aria-label="Agustín Pochelú, estudio contable">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="38" height="38"><rect width="64" height="64" rx="14" fill="currentColor"/><text x="32" y="43" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#D9BC6A" text-anchor="middle">AP</text></svg>
+      </span>
+      <span class="brand-text"><strong>Agustín Pochelú</strong><small>Estudio contable</small></span>
+    </a>
+    <a class="btn-volver" href="index.html">Volver al tablero</a>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+  <header class="principal">
+    <p class="eyebrow"><span class="dot"></span> Uso interno</p>
+    <h1>Importar datos</h1>
+    <p>
+      Un archivo de Excel con los datos del ejercicio: el plan de cuentas, la apertura y
+      los comprobantes. La aplicación lo lee, lo controla y arma con eso los archivos del
+      ente. El archivo no sale de esta computadora.
+    </p>
+  </header>
+
+  <section class="paso">
+    <h2><span class="numero">1</span> El modelo</h2>
+    <div class="cuerpo">
+      <p class="ayuda">
+        <strong>El papel de trabajo del estudio entra directo</strong>, con sus hojas y sus
+        nombres de columna: no hace falta pasar los datos a ningún lado. El modelo es para
+        cargar un ejercicio de cero. Los dos ejemplos son ejercicios reales ya cargados.
+      </p>
+      <p class="accesos">
+        <a class="btn" href="../plantilla/modelo-importacion.xlsx" download>Descargar el modelo vacío</a>
+        <span id="ejemplos" hidden>
+          <a class="btn tenue" href="../plantilla/importacion-lima-sur-sas.xlsx" download>Ejemplo: Lima Sur</a>
+          <a class="btn tenue" href="../plantilla/importacion-mordor-sas.xlsx" download>Ejemplo: Mordor</a>
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <section class="paso">
+    <h2><span class="numero">2</span> El archivo</h2>
+    <div class="cuerpo">
+      <div class="zona" id="zona" role="button" tabindex="0">
+        <strong>Arrastrá el archivo acá</strong>
+        <span>o hacé clic para elegirlo · .xlsx, .xlsm o .csv</span>
+      </div>
+      <input type="file" id="archivo" accept=".xlsx,.xlsm,.csv" hidden>
+      <p class="ayuda" id="hojas"></p>
+    </div>
+  </section>
+
+  <section class="paso">
+    <h2><span class="numero">3</span> Qué encontró</h2>
+    <div class="cuerpo">
+      <div id="resultado"><p class="ayuda">Todavía no subiste ningún archivo.</p></div>
+    </div>
+  </section>
+
+  <section class="paso" id="paso-guardar" hidden>
+    <h2><span class="numero">4</span> Los archivos del ente</h2>
+    <div class="cuerpo">
+      <p class="ayuda">
+        El botón de guardar está arriba, en el semáforo. Guardar escribe los cuatro
+        archivos en la carpeta del ente, y lo que reemplaza queda copiado en
+        <code>datos/_reemplazados/</code>. Acá se pueden bajar a mano, para dejarlos
+        en la carpeta que dice cada uno.
+      </p>
+      <p class="accesos" id="descargas"></p>
+      <p><button type="button" class="btn tenue" id="probar" hidden>Probar: armar el diario con esto</button></p>
+      <div id="prueba"></div>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <p>Los datos de los clientes viven en <code>datos/entes/</code> y no se publican.</p>
+  </footer>
+</div>
+
+<script src="bolsa.js?v=1"></script>
+<script src="xlsx.js?v=5"></script>
+<script src="papel.js?v=27"></script>
+<script src="motor.js?v=27"></script>
+<script src="diario.js?v=38"></script>
+<script src="importar.js?v=32"></script>
+</body>
+</html>

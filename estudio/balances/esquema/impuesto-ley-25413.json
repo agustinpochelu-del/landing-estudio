@@ -1,0 +1,113 @@
+{
+ "norma": "Ley 25.413 · Ley 27.264 art. 6 · Decreto 409/2018",
+ "nota": "Cuánto del impuesto sobre los débitos y créditos bancarios se computa como pago a cuenta del impuesto a las ganancias. La tabla de `computo` es fija: sale de la ley. Los límites de venta de `parametros_categoria` se actualizan periódicamente, y por eso van con su vigencia: sirven para controlar que la categoría declarada sea la que corresponde, no para decidirla.",
+ "condicion_excluyente": "Para computar el 100 % o el 60 % de la Ley PyME es obligatorio que la empresa tenga el Certificado MiPyME vigente y esté categorizada formalmente en el registro al momento de hacer el cómputo. Sin certificado vigente se aplica el régimen general.",
+ "remanente": "Si el impuesto computable supera el impuesto a las ganancias determinado, el excedente no genera saldo a favor de libre disponibilidad: no se compensa contra otros tributos ni se traslada a ejercicios futuros. La porción no computada —el excedente, y el porcentaje que por ley no se pudo tomar— se deduce como gasto en el balance impositivo.",
+ "regimen_general": {
+  "porcentaje": 0.33,
+  "nota": "Según acreditaciones y débitos gravados. Límite general. Es lo que se aplica cuando no hay certificado MiPyME vigente."
+ },
+ "computo": [
+  {
+   "categoria": "Microempresa",
+   "alias": [
+    "micro",
+    "microempresa"
+   ],
+   "sector": "*",
+   "porcentaje": 1.0,
+   "regimen": "Ley 27.264 (Art. 6)",
+   "nota": "Opcional: 30 % contra contribuciones patronales (SIPA) — RG 5632/2025."
+  },
+  {
+   "categoria": "Pequeña Empresa",
+   "alias": [
+    "pequena",
+    "pequena empresa"
+   ],
+   "sector": "*",
+   "porcentaje": 1.0,
+   "regimen": "Ley 27.264 (Art. 6)"
+  },
+  {
+   "categoria": "Mediana Tramo 1",
+   "alias": [
+    "mediana tramo 1",
+    "mediana 1"
+   ],
+   "sector": "Industria Manufacturera",
+   "alias_sector": [
+    "industria manufacturera",
+    "industria",
+    "industria y mineria"
+   ],
+   "porcentaje": 0.6,
+   "regimen": "Ley 27.264 (Art. 6)"
+  },
+  {
+   "categoria": "Mediana Tramo 1",
+   "alias": [
+    "mediana tramo 1",
+    "mediana 1"
+   ],
+   "sector": "*",
+   "porcentaje": 0.33,
+   "regimen": "Régimen General",
+   "nota": "Comercio, servicios, agro y construcción."
+  },
+  {
+   "categoria": "Mediana Tramo 2",
+   "alias": [
+    "mediana tramo 2",
+    "mediana 2"
+   ],
+   "sector": "*",
+   "porcentaje": 0.33,
+   "regimen": "Régimen General"
+  }
+ ],
+ "parametros_categoria": {
+  "nota": "Los topes de venta los actualiza la SEPyME una vez al año, por lo general entre marzo y abril. Cada tabla rige para las recategorizaciones que se hagan desde su publicación oficial y se mantiene fija los doce meses siguientes, sin importar la inflación del período. **La tabla que hay que usar es la que estaba vigente cuando la empresa tramitó o renovó su certificado**, no la del cierre del ejercicio: por eso las tablas se guardan todas, con su fecha, y se elige por la fecha del certificado.",
+  "como_se_elige": "La tabla vigente a una fecha es la de mayor `desde` que no sea posterior a esa fecha. La fecha es la del trámite o la renovación del certificado MiPyME del ente, no la del cierre.",
+  "unidad": "Ventas totales anuales en pesos. El parámetro legal es el promedio de los últimos tres ejercicios, neto de IVA e impuestos internos, con las deducciones que prevé la norma: acá se guardan los topes, no el cálculo.",
+  "tablas": [
+   {
+    "desde": null,
+    "resolucion": null,
+    "nota": "**Falta** la resolución de la SEPyME y su fecha de publicación. Sin eso no se sabe a qué año corresponde esta tabla ni para qué certificados sirve. Es la única cargada, así que es la que se usa, y la aplicación lo avisa.",
+    "limites": {
+     "Construcción": {
+      "Micro": 569050000,
+      "Pequeña": 3376460000,
+      "Mediana Tramo 1": 18838350000,
+      "Mediana Tramo 2": 28254420000
+     },
+     "Servicios": {
+      "Micro": 266790000,
+      "Pequeña": 1608430000,
+      "Mediana Tramo 1": 13312440000,
+      "Mediana Tramo 2": 19012110000
+     },
+     "Comercio": {
+      "Micro": 1371080000,
+      "Pequeña": 9766640000,
+      "Mediana Tramo 1": 46423090000,
+      "Mediana Tramo 2": 66319160000
+     },
+     "Industria y Minería": {
+      "Micro": 940600000,
+      "Pequeña": 7028260000,
+      "Mediana Tramo 1": 50022750000,
+      "Mediana Tramo 2": 101070840000
+     },
+     "Agropecuario": {
+      "Micro": 661490000,
+      "Pequeña": 2436680000,
+      "Mediana Tramo 1": 14339940000,
+      "Mediana Tramo 2": 22744110000
+     }
+    }
+   }
+  ]
+ }
+}
