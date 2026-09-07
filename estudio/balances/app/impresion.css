@@ -566,6 +566,17 @@ table.libro tr.total .pe { color: var(--oro-suave); }
    blanco —el total estaba, pero no se veía—. */
 table.libro.sumas tbody tr:nth-child(even):not(.total):not(.suma):not(.grupo-jerarquia) td { background: #fafbfa; }
 table.libro.sumas tr.total td, table.libro.saldos tr.total td { background: var(--total-fondo); }
+/* Las subcuentas van corridas a la derecha y su subtotal, marcado sin llegar a
+   pesar como el total del grupo: es un escalón intermedio, no un cierre. */
+table.libro tr.hija td.concepto { padding-left: 1.6rem; }
+table.libro tr.subtotal td {
+  font-weight: 600; color: var(--verde-700);
+  border-top: 1px solid var(--divisor); border-bottom: 1px solid var(--divisor);
+}
+table.libro tr.subtotal td.concepto { padding-left: 1.6rem; font-style: italic; }
+table.libro.sumas tbody tr:nth-child(even):not(.total):not(.suma):not(.grupo-jerarquia):not(.subtotal) td { background: #fafbfa; }
+table.libro tr.subtotal { break-before: avoid; page-break-before: avoid; }
+
 /* Una sola columna de importes: el concepto se queda con el resto. */
 table.libro.saldos td.concepto, table.libro.saldos th.izq { width: auto; }
 

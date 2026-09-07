@@ -169,23 +169,86 @@
     return grupos.filter((g) => g.cuentas.length);
   }
 
+  /* Las subcuentas y su sumarizadora, juntas y con su subtotal.
+
+     La columna «Suma en» del plan dice de qué cuenta forma parte una subcuenta:
+     los cinco socios suman en «Anticipo Dividendos Socios», los planes de pago
+     en «MF a pagar». Al diario y al mayor van sueltas, y así tiene que ser; en
+     las planillas de saldos, leer cinco renglones y sumarlos a ojo no ayuda.
+
+     Devuelve la lista del grupo con las familias armadas: la sumarizadora
+     primero —si tiene saldo propio—, sus subcuentas atrás, y un renglón de
+     subtotal. El subtotal es exactamente la suma de los renglones que están
+     arriba de él, ni uno más: un papel que muestra una suma que no es la de sus
+     renglones es peor que no mostrarla.
+
+     Una familia de un solo renglón no lleva subtotal: sería repetir la cifra. */
+  function enFamilias(cuentas) {
+    const padreDe = (c) => (d.d.mapeo.cuentas[c.cuenta] || {}).suma_en || null;
+    const hijasDe = {};
+    cuentas.forEach((c) => {
+      const p = padreDe(c);
+      if (p) (hijasDe[p] = hijasDe[p] || []).push(c);
+    });
+    if (!Object.keys(hijasDe).length) {
+      return cuentas.map((c) => ({ tipo: "cuenta", c }));
+    }
+
+    const salida = [];
+    const puestas = new Set();
+    cuentas.forEach((c) => {
+      if (puestas.has(c)) return;
+      /* La familia se emite entera la primera vez que aparece cualquiera de sus
+         integrantes, esté donde esté en el orden del mayor. */
+      const rotulo = hijasDe[c.cuenta] ? c.cuenta : padreDe(c);
+      if (!rotulo || !hijasDe[rotulo]) {
+        salida.push({ tipo: "cuenta", c });
+        puestas.add(c);
+        return;
+      }
+      const familia = [];
+      const padre = cuentas.find((x) => x.cuenta === rotulo);
+      if (padre) familia.push(padre);
+      hijasDe[rotulo].forEach((h) => familia.push(h));
+      familia.forEach((x) => {
+        puestas.add(x);
+        salida.push({ tipo: "cuenta", c: x, hija: x !== padre });
+      });
+      if (familia.length > 1) {
+        salida.push({ tipo: "subtotal", rotulo, cuentas: familia });
+      }
+    });
+    return salida;
+  }
+
   function sumasYSaldos() {
     const tot = { debe: 0, haber: 0, deudor: 0, acreedor: 0 };
-    const fila = (c) => {
+    const fila = (c, hija) => {
       const deudor = c.saldo > 0 ? c.saldo : 0;
       const acreedor = c.saldo < 0 ? -c.saldo : 0;
       tot.debe += c.debe; tot.haber += c.haber;
       tot.deudor += deudor; tot.acreedor += acreedor;
-      return `<tr>
+      return `<tr class="${hija ? "hija" : ""}">
         <td class="concepto">${esc(c.cuenta)}</td>
         <td class="num">${imp(c.debe)}</td>
         <td class="num">${imp(c.haber)}</td>
         <td class="num separa">${imp(deudor)}</td>
         <td class="num">${imp(acreedor)}</td></tr>`;
     };
+
+    const subtotal = (x) => {
+      const s = (f) => x.cuentas.reduce((t, c) => t + f(c), 0);
+      return `<tr class="subtotal">
+        <td class="concepto">Total ${esc(x.rotulo)}</td>
+        <td class="num">${imp(s((c) => c.debe))}</td>
+        <td class="num">${imp(s((c) => c.haber))}</td>
+        <td class="num separa">${imp(s((c) => (c.saldo > 0 ? c.saldo : 0)))}</td>
+        <td class="num">${imp(s((c) => (c.saldo < 0 ? -c.saldo : 0)))}</td></tr>`;
+    };
     const suma = (g, campo) => g.cuentas.reduce((t, c) => t + campo(c), 0);
     const filas = porJerarquia(d.mayor()).map((g) => {
-      const cuerpo = g.cuentas.map(fila).join("");
+      const cuerpo = enFamilias(g.cuentas).map((x) =>
+        x.tipo === "subtotal" ? subtotal(x) : fila(x.c, x.hija)).join("");
       const deudor = suma(g, (c) => (c.saldo > 0 ? c.saldo : 0));
       const acreedor = suma(g, (c) => (c.saldo < 0 ? -c.saldo : 0));
       return `<tr class="grupo-jerarquia"><td colspan="5">
@@ -229,17 +292,21 @@
      no se pueden contradecir: si una cuenta cambia de grupo, cambia en las dos. */
   function estadoDeSaldos() {
     let total = 0;
-    const fila = (c) => {
+    const fila = (c, hija) => {
       total += c.saldo;
-      return `<tr>
+      return `<tr class="${hija ? "hija" : ""}">
         <td class="concepto">${esc(c.cuenta)}</td>
         <td class="num">${imp(c.saldo)}</td></tr>`;
     };
+    const subtotal = (x) => `<tr class="subtotal">
+      <td class="concepto">Total ${esc(x.rotulo)}</td>
+      <td class="num">${imp(x.cuentas.reduce((t, c) => t + c.saldo, 0))}</td></tr>`;
     const filas = porJerarquia(d.mayor()).map((g) => {
       const suma = g.cuentas.reduce((t, c) => t + c.saldo, 0);
       return `<tr class="grupo-jerarquia"><td colspan="2">
           <span class="sigla">${esc(g.sigla)}</span> ${esc(g.rotulo)}</td></tr>` +
-        g.cuentas.map(fila).join("") +
+        enFamilias(g.cuentas).map((x) =>
+          x.tipo === "subtotal" ? subtotal(x) : fila(x.c, x.hija)).join("") +
         `<tr class="suma"><td>Total ${esc(g.rotulo.toLowerCase())}</td>
           <td class="num">${imp(suma)}</td></tr>`;
     }).join("");
