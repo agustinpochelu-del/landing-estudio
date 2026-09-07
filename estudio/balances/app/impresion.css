@@ -335,13 +335,14 @@ table.anexo tr.total td {
   border-top: 1px solid var(--total-linea); border-right-color: var(--total-divisor);
 }
 table.anexo tr.total .pe { color: var(--oro-suave); }
-/* El estado de evolución con todas sus columnas —las reservas y el saldo por
-   revaluación se muestran aunque den cero— llega a doce columnas de importes en
-   una hoja apaisada, y con el cuerpo del resto de los anexos la última quedaba
-   cortada contra el marco del cuadro. */
-table.anexo.apretado { font-size: 7.2pt; }
-table.anexo.apretado th, table.anexo.apretado td { padding: .26rem .2rem; }
-table.anexo.apretado thead th { font-size: 6.4pt; letter-spacing: .02em; }
+/* El nombre de la columna se parte en dos renglones; lo que nunca se parte es un
+   importe. Los dos son `.num`, y el `nowrap` que protege al número le estaba
+   pidiendo a la columna el ancho del nombre entero: «Resultados no asignados» en
+   una sola línea es más ancho que cualquiera de los números que tiene debajo.
+   Con el encabezado en dos líneas, el estado de evolución entra en la hoja
+   apaisada con las doce columnas y el cuerpo de siempre —hay lugar hacia abajo,
+   que es lo que no había hacia el costado—. */
+table.anexo thead th.num { white-space: normal; }
 
 table.anexo .separa { border-left: 1px solid var(--marco); }
 table.anexo thead th.separa { border-left-color: rgba(255,255,255,.35); }

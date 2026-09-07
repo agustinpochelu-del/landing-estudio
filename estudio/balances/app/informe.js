@@ -442,8 +442,7 @@
         ${cols.map((c, i) => `<td class="num${separa(i)}">${imp(f[c.id])}</td>`).join("")}
       </tr>`).join("");
     hoja("apaisada", encabezado("Estado de Evolución del Patrimonio Neto") +
-      `<div class="cuadro"><table class="anexo${cols.length >= 10 ? " apretado" : ""}">${
-        cabeza}<tbody>${filas}</tbody></table></div>`,
+      `<div class="cuadro"><table class="anexo">${cabeza}<tbody>${filas}</tbody></table></div>`,
       { dictamen: "cuadro" });
   }
 
