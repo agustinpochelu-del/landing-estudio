@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="impresion.css?v=48">
+<link rel="stylesheet" href="impresion.css?v=49">
 <script>
   /* La paleta se aplica antes de pintar, para que no haya un parpadeo del
      color anterior. Sale de `?paleta=` o de lo último que se eligió. */
@@ -44,12 +44,49 @@
   </span>
 </div>
 
+<!-- Firmar sin el servidor local: las imágenes las trae quien firma, se usan
+     para dibujar la hoja y no se guardan en ningún lado. -->
+<dialog id="dialogo-firmas" class="no-imprimir">
+  <form method="dialog" class="firmas-subir">
+    <h2>Firmar el balance</h2>
+    <p class="dice">
+      Elegí las imágenes de las firmas: escaneadas o fotografiadas sobre papel blanco,
+      PNG o JPG. Se usan para dibujar las hojas y <strong>no se guardan en ningún
+      lado</strong>: al recargar la página, el balance vuelve sin firmar.
+    </p>
+
+    <label class="una">
+      <span class="quien" id="et-profesional">La firma del profesional</span>
+      <input type="file" id="firma-profesional" accept="image/png,image/jpeg">
+      <span class="previa" id="previa-profesional"></span>
+    </label>
+
+    <label class="una">
+      <span class="quien" id="et-representante">La firma del representante</span>
+      <input type="file" id="firma-representante" accept="image/png,image/jpeg">
+      <span class="previa" id="previa-representante"></span>
+    </label>
+
+    <p class="alto">
+      <label>Alto en la hoja
+        <input type="number" id="alto-firmas" value="12" min="4" max="20" step="1"> mm</label>
+      <span class="dice" id="dice-subir"></span>
+    </p>
+
+    <p class="botones">
+      <button type="button" id="aplicar-subidas">Aplicar al balance</button>
+      <button type="submit" value="cancelar" class="tenue">Cancelar</button>
+    </p>
+  </form>
+</dialog>
+
 <main id="paquete"></main>
 
 <script src="bolsa.js?v=1"></script>
+<script src="rubrica.js?v=1"></script>
 <script src="motor.js?v=27"></script>
 <script src="diario.js?v=38"></script>
-<script src="informe.js?v=32"></script>
+<script src="informe.js?v=33"></script>
 <script>
   /* Firmar.
 
@@ -76,6 +113,7 @@
         avisar("");
         return;
       }
+      if (!conServidor) return abrirDialogo();
       caja.hidden = !caja.hidden;
       if (!caja.hidden) clave.focus();
     };
@@ -100,18 +138,95 @@
 
     clave.onkeydown = function (e) { if (e.key === "Enter") aplicar.click(); };
 
-    /* Las firmas las entrega `herramientas/servidor.py` contra la clave. Si no
-       está corriendo —la aplicación en línea, por ejemplo— el botón no se
-       ofrece: sólo podría fallar. */
-    pedir.hidden = true;
-    window.Bolsa.hayServidor().then(function (hay) { pedir.hidden = !hay; });
+    /* Dos caminos para lo mismo. Con el servidor local, las firmas salen del
+       reservorio contra la clave. Sin servidor —la aplicación publicada— las
+       sube quien firma, se usan y no se guardan: pedir una clave para usar un
+       archivo que trajo la misma persona no agrega nada. */
+    var conServidor = false;
+    window.Bolsa.hayServidor().then(function (hay) { conServidor = hay; });
+
+    var dialogo = document.getElementById("dialogo-firmas");
+    var subidas = {};
+
+    function previa(donde, imagen) {
+      var alto = Number(document.getElementById("alto-firmas").value) || 12;
+      donde.innerHTML = imagen
+        ? '<img src="' + imagen + '" style="height:' + (alto * 96 / 25.4) + 'px">'
+        : "";
+    }
+
+    async function tomar(cual, entrada, donde) {
+      var d = document.getElementById("dice-subir");
+      d.textContent = "";
+      if (!entrada.files.length) { subidas[cual] = null; previa(donde, null); return; }
+      try {
+        subidas[cual] = { imagen: await window.Rubrica.deArchivo(entrada.files[0]) };
+        previa(donde, subidas[cual].imagen);
+      } catch (e) {
+        subidas[cual] = null;
+        previa(donde, null);
+        d.innerHTML = '<span class="mal">' + e.message + "</span>";
+      }
+    }
+
+    ["profesional", "representante"].forEach(function (cual) {
+      var entrada = document.getElementById("firma-" + cual);
+      var donde = document.getElementById("previa-" + cual);
+      entrada.onchange = function () { tomar(cual, entrada, donde); };
+    });
+
+    document.getElementById("alto-firmas").oninput = function () {
+      previa(document.getElementById("previa-profesional"),
+        subidas.profesional && subidas.profesional.imagen);
+      previa(document.getElementById("previa-representante"),
+        subidas.representante && subidas.representante.imagen);
+    };
+
+    document.getElementById("aplicar-subidas").onclick = function () {
+      var d = document.getElementById("dice-subir");
+      if (!subidas.profesional && !subidas.representante) {
+        d.innerHTML = '<span class="mal">No elegiste ninguna imagen.</span>';
+        return;
+      }
+      var alto = Number(document.getElementById("alto-firmas").value) || 12;
+      var puestas = {};
+      ["profesional", "representante"].forEach(function (cual) {
+        if (subidas[cual]) puestas[cual] = { imagen: subidas[cual].imagen, alto_mm: alto };
+      });
+      try {
+        window.Informe.ponerFirmas(puestas);
+      } catch (e) {
+        d.innerHTML = '<span class="mal">' + e.message + "</span>";
+        return;
+      }
+      dialogo.close();
+      pedir.textContent = "Sacar las firmas";
+      avisar(subidas.profesional && subidas.representante
+        ? "Firmado" : "Firmado con una sola firma");
+    };
+
+    function abrirDialogo() {
+      var f = window.Informe.firmantes();
+      if (f) {
+        document.getElementById("et-profesional").textContent =
+          "La firma de " + f.profesional;
+        document.getElementById("et-representante").textContent = f.representante
+          ? "La firma de " + f.representante +
+            (f.cargo ? " (" + f.cargo + ")" : "")
+          : "La firma del representante";
+      }
+      dialogo.showModal();
+    }
 
     /* Se puede entrar con `&firmar=1` —así lo abre la pantalla de las firmas— y
        entonces el cuadro de la clave ya está abierto y esperando. */
     if (new URLSearchParams(location.search).get("firmar") === "1") {
-      caja.hidden = false;
-      avisar("Escribí la clave y apretá Aplicar");
-      setTimeout(function () { clave.focus(); }, 300);
+      window.Bolsa.hayServidor().then(function (hay) {
+        if (!hay) return;
+        caja.hidden = false;
+        avisar("Escribí la clave y apretá Aplicar");
+        setTimeout(function () { clave.focus(); }, 300);
+      });
     }
   })();
 

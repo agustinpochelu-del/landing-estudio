@@ -742,3 +742,56 @@ table.libro tr.grupo-jerarquia .sigla {
 .barra .firma[hidden] { display: none; }
 .barra .dice-firma { font-size: .78rem; opacity: .85; }
 .barra .dice-firma.mal { color: #ffd7cf; opacity: 1; }
+
+/* --- subir las firmas en el momento, sin reservorio ---
+
+   Es el camino de la aplicación publicada: las imágenes las trae quien firma,
+   se usan para dibujar la hoja y se van con la pestaña. */
+#dialogo-firmas {
+  border: 0; border-radius: 12px; padding: 0; max-width: 34rem; width: calc(100% - 2rem);
+  background: #fff; color: var(--cuerpo);
+  box-shadow: 0 18px 50px rgba(8, 38, 34, .35);
+}
+#dialogo-firmas::backdrop { background: rgba(8, 38, 34, .5); }
+.firmas-subir { padding: 1.4rem 1.5rem 1.2rem; font-family: var(--sans); font-size: .92rem; }
+.firmas-subir h2 {
+  font-family: var(--serif); font-size: 1.25rem; color: var(--verde-800);
+  margin: 0 0 .5rem;
+}
+.firmas-subir .dice { color: var(--apagado); font-size: .86rem; margin: 0 0 1.1rem; }
+.firmas-subir .una {
+  display: block; border: 1px solid var(--linea); border-radius: 10px;
+  padding: .7rem .9rem; margin-bottom: .8rem; background: #fbfcfb;
+}
+.firmas-subir .quien {
+  display: block; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--apagado); margin-bottom: .45rem;
+}
+.firmas-subir input[type="file"] { font: inherit; font-size: .85rem; max-width: 100%; }
+.firmas-subir .previa {
+  display: block; min-height: 0; margin-top: .6rem; text-align: center;
+}
+.firmas-subir .previa img { max-width: 100%; }
+.firmas-subir .alto {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: 0 0 1.1rem;
+}
+.firmas-subir .alto label {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado);
+}
+.firmas-subir .alto input {
+  font: inherit; font-size: .9rem; width: 4.5rem; text-transform: none; letter-spacing: 0;
+  padding: .3rem .5rem; border: 1px solid var(--linea); border-radius: 8px;
+}
+.firmas-subir .alto .dice { margin: 0; }
+.firmas-subir .botones { display: flex; gap: .6rem; margin: 0; }
+.firmas-subir button {
+  font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer;
+  border-radius: 999px; padding: .45rem 1.2rem;
+  background: var(--verde-800); color: #fff; border: 1px solid var(--verde-800);
+}
+.firmas-subir button.tenue {
+  background: transparent; color: var(--verde-800); font-weight: 500;
+  border-color: var(--linea);
+}
+.firmas-subir .mal { color: #a8321f; }

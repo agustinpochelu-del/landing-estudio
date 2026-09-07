@@ -14,7 +14,7 @@
     /* Cargar y aplicar firmas lo resuelve `herramientas/servidor.py`. Si no
        está corriendo —la aplicación publicada— no se ofrecen. */
     window.Bolsa.hayServidor().then((hay) => {
-      ["#ver-firmado", "#ir-firmas"].forEach((s) => { if ($(s)) $(s).hidden = !hay; });
+      if ($("#ir-firmas")) $("#ir-firmas").hidden = !hay;
     });
     try {
       indice = await window.Bolsa.indice();
@@ -119,7 +119,7 @@
     const firmado = $("#ver-firmado");
     firmado.href = link.href + "&firmar=1";
     firmado.setAttribute("aria-disabled", motor.fallan.length ? "true" : "false");
-    window.Bolsa.hayServidor().then((hay) => { firmado.hidden = !hay; });
+    firmado.hidden = false;
   }
 
   /* Un ejercicio en armado todavía no tiene sumas y saldos. No es un error: el

@@ -762,7 +762,35 @@
     dibujar();
   }
 
-  window.Informe = { firmar, desfirmar, firmado: () => Object.keys(rubricas).length > 0 };
+  /* Las firmas subidas en el momento, sin pasar por el servidor ni guardarse en
+     ningún lado. Es el camino de la aplicación publicada: el archivo de la firma
+     lo trae la persona que está firmando, se usa para dibujar la hoja y se va
+     con la pestaña. Recargar devuelve el balance sin firmar, igual que siempre. */
+  function ponerFirmas(nuevas) {
+    if (!m || !m.ente) throw new Error("todavía no hay un balance abierto");
+    rubricas = {};
+    if (nuevas.profesional) rubricas.estudio = nuevas.profesional;
+    if (nuevas.representante) rubricas[m.ente.slug] = nuevas.representante;
+    dibujar();
+    return Object.keys(rubricas).length;
+  }
+
+  /* Quiénes firman este balance, para poder ponerle nombre a cada casilla. */
+  function firmantes() {
+    if (!m || !m.ente) return null;
+    const f = (m.ente.datos[m.ente.datos.length - 1].firmantes || [])[0] || {};
+    return {
+      profesional: PROFESIONAL.nombre,
+      representante: f.nombre || "",
+      cargo: f.cargo || "",
+      ente: m.ente.denominacion,
+    };
+  }
+
+  window.Informe = {
+    firmar, desfirmar, ponerFirmas, firmantes,
+    firmado: () => Object.keys(rubricas).length > 0,
+  };
 
   arrancar();
 })();
