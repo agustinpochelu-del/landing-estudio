@@ -515,18 +515,21 @@
     {
      "id": "reserva_legal",
      "grupo": "Ganancias reservadas",
-     "titulo": "Legal"
+     "titulo": "Legal",
+     "siempre": true
     },
     {
      "id": "otras_reservas",
      "grupo": "Ganancias reservadas",
-     "titulo": "Otras"
+     "titulo": "Otras",
+     "siempre": true
     },
     {
      "id": "reservadas_total",
      "grupo": "Ganancias reservadas",
      "titulo": "Total",
      "rol": "subtotal",
+     "siempre": true,
      "suma": [
       "reserva_legal",
       "otras_reservas"
@@ -535,7 +538,8 @@
     {
      "id": "saldo_revaluacion",
      "grupo": "Resultados diferidos",
-     "titulo": "Saldo por revaluación"
+     "titulo": "Saldo por revaluación",
+     "siempre": true
     },
     {
      "id": "resultados_no_asignados",

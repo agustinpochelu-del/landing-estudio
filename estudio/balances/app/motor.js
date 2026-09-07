@@ -309,19 +309,30 @@
        anterior reexpresado, y el del cierre el de hoy. Si hubo suscripciones o
        devoluciones, la diferencia sale sola en «Movimientos del ejercicio»; si
        no hubo, ese renglón da cero y se muestra igual. */
+    /* Cada subtotal suma **lo que su columna declara**, no todo lo que tiene a
+       la izquierda. Mientras las reservas y el saldo por revaluación sólo se
+       mostraban cuando tenían saldo, las dos cuentas daban lo mismo; desde que
+       se muestran siempre, «Total» de los aportes tiene que seguir siendo el de
+       los aportes. */
+    const subtotales = (o) => {
+      columnas.forEach((x) => {
+        if (x.rol !== "subtotal") return;
+        o[x.id] = (x.suma || []).reduce((t, k) => t + (o[k] || 0), 0);
+      });
+      return o;
+    };
     const aportesEn = (col) => {
       const o = {};
-      let suma = 0;
       columnas.forEach((x) => {
         if (x.rol || x.id === "resultados_no_asignados") return;
         o[x.id] = this.v("eepn." + x.id, col);
-        suma += o[x.id];
       });
-      if (columnas.some((x) => x.id === "aportes_total")) o.aportes_total = suma;
-      return o;
+      return subtotales(o);
     };
     const aportesCierre = aportesEn("actual");
-    const totalAportes = (o) => columnas.reduce((t, x) =>
+    /* El total de la fila: todas las columnas propias, sin los subtotales, que
+       repetirían lo mismo. Los resultados no asignados se suman aparte. */
+    const totalColumnas = (o) => columnas.reduce((t, x) =>
       (x.rol || x.id === "resultados_no_asignados" ? t : t + (o[x.id] || 0)), 0);
     /* El movimiento no es la diferencia entre los dos saldos: el capital nominal
        no se mueve y su reexpresión va al ajuste del capital, así que restar las
@@ -335,10 +346,8 @@
       movimientos[x.id] = -(mov["eepn." + x.id] || 0);
       aportesInicio[x.id] = aportesCierre[x.id] - movimientos[x.id];
     });
-    if (columnas.some((x) => x.id === "aportes_total")) {
-      movimientos.aportes_total = totalAportes(movimientos);
-      aportesInicio.aportes_total = totalAportes(aportesInicio);
-    }
+    subtotales(movimientos);
+    subtotales(aportesInicio);
 
     /* Los renglones del estado están siempre, aunque den cero. Que un ejercicio
        no tenga ajuste de resultados anteriores no quiere decir que el renglón no
@@ -348,7 +357,7 @@
       Object.assign({
         concepto: "Saldos al inicio del ejercicio",
         resultados_no_asignados: inicio,
-        total_actual: totalAportes(aportesInicio) + inicio,
+        total_actual: totalColumnas(aportesInicio) + inicio,
         total_anterior: pnAnteriorCierre - resultadoAnterior,
       }, aportesInicio),
       {
@@ -361,13 +370,13 @@
       Object.assign({
         concepto: "Saldos al inicio modificados", rol: "subtotal",
         resultados_no_asignados: inicio + modificacion,
-        total_actual: totalAportes(aportesInicio) + inicio + modificacion,
+        total_actual: totalColumnas(aportesInicio) + inicio + modificacion,
         total_anterior: pnAnteriorCierre - resultadoAnterior,
       }, aportesInicio),
       Object.assign({
         concepto: "Movimientos del ejercicio",
         resultados_no_asignados: 0,
-        total_actual: totalAportes(aportesCierre) - totalAportes(aportesInicio),
+        total_actual: totalColumnas(aportesCierre) - totalColumnas(aportesInicio),
         total_anterior: 0,
       }, movimientos),
       {
