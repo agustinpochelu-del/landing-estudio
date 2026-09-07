@@ -5,15 +5,21 @@
 reglas y `docs/` con el contrato de salida, el caso testigo y cómo está armada
 la aplicación.
 
-Se publica en <https://www.estudiopochelu.com/estudio/balances/app/index>,
+Se publica en <https://www.estudiopochelu.com/estudio/balances/app/tablero>,
 detrás de la clave del Área del Estudio.
 
-## Por qué la dirección termina en `/app/index`
+## Por qué la dirección termina en `/app/tablero`
 
-El sitio se publica con `trailingSlash: false`. La aplicación vive en `app/` y
-busca el esquema en `../esquema/`, así que la carpeta base tiene que ser la de
-`app/`. En `/estudio/balances` —sin barra final— las rutas relativas resolverían
-contra `/estudio/` y no encontraría ni el plan de exposición.
+El sitio se publica con `trailingSlash: false` y `cleanUrls: true`. Dos cosas se
+suman:
+
+1. La aplicación vive en `app/` y busca el esquema en `../esquema/`, así que la
+   carpeta base tiene que ser la de `app/`. En `/estudio/balances` —sin barra
+   final— las rutas relativas resolverían contra `/estudio/`.
+2. La página de entrada **no puede llamarse `index.html`**. Se probó, y Vercel
+   redirige `/estudio/balances/app/index` a `/estudio/balances/app`: le saca el
+   nombre y deja la forma de carpeta, sin barra final, que es justo la que
+   rompe las rutas relativas. Por eso se llama `tablero.html`.
 
 En `vercel.json` hay una redirección de `/estudio/balances` a esta dirección,
 para que escribirla corta también funcione. El link de `estudio.html` apunta

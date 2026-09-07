@@ -111,11 +111,11 @@
           <li>Carga desde Excel</li>
           <li>Todo en el navegador</li>
         </ul>
-        <!-- La dirección lleva /app/index a propósito. La aplicación busca el esquema
-             en `../esquema/`, así que la carpeta base tiene que ser la de `app/`: en
-             /estudio/balances las rutas relativas resolverían contra /estudio/ y no
-             encontraría ni el plan de exposición. Ver estudio/balances/LEEME.md. -->
-        <a class="btn btn-primary" href="/estudio/balances/app/index">Abrir los estados contables</a>
+        <!-- La dirección lleva /app/tablero a propósito, y la página de entrada no
+             se llama index: Vercel le sacaría el nombre y dejaría /estudio/balances/app,
+             sin barra final, donde las rutas relativas resuelven contra
+             /estudio/balances/ y no carga nada. Ver estudio/balances/LEEME.md. -->
+        <a class="btn btn-primary" href="/estudio/balances/app/tablero">Abrir los estados contables</a>
       </div>
     </article>
 

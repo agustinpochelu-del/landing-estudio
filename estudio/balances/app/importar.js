@@ -1584,7 +1584,7 @@
         $("#guardado").innerHTML = `<span class="mal">${esc(e.message)}.</span>`;
         return;
       }
-      window.open(`index.html?ente=${encodeURIComponent(r.slug)}` +
+      window.open(`tablero.html?ente=${encodeURIComponent(r.slug)}` +
         `&ejercicio=${encodeURIComponent(r.anio)}`, "_blank", "noopener");
     };
 

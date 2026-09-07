@@ -5,7 +5,7 @@
   "redirects": [
     {
       "source": "/estudio/balances",
-      "destination": "/estudio/balances/app/index",
+      "destination": "/estudio/balances/app/tablero",
       "permanent": false
     }
   ],
