@@ -9,6 +9,9 @@
   const $ = (s) => document.querySelector(s);
 
   let d;
+  /* Moneda homogénea (lo normal) o valores históricos, sin ajuste por
+     inflación. Lo decide `?moneda=historica` y cambia el diario entero. */
+  let historico = false;
 
   const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 
@@ -42,8 +45,13 @@
     </section>`;
   }
 
+  /* La moneda va escrita en cada hoja, siempre. Un balance de sumas y saldos a
+     valores históricos y otro en moneda homogénea son dos papeles distintos con
+     el mismo título: si no lo dice, se confunden. */
   const periodo = () => `Ejercicio N° ${d.ej.numero}, iniciado el ${F(d.ej.inicio)} ` +
-    `y finalizado el ${F(d.ej.cierre)}. Importes en pesos.`;
+    `y finalizado el ${F(d.ej.cierre)}. ` + (historico
+      ? "Importes a valores históricos, sin ajuste por inflación."
+      : "Importes en moneda homogénea del cierre.");
 
   /* ---------- libro diario ---------- */
 
@@ -762,30 +770,41 @@
   async function arrancar() {
     const q = new URLSearchParams(location.search);
     const ente = q.get("ente"), ejercicio = q.get("ejercicio");
+    historico = q.get("moneda") === "historica";
     if (!ente || !ejercicio) {
       $("#paquete").innerHTML = `<section class="hoja"><p>Faltan los parámetros
         <code>ente</code> y <code>ejercicio</code>. Se entra desde el tablero.</p></section>`;
       return;
     }
     try {
-      d = await window.LibroDiario.cargar(ente, ejercicio);
+      d = await window.LibroDiario.cargar(ente, ejercicio, { historico });
     } catch (e) {
       $("#paquete").innerHTML = `<section class="hoja"><p>${esc(e.message)}</p></section>`;
       return;
     }
     $("#titulo-barra").textContent =
-      `Libros — ${d.ente.denominacion} · ejercicio N° ${d.ej.numero}`;
-    document.title = `Libros ${d.ente.denominacion} ${d.ej.cierre.slice(0, 4)}`;
-    $("#paquete").innerHTML = controles() + diario() + mayor() + sumasYSaldos() +
-      estadoDeSaldos() + conciliacionBancaria() + papelDeAjuste() + estadoDeResultados() + anexoDeGastos() +
-      determinacionGanancias();
+      `Libros — ${d.ente.denominacion} · ejercicio N° ${d.ej.numero}` +
+      (historico ? " · valores históricos" : "");
+    document.title = `Libros ${d.ente.denominacion} ${d.ej.cierre.slice(0, 4)}` +
+      (historico ? " históricos" : "");
+
+    /* A valores históricos sólo tienen sentido estos dos: son fotos de saldos.
+       El diario y el mayor a históricos serían el mismo libro con los asientos
+       del ajuste sacados, que no es un libro de nada; y los papeles del ajuste
+       por inflación, a valores históricos, no existen. */
+    $("#paquete").innerHTML = historico
+      ? sumasYSaldos() + estadoDeSaldos()
+      : controles() + diario() + mayor() + sumasYSaldos() +
+        estadoDeSaldos() + conciliacionBancaria() + papelDeAjuste() +
+        estadoDeResultados() + anexoDeGastos() + determinacionGanancias();
 
     /* Buscar una cuenta en el mayor. Filtra sólo el mayor y no las planillas de
        saldos: ahí esconder renglones dejaría totales que no cierran con lo que
        se ve, y un papel que muestra una suma que no es la de sus renglones es
        peor que no tener filtro. */
     const busca = $("#busca");
-    if (busca) {
+    if (busca && historico) busca.closest("label").hidden = true;
+    if (busca && !historico) {
       const cuentas = () =>
         Array.prototype.slice.call(document.querySelectorAll(".cuenta-mayor"));
       busca.value = q.get("cuenta") || "";
@@ -805,7 +824,30 @@
       busca.oninput();
     }
 
+    /* Cambiar de moneda es rearmar el diario entero, así que se recarga la
+       página con el parámetro puesto y se conserva lo demás. */
+    const moneda = $("#moneda");
+    if (moneda) {
+      moneda.value = historico ? "historica" : "";
+      moneda.onchange = () => {
+        const p = new URLSearchParams(location.search);
+        if (moneda.value) p.set("moneda", moneda.value); else p.delete("moneda");
+        p.delete("cuenta");
+        if (historico !== !!moneda.value && ["diario", "mayor"].indexOf(p.get("libro")) >= 0) {
+          p.delete("libro");
+        }
+        location.search = p.toString();
+      };
+    }
+
     const cual = $("#cual");
+    /* En históricos el selector no puede ofrecer libros que no se dibujaron. */
+    if (historico) {
+      Array.prototype.slice.call(cual.options).forEach((o) => {
+        if (["todos", "sumas", "saldos"].indexOf(o.value) < 0) o.remove();
+      });
+      cual.options[0].textContent = "los dos";
+    }
     cual.value = q.get("libro") || "todos";
     /* Al imprimir un solo libro, el corte de página que separa un libro del
        siguiente se aplicaba igual: el anterior está oculto pero sigue siendo

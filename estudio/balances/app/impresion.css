@@ -150,6 +150,11 @@
 
 * { box-sizing: border-box; }
 
+/* `hidden` lo pone el navegador como `display: none`, pero cualquier regla de
+   acá con más peso —un `.barra .elige { display: flex }`— se lo lleva puesta y
+   el elemento escondido se ve igual. Ya pasó dos veces. Escondido es escondido. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0; background: #46524f;
   font-family: var(--sans); color: var(--tinta); font-size: 10pt; line-height: 1.4;
