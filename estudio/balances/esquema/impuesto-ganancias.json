@@ -124,7 +124,8 @@
      "neteo_axi",
      "impuesto"
     ],
-    "por_que_no": "La apertura no es un movimiento del ejercicio; la valuación al cierre y la amortización no son ni una compra ni una venta, y la reexpresión y el impuesto tampoco."
+    "por_que_no": "La apertura no es un movimiento del ejercicio; la valuación al cierre y la amortización no son ni una compra ni una venta, y la reexpresión y el impuesto tampoco.",
+    "sin_fondos": "Tampoco entra el asiento que no toca ninguna cuenta computable: si la cuenta que no computa baja contra el patrimonio neto —el acta que imputa a la distribución los anticipos entregados en ejercicios anteriores—, no entraron ni salieron fondos y la exposición no cambió. El retiro se ajustó en el ejercicio en que la plata salió."
    }
   }
  },
