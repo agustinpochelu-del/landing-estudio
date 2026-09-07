@@ -1136,25 +1136,47 @@
 
     /* ----- fase II: los movimientos del ejercicio -----
 
-       Un asiento cambia la exposición sólo si algo entró o salió de las cuentas
-       computables. Si no toca ninguna, no hubo fondos: la cuenta del socio bajó
-       contra el patrimonio neto y nada más. Es el caso del acta que imputa los
-       anticipos ya entregados a la distribución de resultados —el retiro se
-       ajustó en el ejercicio en que la plata salió—, y también el de cualquier
-       reclasificación entre cuentas que el ajuste no computa. */
-    const esComputable = (c) => (esActivo(c) || esPasivo(c)) && !noComputable(c);
-    const mueveFondos = (a) => a.lineas.some((l) => esComputable(l.cuenta));
+       Lo que entra no es el movimiento de la cuenta que no computa: es lo que el
+       asiento movió de la **posición computable** —activo computable menos
+       pasivo computable—, que es lo único que cambia la exposición. Un asiento
+       que la deja igual no sacó ni trajo fondos.
 
-    const bloque = (defs, signo, soloConFondos) => {
+       El acta de asamblea es el caso: cancela las cuentas de los socios contra
+       los resultados no asignados —los anticipos ya se habían entregado, y el
+       retiro se ajustó en el ejercicio en que la plata salió— y de paso compensa
+       el anticipo del director contra los honorarios a pagar, un activo
+       computable contra un pasivo computable por el mismo importe. Toca cuentas
+       computables, pero la posición queda idéntica: no hay ajuste. */
+    const esComputable = (c) => (esActivo(c) || esPasivo(c)) && !noComputable(c);
+    const movioPosicion = (a) => a.lineas.reduce(
+      (t, l) => t + (esComputable(l.cuenta) ? l.debe - l.haber : 0), 0);
+
+    /* Qué parte de lo que se movió en las cuentas rastreadas fue de verdad
+       fondos: hasta donde llegó el cambio de la posición computable, y nunca más
+       que el propio importe. El retiro del banco entra entero; el acta, en cero;
+       una cancelación mitad en efectivo y mitad contra resultados, por la mitad.
+
+       El tope de 1 es lo que hace que el resumen del mes del banco —un solo
+       asiento con todo el movimiento del mes— no infle el retiro del socio con
+       lo que el banco hizo por otras razones. */
+    const fondosDe = (a, rastreadas) => {
+      const enRastreadas = a.lineas.reduce(
+        (t, l) => t + (rastreadas.has(l.cuenta) ? l.debe - l.haber : 0), 0);
+      if (Math.abs(enRastreadas) < 0.005) return 0;
+      return Math.min(1, Math.max(0, -movioPosicion(a) / enRastreadas));
+    };
+
+    const bloque = (defs, signo, rastreadas) => {
       const grupos = (defs || []).map((def) => {
         const porMes = {};
         this.asientos.forEach((a) => {
           if (a.rol === "apertura") return;
           if ((def.excluir_plantillas || []).indexOf(a.template) >= 0) return;
-          if (soloConFondos && !mueveFondos(a)) return;
+          const parte = rastreadas ? fondosDe(a, rastreadas) : 1;
+          if (!parte) return;
           a.lineas.forEach((l) => {
             if ((def.cuentas || []).indexOf(l.cuenta) < 0) return;
-            const mov = l.debe - l.haber;
+            const mov = (l.debe - l.haber) * parte;
             /* «debe» toma sólo lo que aumentó la cuenta y «haber» sólo lo que la
                bajó; dentro de un mismo mes se netean, que es exacto porque
                llevan el mismo coeficiente. */
@@ -1175,6 +1197,7 @@
     };
     let f2 = g.ajuste_inflacion.fase_ii || {};
     let sinFondos = [];
+    let rastreadas = null;
     /* La fase dinámica se deduce de la misma clasificación de la fase estática:
        cada activo no computable que se mueve cambia la exposición. No hay que
        declarar dos veces la misma decisión. */
@@ -1198,15 +1221,18 @@
       };
       /* Lo que quedó afuera por no mover fondos se dice en el papel: sacar un
          importe de la fase dinámica en silencio sería peor que contarlo mal. */
+      rastreadas = new Set(activos);
       sinFondos = [];
       this.asientos.forEach((a) => {
         if (a.rol === "apertura") return;
         if (fuera.indexOf(a.template) >= 0) return;
-        if (mueveFondos(a)) return;
+        const parte = fondosDe(a, rastreadas);
+        if (Math.abs(parte - 1) < 1e-9) return;
         a.lineas.forEach((l) => {
-          if (activos.indexOf(l.cuenta) < 0) return;
-          sinFondos.push({ fecha: a.fecha, cuenta: l.cuenta,
-                           importe: l.debe - l.haber, glosa: a.glosa || "" });
+          if (!rastreadas.has(l.cuenta)) return;
+          const mov = l.debe - l.haber;
+          sinFondos.push({ fecha: a.fecha, cuenta: l.cuenta, importe: mov,
+                           computado: mov * parte, glosa: a.glosa || "" });
         });
       });
     }
@@ -1214,8 +1240,8 @@
       derivada: !!f2.derivada,
       nota: f2.nota || null,
       sin_fondos: sinFondos,
-      positivos: bloque(f2.positivos, 1, !!f2.derivada),
-      negativos: bloque(f2.negativos, -1, !!f2.derivada),
+      positivos: bloque(f2.positivos, 1, rastreadas),
+      negativos: bloque(f2.negativos, -1, rastreadas),
     };
     r.fase_ii.total = r.fase_ii.positivos.total + r.fase_ii.negativos.total;
 

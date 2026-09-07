@@ -730,10 +730,13 @@
           <td class="num">${impc(g.fase_ii.total)}</td></tr></tfoot>
       </table>
       ${!(g.fase_ii.sin_fondos || []).length ? "" : `
-        <p class="pie-papel">No entraron en la fase dinámica, porque el asiento no
-          movió ninguna cuenta computable —no hubo fondos que entraran ni salieran—:
-          ${g.fase_ii.sin_fondos.map((x) => `${esc(x.cuenta)}, ${esc(x.fecha)},
-            ${impc(x.importe)}`).join("; ")}.</p>`}`;
+        <p class="pie-papel">Estos movimientos no entraron en la fase dinámica, o
+          entraron por menos: el asiento no cambió la posición computable —activo
+          computable menos pasivo computable—, así que no hubo fondos que entraran
+          ni salieran. ${g.fase_ii.sin_fondos.map((x) =>
+            `${esc(x.cuenta)}, ${esc(x.fecha)}, ${impc(x.importe)}${
+              Math.abs(x.computado) > 0.005 ? `, computado ${impc(x.computado)}` : ""}`
+            ).join("; ")}.</p>`}`;
 
     const h = g.honorarios;
     const honorarios = `

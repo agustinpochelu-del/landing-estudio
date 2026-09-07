@@ -125,7 +125,7 @@
      "impuesto"
     ],
     "por_que_no": "La apertura no es un movimiento del ejercicio; la valuación al cierre y la amortización no son ni una compra ni una venta, y la reexpresión y el impuesto tampoco.",
-    "sin_fondos": "Tampoco entra el asiento que no toca ninguna cuenta computable: si la cuenta que no computa baja contra el patrimonio neto —el acta que imputa a la distribución los anticipos entregados en ejercicios anteriores—, no entraron ni salieron fondos y la exposición no cambió. El retiro se ajustó en el ejercicio en que la plata salió."
+    "cuanto_entra": "Cada movimiento entra hasta donde el asiento cambió la posición computable —activo computable menos pasivo computable—, y nunca por más que su propio importe. El retiro pagado por el banco entra entero. El acta de asamblea que cancela las cuentas de los socios contra los resultados no asignados entra en cero: los anticipos ya se habían entregado y el retiro se ajustó en el ejercicio en que la plata salió. Que el acta compense además un activo computable contra un pasivo computable por el mismo importe no cambia nada: la posición queda igual. Lo que queda afuera se imprime al pie del papel."
    }
   }
  },
