@@ -228,9 +228,8 @@
       /* Los roles no viven en el mapeo sino en el ejercicio: se leen del último
          para poder mostrarlos en la planilla que se baja. */
       estado.roles = {};
-      const ficha = (await json(`${RAIZ}/datos/indice.json`)).entes
-        .find((e) => e.slug === slug);
-      const anio = ficha && ficha.ejercicios.length
+      const ficha = (await window.Bolsa.indice()).entes.find((e) => e.slug === slug);
+      const anio = ficha && (ficha.ejercicios || []).length
         ? ficha.ejercicios[ficha.ejercicios.length - 1].anio : null;
       if (anio) {
         const ej = await json(`${RAIZ}/datos/entes/${slug}/${anio}/ejercicio.json`);
@@ -245,9 +244,28 @@
   }
 
   async function arrancar() {
-    const indice = await json(`${RAIZ}/datos/indice.json`);
+    /* El índice sale de la bolsa, no del disco: en la aplicación publicada no
+       hay carpeta `datos/`, y leer el archivo directo dejaba la página en
+       blanco —sin empresas en el selector y sin tabla— en vez de mostrar los
+       ejercicios que se importaron desde el navegador. */
+    let indice;
+    try {
+      indice = await window.Bolsa.indice();
+    } catch (e) {
+      $("#tabla").innerHTML = `<div class="error">No pude leer el índice de
+        empresas: ${esc(e.message)}</div>`;
+      return;
+    }
     const sel = $("#ente");
     const fichas = indice.entes.map((e) => ({ slug: e.slug, nombre: e.denominacion }));
+    /* Sin ninguna empresa no hay plan que mostrar. Pasa la primera vez en la
+       aplicación publicada: todavía no se importó nada. No es un error. */
+    if (!fichas.length) {
+      $("#tabla").innerHTML = `<p class="ayuda">Todavía no hay ninguna empresa.
+        Importá un ejercicio desde <a href="importar.html">Importar datos</a> y
+        el plan de cuentas aparece acá.</p>`;
+      return;
+    }
     fichas.forEach((f) => {
       const o = document.createElement("option");
       o.value = f.slug;
