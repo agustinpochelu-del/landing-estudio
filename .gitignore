@@ -17,3 +17,10 @@ Memoria.md
 # nadie adentro, y sin ella el boton "Descargar el modelo vacio" queda roto.
 # La ruta va completa a proposito: no abre la puerta a ningun otro .xlsx.
 !estudio/balances/plantilla/modelo-importacion.xlsx
+
+# Registro de complementos instalados (agentes, skills, CLIs). Rutas locales,
+# no es contenido del sitio.
+Complementos.md
+
+# Salida generada por graphify: se rearma sola con /graphify.
+graphify-out/

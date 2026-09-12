@@ -16,6 +16,12 @@ Para delegar un trabajo completo de mantenimiento está el subagente
 Leé también `Memoria.md` (privado, fuera de git): son las correcciones y el
 contexto que se fue acumulando sesión a sesión.
 
+`Complementos.md` (también privado, fuera de git) es el registro aparte de lo que
+hay instalado para Claude Code en esta máquina: agentes, skills, plugins y
+herramientas de consola. Vive acá porque es el proyecto que se abre todos los
+días, pero **no es contenido del sitio**: mantener la página nunca lo toca. Si se
+instala un complemento nuevo, se anota ahí en el momento.
+
 ## Memoria
 
 **Cuando Agustín te corrija, o aparezca contexto nuevo del negocio o del
