@@ -119,14 +119,38 @@
       </div>
     </article>
 
+    <article class="tool">
+      <span class="tool-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18l2.5-1.5L10 21l2-1.5L14 21l2.5-1.5L19 21V3H5Z"/><path d="M8.5 8h7"/><path d="M8.5 12h7"/><path d="M8.5 16h4"/></svg>
+      </span>
+      <div class="tool-body">
+        <h2>Honorarios</h2>
+        <p>
+          El padrón de clientes con sus abonos y los ajustes de cada uno, el devengamiento
+          mes a mes, la cuenta corriente y la emisión de facturas y notas de crédito, con
+          el PDF y el envío por mail. Nada se emite sin confirmarlo antes en pantalla.
+        </p>
+        <ul class="tool-meta">
+          <li>Facturación y cobranzas</li>
+          <li>Base propia</li>
+          <li>Acceso propio</li>
+        </ul>
+        <!-- Vive en Render, no acá: necesita Chromium para imprimir la factura en PDF.
+             Si se renombra el servicio en Render, cambia el subdominio y hay que
+             actualizar este link. En el plan gratis el servicio se apaga a los 15
+             minutos sin uso y la primera entrada tarda cerca de un minuto. -->
+        <a class="btn btn-primary" href="https://honorarios-l8q3.onrender.com" target="_blank" rel="noopener">Abrir Honorarios</a>
+      </div>
+    </article>
+
     <div class="tools-notice">
       <span class="auth-notice-ico" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
       </span>
       <p>
-        Entraste con la clave del estudio. El importador de Libro de IVA se publica acá
-        adentro y usa esta misma clave; el liquidador vive en otro servidor y pide la suya
-        aparte.
+        Entraste con la clave del estudio. El importador de Libro de IVA y los estados
+        contables se publican acá adentro y usan esta misma clave; el liquidador y
+        Honorarios viven en otros servidores y piden la suya aparte.
       </p>
     </div>
 
