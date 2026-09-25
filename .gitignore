@@ -18,6 +18,11 @@ Memoria.md
 # La ruta va completa a proposito: no abre la puerta a ningun otro .xlsx.
 !estudio/balances/plantilla/modelo-importacion.xlsx
 
+# Inventario de servicios, credenciales y dónde vive cada cosa. No tiene
+# ninguna clave adentro, pero es el mapa completo de la infraestructura y el
+# repositorio es público. No se sube.
+Servicios.md
+
 # Registro de complementos instalados (agentes, skills, CLIs). Rutas locales,
 # no es contenido del sitio.
 Complementos.md
