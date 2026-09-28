@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<!-- Sin cache: es una herramienta local que se edita seguido. Sin esto el
+     navegador se queda con el HTML viejo, sigue pidiendo las versiones viejas
+     de los .js y un arreglo recien hecho parece no funcionar. -->
+<meta http-equiv="cache-control" content="no-store">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquidador de sueldos</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css?v=70">
+<style>
+  .recibo { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px 20px; margin: 16px 0; }
+  .recibo h3 { margin: 0; font-size: 15px; }
+  .recibo .cuil { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  table.recibo-detalle { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
+  table.recibo-detalle th, table.recibo-detalle td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+  table.recibo-detalle th:first-child, table.recibo-detalle td:first-child { text-align: left; }
+  table.recibo-detalle th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  table.recibo-detalle td.num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  table.recibo-detalle tr.suma td { font-weight: 600; border-top: 2px solid var(--line); }
+  table.recibo-detalle tr.neto td { font-weight: 700; }
+  .igual { color: #1c6b3f; }
+  .distinto { color: #a1121c; font-weight: 600; }
+
+  /* La grilla de novedades: una fila por empleado, se tipea encima. */
+  .grilla-envoltorio { overflow-x: auto; }
+  table.novedades { border-collapse: collapse; font-size: 13px; min-width: 100%; }
+  table.novedades th, table.novedades td { padding: 4px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.novedades thead th { font-size: 11.5px; color: var(--muted); font-weight: 600; text-align: right; vertical-align: bottom; }
+  table.novedades thead th:first-child { text-align: left; }
+  table.novedades th small { display: block; font-weight: 400; opacity: .7; }
+  table.novedades td.empleado { text-align: left; }
+  table.novedades td.empleado .n { font-weight: 600; }
+  table.novedades td.empleado .c { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  table.novedades input {
+    width: 100%; min-width: 96px; text-align: right; padding: 4px 6px;
+    font: inherit; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit;
+  }
+  table.novedades input.corto { min-width: 56px; }
+  table.novedades input:focus { outline: 2px solid #2d6cdf; outline-offset: -1px; }
+  table.novedades input.objetivo { border-style: dashed; font-weight: 600; }
+  table.novedades input.mal-tipeado { border-color: #a1121c; background: rgba(161,18,28,.06); }
+  table.novedades td.calculado { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  table.novedades .corte { border-left: 2px solid var(--line); }
+  table.novedades tfoot td { font-weight: 600; border-top: 2px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+  table.novedades tfoot td:first-child { text-align: left; }
+
+  .ficha-resumen { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 12px 0 0; font-size: 13px; }
+  .ficha-resumen > div { min-width: 170px; }
+  .ficha-resumen dt { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .ficha-resumen dd { margin: 3px 0 0; font-variant-numeric: tabular-nums; }
+  .fila-campos { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; margin-bottom: 14px; }
+  .fila-campos label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); }
+  .fila-campos select, .fila-campos input[type="month"] { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  .sello-version { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  .sello-version code { font-variant-numeric: tabular-nums; }
+  .sello-version.vieja { color: #a1121c; font-weight: 600; }</style>
+</head>
+<body>
+<div class="envoltorio">
+
+<header class="principal">
+  <h1>Liquidador de sueldos</h1>
+  <p>
+    Liquida el mes desde el legajo de cada empleado: el sueldo básico y la
+    antigüedad salen de ahí, y en pantalla se toca solo lo que cambió. Salen los
+    recibos y la planilla que el armador convierte en el TXT del libro. Todo
+    pasa en esta computadora: nada sale del navegador.
+  </p>
+  <p class="nota">
+    <a href="armador.html">Armador del TXT</a>
+  </p>
+  <p class="sello-version" id="sello-version"></p>
+</header>
+
+<div id="estado-memoria"></div>
+
+<details class="paso" open>
+  <summary>
+    <span class="numero">1</span> La empresa y el mes
+    <span class="resumen" id="resumen-empresa">Sin cargar</span>
+  </summary>
+  <div class="cuerpo">
+    <div class="fila-campos">
+      <label>Empresa
+        <select id="empresa"></select>
+      </label>
+      <label>Período
+        <input type="month" id="periodo">
+      </label>
+      <label>&nbsp;
+        <button id="rehacer" type="button">Rehacer desde el legajo</button>
+      </label>
+    </div>
+
+    <p class="nota">
+      El legajo se carga una vez y queda guardado en esta computadora. Tiene que
+      traer <strong>fecha de ingreso</strong> y <strong>sueldo básico</strong>:
+      son los que hacen que la liquidación salga sola en vez de tipearla.
+    </p>
+    <div class="soltar" id="soltar-padron">
+      <input type="file" id="archivo-padron" accept=".csv,.xlsx,.xlsm">
+      <span>Soltá acá <code>Empleados &lt;CUIT&gt;.csv</code></span>
+    </div>
+    <div id="estado-padron"></div>
+    <div id="ficha"></div>
+  </div>
+</details>
+
+<details class="paso" open>
+  <summary>
+    <span class="numero">2</span> Las novedades del mes
+    <span class="resumen" id="resumen-novedades">Sin cargar</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Ya viene llena con el mes completo. Tipeá arriba de lo que cambió y los
+      recibos se recalculan solos. En <strong>Neto a pagar</strong> podés
+      escribir el neto que querés y el «a cuenta de futuros aumentos» se despeja
+      para llegar ahí.
+    </p>
+    <div id="avisos-novedades"></div>
+    <div class="grilla-envoltorio"><div id="grilla"></div></div>
+    <div class="botonera">
+      <button id="bajar-novedades" type="button" disabled>Bajar las novedades</button>
+      <button id="bajar-legajo" type="button" disabled>Bajar el legajo actualizado</button>
+    </div>
+  </div>
+</details>
+
+<details class="paso" open>
+  <summary>
+    <span class="numero">3</span> El piso del convenio
+    <span class="resumen" id="resumen-convenio">Sin controlar</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      El convenio es el mínimo. Pagar por encima está bien y es lo que hace la
+      empresa; lo que no puede pasar es quedar por debajo sin darse cuenta.
+      Acá se compara concepto por concepto contra la escala del acuerdo.
+    </p>
+    <div id="convenio"></div>
+  </div>
+</details>
+
+<details class="paso" open>
+  <summary>
+    <span class="numero">4</span> Los recibos
+    <span class="resumen" id="resumen-recibos">Sin liquidar</span>
+  </summary>
+  <div class="cuerpo">
+    <div id="avisos"></div>
+    <div id="recibos"></div>
+  </div>
+</details>
+
+<details class="paso">
+  <summary>
+    <span class="numero">5</span> El cotejo contra el recibo emitido
+    <span class="resumen" id="resumen-cotejo">Opcional</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Sirve para controlar un mes que se liquidó afuera. Soltá el
+      <code>Sueldos_MM-AAAA.xlsm</code> del mismo período y se compara contra lo
+      liquidado acá, para ver si hay diferencias y de qué lado están.
+    </p>
+    <div class="soltar" id="soltar-cotejo">
+      <input type="file" id="archivo-cotejo" accept=".xlsx,.xlsm">
+      <span>Soltá acá <code>Sueldos_MM-AAAA.xlsm</code></span>
+    </div>
+    <div id="estado-cotejo"></div>
+    <div id="cotejo"><p class="nota">Cargá el recibo emitido acá arriba.</p></div>
+  </div>
+</details>
+
+<details class="paso">
+  <summary>
+    <span class="numero">6</span> La planilla para el armador
+    <span class="resumen" id="resumen-planilla"></span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Lo liquidado, en la misma forma que lee el armador del TXT: una fila por
+      concepto liquidado. Se baja y se suelta en el paso 3 del
+      <a href="armador.html">armador</a>. Los conceptos que se pagan y no se
+      informan quedan afuera.
+    </p>
+    <div class="botonera">
+      <button id="bajar-planilla" disabled>Bajar la planilla</button>
+    </div>
+    <div class="tabla-envoltorio"><div id="previa-planilla"></div></div>
+  </div>
+</details>
+
+</div>
+
+<script src="registros.js?v=70"></script>
+<script src="version.js?v=70"></script>
+<script src="tablas.js?v=70"></script>
+<script src="perfiles.js?v=70"></script>
+<script src="topes.js?v=70"></script>
+<script src="xlsx.js?v=70"></script>
+<script src="sueldos.js?v=70"></script>
+<script src="reservorios.js?v=70"></script>
+<script src="convenios.js?v=70"></script>
+<script src="cifrado.js?v=70"></script>
+<script src="empresa.js?v=70"></script>
+<script src="liquidador.js?v=70"></script>
+<script src="recibos.js?v=70"></script>
+</body>
+</html>

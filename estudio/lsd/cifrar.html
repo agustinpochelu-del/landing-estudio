@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="cache-control" content="no-store">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cifrar un reservorio</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css?v=70">
+<style>
+  .sello-version { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  .sello-version code { font-variant-numeric: tabular-nums; }
+  .sello-version.vieja { color: #a1121c; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+<header class="principal">
+  <h1>Cifrar un reservorio</h1>
+  <p>
+    Prepara el reservorio de empleados para publicarlo. El archivo sale cifrado:
+    en el servidor y en el repositorio es ruido, y se abre solamente en el
+    navegador, con la frase. Todo pasa en esta computadora.
+  </p>
+  <p class="nota">
+    <a href="armador.html">Armador del libro</a> ·
+    <a href="recibos.html">Liquidador de sueldos</a>
+  </p>
+  <p class="sello-version" id="sello-version"></p>
+</header>
+
+<details class="paso" id="paso-cifrar" open>
+  <summary>
+    <span class="numero">1</span> El archivo y la frase
+    <span class="resumen" id="resumen-cifrar">Sin cargar</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Sirve para cualquier archivo, pero el que importa es
+      <code>Empleados &lt;CUIT&gt;.csv</code>: es el único que lleva CUIL, nombre
+      y CBU. El de conceptos no tiene ningún dato personal y va sin cifrar.
+    </p>
+
+    <div class="soltar" id="soltar-claro">
+      <p>Arrastrá acá el archivo a cifrar.</p>
+      <input type="file" id="archivo-claro">
+    </div>
+
+    <div class="campos">
+      <div>
+        <label for="frase">La frase
+          <span class="ayuda">Larga. Es lo único que protege el archivo</span>
+        </label>
+        <input type="password" id="frase" autocomplete="new-password">
+      </div>
+      <div>
+        <label for="frase2">Otra vez
+          <span class="ayuda">Para no cifrar con una frase mal tipeada</span>
+        </label>
+        <input type="password" id="frase2" autocomplete="new-password">
+      </div>
+    </div>
+
+    <p class="nota">
+      <strong>Si la frase se pierde, el archivo no se recupera.</strong> El CSV
+      sin cifrar en la carpeta de la empresa sigue siendo el respaldo.
+    </p>
+
+    <div class="botonera">
+      <button id="btn-cifrar" disabled>Cifrar y bajar</button>
+    </div>
+    <div id="estado-cifrar"></div>
+  </div>
+</details>
+
+<details class="paso" id="paso-probar" open>
+  <summary>
+    <span class="numero">2</span> Probar que abre
+    <span class="resumen" id="resumen-probar">Sin probar</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Antes de publicarlo conviene abrirlo acá con la frase, y ver que salgan las
+      filas que tienen que salir. Un archivo cifrado que nadie probó es un
+      archivo que se descubre roto el día que hace falta.
+    </p>
+    <div class="soltar" id="soltar-cifrado">
+      <p>Arrastrá acá el archivo <code>.enc</code> para probarlo.</p>
+      <input type="file" id="archivo-cifrado" accept=".enc,.json">
+    </div>
+    <div id="estado-probar"></div>
+  </div>
+</details>
+
+</div>
+
+<script src="version.js?v=70"></script>
+<script src="cifrado.js?v=70"></script>
+<script src="cifrar-pagina.js?v=70"></script>
+</body>
+</html>

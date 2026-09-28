@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<!-- Sin cache: es una herramienta local que se edita seguido. Sin esto el
+     navegador se queda con el HTML viejo, sigue pidiendo las versiones viejas
+     de los .js y un arreglo recien hecho parece no funcionar. -->
+<meta http-equiv="cache-control" content="no-store">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Armador de Libro de Sueldos Digital</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css?v=70">
+<style>
+  .sello-version { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  .sello-version code { font-variant-numeric: tabular-nums; }
+  .sello-version.vieja { color: #a1121c; font-weight: 600; }</style>
+</head>
+<body>
+<div class="envoltorio">
+
+<header class="principal">
+  <h1>Armador de Libro de Sueldos Digital</h1>
+  <p>
+    Convierte la planilla de liquidación en el archivo TXT que importa el servicio
+    de ARCA, y controla antes de subirlo lo mismo que controla el servicio.
+    Todo pasa en esta computadora: la planilla no sale del navegador.
+  </p>
+  <p class="nota">
+    <a href="recibos.html">Liquidador de sueldos</a> ·
+    <a href="credito.html">Crédito fiscal</a>
+  </p>
+  <p class="sello-version" id="sello-version"></p>
+</header>
+
+<!-- 1 ---------------------------------------------------------------- -->
+<details class="paso" id="paso-datos" open>
+  <summary>
+    <span class="numero">1</span> Los datos de la liquidación
+    <span class="resumen" id="resumen-datos">Sin completar</span>
+  </summary>
+  <div class="cuerpo">
+    <div class="campos">
+      <!-- La lista sale del índice de `reservorios/`. Si esa carpeta no está,
+           queda escondida y se escribe el CUIT como siempre. -->
+      <div id="caja-empleador" hidden>
+        <label for="empleador">Empleador
+          <span class="ayuda">Los que ya tienen su reservorio</span>
+        </label>
+        <select id="empleador"></select>
+      </div>
+      <div>
+        <label for="cuit">CUIT del empleador
+          <span class="ayuda">Sin guiones</span>
+        </label>
+        <input type="text" id="cuit" inputmode="numeric" placeholder="30123456789">
+      </div>
+      <div>
+        <label for="periodo">Período
+          <span class="ayuda" id="ayuda-periodo">AAAAMM</span>
+        </label>
+        <input type="text" id="periodo" inputmode="numeric" placeholder="202603">
+      </div>
+      <div>
+        <label for="nroLiquidacion">Número de liquidación
+          <span class="ayuda">Ascendente dentro del período</span>
+        </label>
+        <input type="text" id="nroLiquidacion" inputmode="numeric" value="1">
+      </div>
+      <div>
+        <label for="tipoLiquidacion">Tipo de liquidación</label>
+        <select id="tipoLiquidacion">
+          <option value="M">M — Mensual</option>
+          <option value="Q">Q — Quincenal</option>
+          <option value="D">D — Por días</option>
+          <option value="H">H — Por horas</option>
+        </select>
+      </div>
+      <div>
+        <label for="envio">Identificación del envío</label>
+        <select id="envio">
+          <option value="SJ">SJ — Liquidación y datos del F931</option>
+          <option value="RE">RE — Solo datos del F931 (rectificativa)</option>
+        </select>
+      </div>
+      <div>
+        <label for="topeMes">Tope mensual de ANSeS
+          <span class="ayuda">Vacío = el del reservorio para ese período</span>
+        </label>
+        <input type="text" id="topeMes" inputmode="decimal" placeholder="0,00">
+      </div>
+      <div>
+        <label for="fechaPago">Fecha de pago
+          <span class="ayuda">Solo si la planilla no la trae</span>
+        </label>
+        <input type="date" id="fechaPago">
+      </div>
+      <div>
+        <label for="fechaRubrica">Fecha de rúbrica
+          <span class="ayuda">Vacía si no se informa</span>
+        </label>
+        <input type="date" id="fechaRubrica">
+      </div>
+    </div>
+    <p class="nota">
+      La <strong>fecha de pago</strong> sale de la planilla cuando la trae. Si
+      no, se usa la de acá. Conviene mirarla: los tres clientes venían
+      presentando una fecha vieja cableada en su planilla de armado.
+    </p>
+    <p class="nota">
+      El tope se toma solo del reservorio, según el período. El campo de arriba
+      es para pisarlo a mano cuando haga falta. Topea <code>REM 1</code>,
+      <code>REM 4</code> y <code>REM 5</code>.
+    </p>
+    <div id="origen-tope"></div>
+
+    <h3 class="subtitulo">Las alícuotas de aportes</h3>
+    <p class="nota">
+      ARCA recalcula estos tres aportes sobre las bases y los cruza contra el
+      recibo. Si no coinciden, el libro definitivo sale con el número de ARCA.
+      Cargalas para que el control corra; si van vacías, no se controla.
+    </p>
+    <div class="campos">
+      <div>
+        <label for="alicSipa">SIPA sobre REM 1
+          <span class="ayuda">%</span>
+        </label>
+        <input type="text" id="alicSipa" inputmode="decimal" placeholder="11">
+      </div>
+      <div>
+        <label for="alicInssjyp">INSSJyP sobre REM 5
+          <span class="ayuda">%</span>
+        </label>
+        <input type="text" id="alicInssjyp" inputmode="decimal" placeholder="3">
+      </div>
+      <div>
+        <label for="alicOS">Obra social sobre REM 4
+          <span class="ayuda">%</span>
+        </label>
+        <input type="text" id="alicOS" inputmode="decimal" placeholder="3">
+      </div>
+      <div>
+        <label for="alicAdherente">Adicional por adherente
+          <span class="ayuda">% que se suma al de obra social, por cada uno</span>
+        </label>
+        <input type="text" id="alicAdherente" inputmode="decimal" placeholder="1,5">
+      </div>
+    </div>
+  </div>
+</details>
+
+<!-- 2 ---------------------------------------------------------------- -->
+<details class="paso" id="paso-parametrizacion" open>
+  <summary>
+    <span class="numero">2</span> Lo que no cambia mes a mes
+    <span class="resumen" id="resumen-parametrizacion">Sin cargar</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Lo de esta sección se arma una vez por empresa y se vuelve a usar todos los
+      meses. Lo único que cambia de un mes al otro son los importes.
+    </p>
+
+    <h3 class="subtitulo">El reservorio de conceptos</h3>
+    <p class="nota">
+      Ata cada concepto del empleador con su concepto ARCA y sus subsistemas. Se
+      exporta desde el módulo <strong>CONCEPTOS</strong> del propio servicio. Sin ella
+      el archivo se arma igual, pero no se pueden calcular las bases imponibles y el
+      control queda a medias.
+    </p>
+    <div class="soltar" id="soltar-parametrizacion">
+      <p>Arrastrá acá el reservorio de conceptos, o la exportación del servicio.</p>
+      <input type="file" id="archivo-parametrizacion" accept=".xlsx,.xlsm,.csv,.txt">
+    </div>
+    <div id="detalle-parametrizacion"></div>
+
+    <h3 class="subtitulo">El reservorio de empleados</h3>
+    <p class="nota">
+      Una fila por CUIL con los datos de la relación laboral: obra social,
+      modalidad, situación, condición, actividad, localidad, situación de revista,
+      CBU y legajo. Salen del alta en Simplificación Registral y del sistema. Sin
+      reservorio, el registro 04 sale casi vacío.
+    </p>
+    <div class="soltar" id="soltar-padron">
+      <p>Arrastrá acá el reservorio de empleados de la empresa.</p>
+      <input type="file" id="archivo-padron" accept=".xlsx,.xlsm,.csv,.txt">
+    </div>
+    <div id="detalle-padron"></div>
+
+    <h3 class="subtitulo">Los conceptos que no se pasan</h3>
+    <div class="campos" style="margin-top:12px">
+      <div style="grid-column:1/-1">
+        <label for="excluidos">Conceptos que no se pasan al libro
+          <span class="ayuda">
+            Códigos del empleador separados por coma. Van los que el servicio no
+            admite —por ejemplo un embargo por cuota alimentaria—. Se dejan afuera
+            del archivo y quedan listados en el paso 5.
+          </span>
+        </label>
+        <input type="text" id="excluidos" placeholder="209, 210">
+      </div>
+    </div>
+
+    <div id="novedades"></div>
+  </div>
+</details>
+
+<!-- 3 ---------------------------------------------------------------- -->
+<details class="paso" id="paso-planilla" open>
+  <summary>
+    <span class="numero">3</span> La planilla de liquidación
+    <span class="resumen" id="resumen-planilla">Sin cargar</span>
+  </summary>
+  <div class="cuerpo">
+    <p class="nota">
+      Una fila por concepto liquidado, con el CUIL repetido en cada fila del mismo
+      trabajador. Los datos del trabajador se toman de su primera fila.
+    </p>
+    <div class="soltar" id="soltar-planilla">
+      <p>Arrastrá acá la exportación de conceptos del mes. Lee <code>.xlsx</code> y <code>.csv</code>.</p>
+      <input type="file" id="archivo-planilla" accept=".xlsx,.xlsm,.csv,.txt">
+    </div>
+    <div id="detalle-planilla"></div>
+    <div id="selector-liquidacion"></div>
+  </div>
+</details>
+
+<!-- 4 ---------------------------------------------------------------- -->
+<details class="paso" id="paso-columnas">
+  <summary>
+    <span class="numero">4</span> Las columnas reconocidas
+    <span class="resumen" id="resumen-columnas">Todavía no hay planilla</span>
+  </summary>
+  <div class="cuerpo" id="cuerpo-columnas"></div>
+</details>
+
+<!-- 5 ---------------------------------------------------------------- -->
+<details class="paso" id="paso-control">
+  <summary>
+    <span class="numero">5</span> El control previo
+    <span class="resumen" id="resumen-control">Todavía no se corrió</span>
+  </summary>
+  <div class="cuerpo" id="cuerpo-control"></div>
+</details>
+
+<!-- 6 ---------------------------------------------------------------- -->
+<details class="paso" id="paso-archivo" open>
+  <summary>
+    <span class="numero">6</span> El archivo
+    <span class="resumen" id="resumen-archivo">Todavía no se generó</span>
+  </summary>
+  <div class="cuerpo" id="cuerpo-archivo">
+    <p class="nota">Cargá la planilla del paso 3 para generar el archivo.</p>
+  </div>
+</details>
+
+</div>
+
+<script src="registros.js?v=70"></script>
+<script src="version.js?v=70"></script>
+<script src="tablas.js?v=70"></script>
+<script src="perfiles.js?v=70"></script>
+<script src="topes.js?v=70"></script>
+<script src="xlsx.js?v=70"></script>
+<script src="sueldos.js?v=70"></script>
+<script src="reservorios.js?v=70"></script>
+<script src="cifrado.js?v=70"></script>
+<script src="empresa.js?v=70"></script>
+<script src="recibo-origen.js?v=70"></script>
+<script src="credito.js?v=70"></script>
+<script src="app.js?v=70"></script>
+</body>
+</html>

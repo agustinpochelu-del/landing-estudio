@@ -1,0 +1,434 @@
+/*
+ * Presentación del armador de Libro de Sueldos Digital.
+ *
+ * Los colores y las tipografías son los de estudiopochelu.com y los mismos
+ * que usa el importador de Libro de IVA Digital: las dos herramientas del
+ * estudio tienen que verse hermanas. La identidad visual es zona protegida:
+ * no se cambia por iniciativa propia.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Marca */
+  --green-900: #082622;
+  --green-800: #0e3b34;
+  --green-700: #145046;
+  --green-600: #1b6b5c;
+  --green-500: #2c8a76;
+  --gold: #c9a227;
+  --gold-soft: #d9bc6a;
+
+  /* Neutros */
+  --ink: #0c1a17;
+  --body: #445350;
+  --muted: #6b7b77;
+  --line: #e1e4df;
+  --cream: #f6f5f0;
+  --cream-2: #efeee7;
+  --white: #ffffff;
+
+  /* Señales. No están en la marca: se usan solo para avisar. */
+  --bien: #146b4e;
+  --bien-fondo: #e4f2ea;
+  --mal: #a32217;
+  --mal-fondo: #fbeae8;
+  --ojo: #8a6410;
+  --ojo-fondo: #faf1dc;
+
+  /* Sistema */
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(8, 38, 34, 0.06), 0 4px 12px rgba(8, 38, 34, 0.05);
+  --shadow-md: 0 2px 6px rgba(8, 38, 34, 0.07), 0 18px 40px rgba(8, 38, 34, 0.09);
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono: 'SF Mono', 'Cascadia Mono', Consolas, 'Liberation Mono', monospace;
+  --wrap: 1160px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 20px 80px;
+  background: var(--cream);
+  color: var(--body);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.envoltorio { max-width: var(--wrap); margin: 0 auto; }
+
+/* ---------- Encabezado ---------- */
+
+header.principal {
+  padding: 40px 0 28px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 28px;
+}
+
+header.principal h1 {
+  font-family: var(--serif);
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--green-900);
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+header.principal p { margin: 0; color: var(--muted); max-width: 70ch; }
+
+/* ---------- Pasos ---------- */
+
+.paso {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.paso > summary {
+  cursor: pointer;
+  padding: 18px 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  list-style: none;
+  font-weight: 600;
+  color: var(--green-800);
+}
+
+.paso > summary::-webkit-details-marker { display: none; }
+
+.paso > summary::before {
+  content: '▸';
+  color: var(--green-500);
+  font-size: 13px;
+  transition: transform 0.15s ease;
+}
+
+.paso[open] > summary::before { transform: rotate(90deg); }
+
+.paso > summary .numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--green-700);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  flex: none;
+  align-self: center;
+}
+
+.paso > summary .resumen {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: 13.5px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.cuerpo { padding: 4px 24px 24px; border-top: 1px solid var(--line); }
+
+/* ---------- Formularios ---------- */
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin: 18px 0 4px;
+}
+
+label { display: block; font-size: 13px; font-weight: 600; color: var(--green-800); margin-bottom: 5px; }
+
+label .ayuda { display: block; font-weight: 400; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+input[type='text'], input[type='number'], select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--white);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+input:focus, select:focus { outline: 2px solid var(--green-500); outline-offset: -1px; border-color: transparent; }
+
+/* ---------- Zona de archivo ---------- */
+
+.soltar {
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  text-align: center;
+  background: var(--cream-2);
+  transition: border-color 0.15s ease, background 0.15s ease;
+  margin-top: 16px;
+}
+
+.soltar.encima { border-color: var(--green-500); background: var(--bien-fondo); }
+.soltar p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+
+/* ---------- Botones ---------- */
+
+button {
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--green-700);
+  background: var(--green-700);
+  color: var(--white);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+button:hover:not(:disabled) { background: var(--green-600); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.suave { background: var(--white); color: var(--green-700); }
+button.suave:hover:not(:disabled) { background: var(--cream-2); }
+
+.botonera { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+
+/* ---------- Tablas ---------- */
+
+.tabla-envoltorio { overflow-x: auto; margin-top: 16px; }
+
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+
+th {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+td.numero, th.numero { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+tr:last-child td { border-bottom: none; }
+
+tbody tr:hover { background: var(--cream); }
+
+/* ---------- Señales ---------- */
+
+.marca {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.marca.bien { background: var(--bien-fondo); color: var(--bien); }
+.marca.mal { background: var(--mal-fondo); color: var(--mal); }
+.marca.ojo { background: var(--ojo-fondo); color: var(--ojo); }
+
+.aviso {
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-top: 16px;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.aviso.bien { background: var(--bien-fondo); color: var(--bien); border-color: #bfe0cd; }
+.aviso.mal { background: var(--mal-fondo); color: var(--mal); border-color: #f0c9c5; }
+.aviso.ojo { background: var(--ojo-fondo); color: var(--ojo); border-color: #ecd9a8; }
+
+/*
+ * Un aviso que se pliega. Lo usa el detalle de ajustes del paso 6: son decenas
+ * de renglones y, abiertos, empujaban el botón de bajar el archivo fuera de la
+ * pantalla. El detalle sigue entero, pero hay que pedirlo.
+ */
+.aviso.plegable { padding: 0; }
+
+.aviso.plegable > summary {
+  cursor: pointer;
+  padding: 14px 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  list-style: none;
+}
+
+.aviso.plegable > summary::-webkit-details-marker { display: none; }
+
+.aviso.plegable > summary::before {
+  content: '▸';
+  font-size: 13px;
+  transition: transform 0.15s ease;
+}
+
+.aviso.plegable[open] > summary::before { transform: rotate(90deg); }
+
+.aviso.plegable > summary:focus-visible {
+  outline: 2px solid var(--ojo);
+  outline-offset: -2px;
+  border-radius: var(--radius);
+}
+
+.aviso.plegable .cuantos { font-weight: 400; opacity: 0.75; }
+
+.aviso.plegable .detalle { padding: 0 18px 14px; }
+.aviso.plegable .detalle p { margin: 0 0 7px; }
+.aviso.plegable .detalle p:last-child { margin-bottom: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso.plegable > summary::before { transition: none; }
+}
+
+.lista-hallazgos { list-style: none; padding: 0; margin: 16px 0 0; }
+
+.lista-hallazgos li {
+  padding: 10px 14px;
+  border-left: 3px solid var(--line);
+  background: var(--cream-2);
+  border-radius: 0 9px 9px 0;
+  margin-bottom: 7px;
+  font-size: 13.5px;
+}
+
+.lista-hallazgos li.error { border-left-color: var(--mal); background: var(--mal-fondo); }
+.lista-hallazgos li.aviso { border-left-color: var(--ojo); background: var(--ojo-fondo); }
+.lista-hallazgos li .quien { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-right: 8px; }
+
+/* ---------- Vista previa del archivo ---------- */
+
+.previa {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  background: var(--green-900);
+  color: #cfe3dd;
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  white-space: pre;
+  margin-top: 16px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.nota { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+.nota code, .previa strong { font-family: var(--mono); }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  background: var(--cream-2);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+
+/* ---------- Pruebas ---------- */
+
+.prueba { padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; display: flex; gap: 10px; }
+.prueba .estado { flex: none; width: 62px; font-weight: 700; font-size: 12px; }
+.prueba.pasa .estado { color: var(--bien); }
+.prueba.falla .estado { color: var(--mal); }
+.prueba .detalle { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+
+/* Subtítulos dentro de un paso, para separar sus partes. */
+.subtitulo {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--green-800);
+  margin: 28px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.cuerpo > .subtitulo:first-of-type { border-top: none; padding-top: 0; margin-top: 20px; }
+
+/* ---------- Novedades de los reservorios ---------- */
+
+.novedad {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-top: 14px;
+  background: var(--cream-2);
+}
+
+.novedad-titulo {
+  font-weight: 600;
+  color: var(--green-800);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.novedad .campos { margin-bottom: 0; }
+
+/* ---------- El diálogo que pide la frase ---------- */
+
+/*
+ * Aparece cuando un reservorio viene cifrado. Es el único diálogo modal de la
+ * aplicación: todo lo demás pasa en la página. Acá hace falta porque la frase
+ * frena la carga —sin ella no hay reservorio— y una caja más entre las otras
+ * se pasaría por alto, que es exactamente lo que ya nos costó tres rondas con
+ * el paso 2 cerrado.
+ */
+.dialogo-frase {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0;
+  max-width: 460px;
+  width: calc(100% - 32px);
+  background: var(--white);
+  color: var(--body);
+  box-shadow: 0 18px 50px rgba(8, 38, 34, 0.22);
+}
+.dialogo-frase::backdrop { background: rgba(8, 38, 34, 0.45); }
+.dialogo-frase form { padding: 22px 24px 18px; }
+.dialogo-frase h3 {
+  margin: 0 0 6px;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 19px;
+  color: var(--green-800);
+}
+.dialogo-frase label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-800);
+}
+.dialogo-frase input { width: 100%; }
+.dialogo-frase menu {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin: 18px 0 0;
+  padding: 0;
+}
+
+/* Un pedazo de archivo, para confirmar a ojo que es el que se esperaba. */
+.codigo {
+  background: var(--cream-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: pre;
+}

@@ -26,6 +26,12 @@
       ]
     },
     {
+      "source": "/estudio/lsd/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, must-revalidate" }
+      ]
+    },
+    {
       "source": "/(.*).(svg|png|jpg|jpeg|webp|woff2)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
