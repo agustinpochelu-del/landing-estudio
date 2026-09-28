@@ -18,19 +18,26 @@ Memoria.md
 # La ruta va completa a proposito: no abre la puerta a ningun otro .xlsx.
 !estudio/balances/plantilla/modelo-importacion.xlsx
 
-# Los reservorios de CONCEPTOS del armador de sueldos. Son codigo de concepto,
-# descripcion y las quince marcas de subsistema: ni un CUIL, ni un nombre, ni un
-# CBU. Verificado en los tres.
+# Los reservorios del armador de sueldos. Acá la regla se da vuelta: en vez de
+# bloquear lo peligroso, se bloquea TODO y se destapa lo que se puede publicar.
 #
-# Cada ruta va completa, una por una, POR LA MISMA RAZON de siempre y esta vez
-# con mas motivo: al lado viven los "Empleados <CUIT>.csv", que SI llevan CUIL,
-# nombre y CBU. Una excepcion con comodin —!estudio/lsd/reservorios/*.csv— los
-# destaparia a los dos de una sola vez, y nadie se enteraria hasta que fuera
-# tarde. Los de empleados se publican cifrados, como .csv.enc, y el .enc no lo
-# bloquea esta regla porque no termina en .csv.
-!estudio/lsd/reservorios/Conceptos 30644965593.csv
-!estudio/lsd/reservorios/Conceptos 20227823357.csv
-!estudio/lsd/reservorios/Conceptos 27134231780.csv
+# Es la única carpeta del repositorio donde conviven archivos que pueden subir
+# con archivos que no pueden subir nunca, y con el mismo nombre de base:
+#
+#   Conceptos <CUIT>.csv        codigo, descripcion y las quince marcas de
+#                               subsistema. Ni un CUIL, ni un nombre, ni un CBU.
+#   Empleados <CUIT>.csv.enc    el padron, cifrado. Adentro es ruido.
+#   Empleados <CUIT>.csv        el padron EN CLARO: CUIL, nombre y CBU.
+#
+# Se probó al reves antes de confiar en esto: con la regla anterior —que
+# bloqueaba *.csv y destapaba los de conceptos uno por uno— un archivo
+# "Empleados <CUIT>.csv.bak" NO quedaba bloqueado por nada, y los .bak son
+# copias enteras del padron en claro. Con lista blanca, lo que no esté nombrado
+# acá abajo no sube, se llame como se llame.
+estudio/lsd/reservorios/*
+!estudio/lsd/reservorios/indice.json
+!estudio/lsd/reservorios/Conceptos *.csv
+!estudio/lsd/reservorios/*.csv.enc
 
 # Inventario de servicios, credenciales y dónde vive cada cosa. No tiene
 # ninguna clave adentro, pero es el mapa completo de la infraestructura y el

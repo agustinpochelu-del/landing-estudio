@@ -1,0 +1,10 @@
+# Los reservorios cifrados del armador de sueldos viajan tal cual.
+#
+# Son JSON, así que git los toma por texto y les convierte los fines de línea al
+# guardarlos y al sacarlos. Con este formato no rompe nada —el JSON no se fija
+# en los espacios, y el base64 va entero en su renglón—, pero un archivo cifrado
+# no tiene por qué pasar por ninguna conversión: alcanza con que el día de
+# mañana el formato cambie, o que alguien guarde el sobre de otra manera, para
+# que la conversión se coma un byte y el archivo no abra más. Y eso se
+# descubriría el día que haga falta el padrón.
+*.csv.enc -text -diff

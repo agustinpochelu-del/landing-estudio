@@ -54,9 +54,15 @@ carpeta de la empresa sigue siendo el respaldo.
 | `referencia/` | **NO** | Los PDF y planillas de ARCA. No hacen falta para correr. |
 | `herramientas/servidor.py` | **NO** | Sirve para trabajar en la máquina. |
 
-El `.gitignore` de la landing bloquea `*.csv` y destapa **uno por uno**, con la
-ruta completa, los tres de conceptos. Con comodín destaparía también los de
-empleados, que están en la misma carpeta.
+Para esta carpeta el `.gitignore` de la landing **da vuelta la regla**: bloquea
+todo y destapa nada más que `indice.json`, `Conceptos *.csv` y `*.csv.enc`. Lo
+que no esté nombrado ahí no sube, se llame como se llame.
+
+Es la única carpeta del repositorio donde conviven archivos que pueden subir con
+archivos que no pueden subir nunca, y con el mismo nombre de base. La regla
+anterior —bloquear `*.csv` y destapar los de conceptos uno por uno— dejaba pasar
+un `Empleados <CUIT>.csv.bak`, que es el padrón entero en claro. Se descubrió
+probándola al revés, no leyéndola.
 
 ## El mismo índice sirve en los dos lados
 

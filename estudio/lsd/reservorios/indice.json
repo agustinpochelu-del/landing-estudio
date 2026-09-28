@@ -1,0 +1,79 @@
+{
+  "_lea": "LEEME.md",
+  "_que_es": "Los reservorios que la aplicación lee sola al elegir el empleador. Para sumar una empresa: copiar sus dos CSV a esta carpeta y anotarla acá. No hay que tocar código.",
+  "_excluidos": "Conceptos que esa empresa no pasa al libro. Son de la empresa, no del mes: entran solos y no hay que volver a escribirlos en cada liquidación.",
+  "_recibos": "Solo para los origenes que no son una tabla sino un recibo dibujado por hoja. `alias` traduce la descripcion que imprime el recibo al codigo de concepto de la empresa, porque el recibo no trae el codigo y la descripcion no coincide con la del reservorio de conceptos. `excluidos` de aca va por descripcion, no por numero, por el mismo motivo. Un concepto sin alias no se inventa: sale sin codigo y el control del paso 5 lo marca.",
+  "_provincia": "Donde trabaja la gente, cuando es una sola provincia para toda la empresa. Es el valor por defecto del credito fiscal del decreto 814/2001. La columna Provincia del reservorio de empleados manda sobre esta: se usa cuando el trabajador no la trae. Nautical no la tiene y no debe tenerla, porque su gente esta repartida entre Chubut y Rio Negro.",
+  "_alicuotas": "Los aportes del trabajador, en por ciento. ARCA los recalcula sobre las bases y los cruza contra lo retenido en el recibo; sin estos números ese control no corre, y es el que encontró que a Nautical le faltaba retener $1.950.679,92 en 202609. Van acá por el mismo motivo que todo lo demás: no cambian mes a mes.",
+  "empresas": {
+    "30644965593": {
+      "nombre": "Nautical SRL",
+      "conceptos": "Conceptos 30644965593.csv",
+      "empleados": "Empleados 30644965593.csv",
+      "origen": "F:\\OneDrive\\ESTUDIO\\EMPRESAS\\STADLER\\NAUTICAL\\sueldos",
+      "excluidos": [
+        "209",
+        "210",
+        "403",
+        "513",
+        "522",
+        "531"
+      ],
+      "alicuotas": {
+        "sipa": 11,
+        "inssjyp": 3,
+        "obraSocial": 3,
+        "adherente": 1.5
+      },
+      "consolidar": {
+        "100": "80"
+      },
+      "_por_que_consolidar": "80 «Vacaciones» y 100 «Descuento p/vacaciones pagas» van los dos al concepto ARCA 150000 y con los mismos días. Informados por separado, ARCA suma +8 y −8, le da cero días de vacaciones, no puede topear el adelanto vacacional y descarta el neto de la base: es el rechazo de CAYO en 202609. Se informa el neto con el concepto de vacaciones, que es lo que hacía el armado que ARCA aceptaba.",
+      "aportesAlValorCalculado": true,
+      "_por_que_aportes": "En 202609 el sistema de sueldos venía topeando con una tabla vieja —$3.505.701,36 contra los $4.691.748,47 de la Res. ANSeS 257/2026— y retuvo de menos $1.950.679,92 en once empleados. Decisión de Agustín el 27/09/2026: se informa lo que hay que informar y la diferencia es carga de la empresa. El libro definitivo sale con el número de ARCA de todos modos.",
+      "_fuente_alicuotas": "Confirmadas contra la validación de ARCA del 27/09/2026: su recálculo da $516.092,33 de SIPA y $140.752,45 de PAMI y de obra social sobre una base de $4.691.748,47, que es exactamente el 11 % y el 3 %.",
+      "_por_que_excluidos": "209 y 210 «Expte. N 0071-16» y 403 «Dev. Imp. a las Gs Art 145 Dec 1344/98»: van a 550000 (no remunerativo) en débito y sin subsistemas, así que bajan la bruta y no bajan ninguna base, y ARCA rechaza con «Base imponible N es mayor a la remuneración bruta». 522 «ADICIONAL SITIO 3» y 531 «Viaticos»: no están en la parametrización y ARCA los rechaza con «Código de concepto inexistente». Los cinco los decidió Agustín el 27/09/2026: no se informan al libro. 513 «Adcional No remunerativo SAE»: está mapeado a 170005 «Viáticos sin comprobante», que en la planilla de ARCA es remunerativo, así que sus $298.610,40 del 202609 entraban a la remuneración y los remunerativos daban $89.813.187,07 contra los $89.514.576,67 del PDF de liquidación. Decisión de Agustín el 27/09/2026: se excluye, como el 522 y el 531, en vez de remapearlo a 550000. El importe no queda informado en el libro."
+    },
+    "20227823357": {
+      "nombre": "Martín Prado",
+      "conceptos": "Conceptos 20227823357.csv",
+      "provincia": "Chubut",
+      "_por_que_provincia": "Confirmado por Agustin el 27/09/2026: todos sus empleados trabajan en Chubut, asi que el credito del decreto 814 va al 6,65 % sobre la REM 10 de cada uno. Se carga aca y no como columna en el reservorio de empleados por dos motivos: seria el mismo dato repetido en cada fila, y si alguna vez se vuelve a exportar ese CSV desde el sistema de sueldos la columna agregada a mano desaparece sin aviso y el credito se cae solo.",
+      "empleados": "Empleados 20227823357.csv",
+      "excluidos": [
+        "11"
+      ],
+      "_por_que_excluidos": "11 «VIATICO»: en la parametrización cargada en ARCA está como 110000 «Sueldo», remunerativo y con los catorce subsistemas en 1. El registro 03 manda el código del empleador, no el de ARCA, así que ARCA lo resuelve con SU copia: en 202609 determinó las bases 1 a 10 de los cuatro empleados con los viáticos adentro y las nuestras sin ellos, y rechazó el archivo con 32 errores, siempre por los mismos $190.153,77 por empleado ($760.615,08 en total). Decisión de Agustín el 27/09/2026: no se informan al libro, como los cinco de Nautical, en vez de reparametrizar el concepto en el servicio. El importe no queda informado en el libro y no se tributa sobre él. Antes de esto se había probado cambiando el CSV a 550000 sin subsistemas: no sirve, porque el CSV es una exportación de lo que ARCA tiene y cambiarlo mueve un solo lado de la comparación.",
+      "recibos": {
+        "alias": {
+          "Sueldo Básico": "1",
+          "Presentismo": "10",
+          "Zona": "12",
+          "Antigüedad": "14",
+          "A cta Futuros Aumentos": "13",
+          "Viáticos": "11",
+          "Redondeo": "20",
+          "Jubilación": "30",
+          "Ley 19032": "31",
+          "Obra Social": "32",
+          "Sindicato": "33",
+          "F/A/Social": "34"
+        },
+        "excluidos": [
+          "ANR Jul/Ago. 26"
+        ]
+      },
+      "_por_que_recibos": "El libro de Martín Prado es un recibo dibujado por hoja, una hoja por empleado, y no una tabla. La hoja resumen del final sí es una tabla, pero está incompleta: en 202608 le faltaban los viáticos y el ANR de los cuatro empleados, $849.424,60. Por eso se lee el recibo, aunque el resumen sea una tabla y el recibo no. Los doce alias se verificaron contra el libro de 08/2026 el 27/09/2026: el recibo escribe «Zona» donde el reservorio de conceptos dice «Zona Desfavorable» y «F/A/Social» donde dice «F/A / Sindical», así que sin la tabla esos conceptos salían sin código. Se comparan sin acentos, sin mayúsculas y sin puntuación, así que «Antiguedad» y «Antigüedad» son el mismo.",
+      "_por_que_excluidos_del_recibo": "«ANR Jul/Ago. 26» es un importe no remunerativo que corrige viáticos de períodos anteriores. Decisión de Agustín el 27/09/2026: no se considera, y como no va a repetirse no se le busca concepto ARCA; queda dicho que no entra al archivo. Suma al control del subtotal del recibo —está impreso en el papel— y no sale al libro.",
+      "origen": "F:\\OneDrive\\ESTUDIO\\EMPRESAS\\martin"
+    },
+    "27134231780": {
+      "nombre": "Viviana Barbano",
+      "conceptos": "Conceptos 27134231780.csv",
+      "provincia": "Chubut",
+      "_por_que_provincia": "Confirmado por Agustin el 27/09/2026: todos sus empleados trabajan en Chubut, asi que el credito del decreto 814 va al 6,65 % sobre la REM 10 de cada uno. Se carga aca y no como columna en el reservorio de empleados por dos motivos: seria el mismo dato repetido en cada fila, y si alguna vez se vuelve a exportar ese CSV desde el sistema de sueldos la columna agregada a mano desaparece sin aviso y el credito se cae solo.",
+      "empleados": "Empleados 27134231780.csv",
+      "origen": "F:\\OneDrive\\ESTUDIO\\EMPRESAS\\PEÑA\\BARBANO\\sueldos"
+    }
+  }
+}
