@@ -432,3 +432,62 @@ code {
   overflow-x: auto;
   white-space: pre;
 }
+
+/* ---------- La barra de arriba, con la vuelta al Área del Estudio ---------- */
+
+/*
+ * El enlace va a la dirección completa del sitio y no a `/estudio`, que sería
+ * lo natural. Es a propósito: estas páginas se abren en dos lados —en esta
+ * computadora, servidas desde la carpeta del proyecto, y publicadas adentro
+ * del Área— y `/estudio` no existe del lado de acá. Con la dirección completa
+ * el mismo archivo sirve en los dos, sin una versión distinta para cada uno.
+ *
+ * Es lo que ya hacen el importador de IVA y los estados contables.
+ */
+.site-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  /* El body tiene 20px de padding a los costados y la barra tiene que llegar
+     hasta el borde, como en las otras herramientas del Area. */
+  margin: 0 -20px 26px;
+}
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--green-800);
+  text-decoration: none;
+}
+.brand-mark { display: inline-flex; color: var(--green-800); }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-text strong { font-size: 15px; color: var(--ink); }
+.brand-text small { font-size: 12px; color: var(--muted); }
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 17px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(12, 26, 23, 0.22);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+}
+.btn-volver:hover {
+  border-color: var(--green-700);
+  color: var(--green-800);
+  background: rgba(27, 107, 92, 0.06);
+}
