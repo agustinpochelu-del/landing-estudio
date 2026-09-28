@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
 
@@ -47,125 +47,140 @@
     </header>
 
     <!-- ── Herramientas ──
-         Para sumar una nueva: copiá el bloque .tool entero y cambiale el
-         título, la descripción, las etiquetas y el link. -->
-    <article class="tool">
-      <span class="tool-ico" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M7 7 4 14a3 3 0 0 0 6 0Z"/><path d="m17 7-3 7a3 3 0 0 0 6 0Z"/><path d="M9 21h6"/></svg>
-      </span>
-      <div class="tool-body">
-        <h2>Liquidador ARCA</h2>
-        <p>
-          Calcula intereses resarcitorios, punitorios y capitalizables para juicios de
-          ejecución fiscal. Los importes se verifican contra el detalle de cálculo que
-          emite ARCA.
-        </p>
-        <ul class="tool-meta">
-          <li>Ejecución fiscal</li>
-          <li>Carga y descarga en Excel</li>
-          <li>Acceso propio</li>
-        </ul>
-        <!-- Si se renombra el subdominio en Streamlit (Settings → App URL), hay que
-             actualizar este link: la dirección vieja deja de funcionar. -->
-        <a class="btn btn-primary" href="https://liquidador-pochelu.streamlit.app" target="_blank" rel="noopener">Abrir el liquidador</a>
-      </div>
-    </article>
+         Van en grilla: las columnas se acomodan solas al ancho de la pantalla, así
+         que sumar una tarjeta no alarga el scroll hasta que se llena la fila.
+         Para sumar una nueva: copiá un bloque <article class="tool"> entero, adentro
+         del .tools-grid, y cambiale el ícono, el título, la descripción, las
+         etiquetas y el link. No hace falta tocar el CSS. -->
+    <div class="tools-grid">
+      <article class="tool">
+        <div class="tool-head">
+          <span class="tool-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M7 7 4 14a3 3 0 0 0 6 0Z"/><path d="m17 7-3 7a3 3 0 0 0 6 0Z"/><path d="M9 21h6"/></svg>
+          </span>
+          <h2>Liquidador ARCA</h2>
+        </div>
+        <div class="tool-body">
+          <p>
+            Calcula intereses resarcitorios, punitorios y capitalizables para juicios de
+            ejecución fiscal. Los importes se verifican contra el detalle de cálculo que
+            emite ARCA.
+          </p>
+          <ul class="tool-meta">
+            <li>Ejecución fiscal</li>
+            <li>Carga y descarga en Excel</li>
+            <li>Acceso propio</li>
+          </ul>
+          <!-- Si se renombra el subdominio en Streamlit (Settings → App URL), hay que
+               actualizar este link: la dirección vieja deja de funcionar. -->
+          <a class="btn btn-primary" href="https://liquidador-pochelu.streamlit.app" target="_blank" rel="noopener">Abrir el liquidador</a>
+        </div>
+      </article>
 
-    <article class="tool">
-      <span class="tool-ico" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6.5A1.5 1.5 0 0 0 5 3.5v17A1.5 1.5 0 0 0 6.5 22h11a1.5 1.5 0 0 0 1.5-1.5V7Z"/><path d="M14 2v5h5"/><path d="M8.5 12.5h7"/><path d="M8.5 16h7"/></svg>
-      </span>
-      <div class="tool-body">
-        <h2>Importador de Libro de IVA Digital</h2>
-        <p>
-          Arma los archivos TXT de compras que pide ARCA a partir de una planilla de
-          comprobantes. Antes de generarlos muestra un control de importes contra la
-          planilla de origen, que tiene que dar cero.
-        </p>
-        <ul class="tool-meta">
-          <li>Libro de IVA Digital</li>
-          <li>Carga desde Excel</li>
-          <li>Todo en el navegador</li>
-        </ul>
-        <!-- La dirección lleva /importador a propósito. El sitio se publica sin
-             barra final, así que en /estudio/libro-iva las rutas relativas de la
-             aplicación resolverían contra /estudio/ y no cargaría ni el CSS. -->
-        <a class="btn btn-primary" href="/estudio/libro-iva/importador">Abrir el importador</a>
-      </div>
-    </article>
+      <article class="tool">
+        <div class="tool-head">
+          <span class="tool-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6.5A1.5 1.5 0 0 0 5 3.5v17A1.5 1.5 0 0 0 6.5 22h11a1.5 1.5 0 0 0 1.5-1.5V7Z"/><path d="M14 2v5h5"/><path d="M8.5 12.5h7"/><path d="M8.5 16h7"/></svg>
+          </span>
+          <h2>Importador de Libro de IVA Digital</h2>
+        </div>
+        <div class="tool-body">
+          <p>
+            Arma los archivos TXT de compras que pide ARCA a partir de una planilla de
+            comprobantes. Antes de generarlos muestra un control de importes contra la
+            planilla de origen, que tiene que dar cero.
+          </p>
+          <ul class="tool-meta">
+            <li>Libro de IVA Digital</li>
+            <li>Carga desde Excel</li>
+            <li>Todo en el navegador</li>
+          </ul>
+          <!-- La dirección lleva /importador a propósito. El sitio se publica sin
+               barra final, así que en /estudio/libro-iva las rutas relativas de la
+               aplicación resolverían contra /estudio/ y no cargaría ni el CSS. -->
+          <a class="btn btn-primary" href="/estudio/libro-iva/importador">Abrir el importador</a>
+        </div>
+      </article>
 
-    <article class="tool">
-      <span class="tool-ico" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 9v11"/><path d="M12.5 13h4.5"/><path d="M12.5 16.5h4.5"/></svg>
-      </span>
-      <div class="tool-body">
-        <h2>Estados contables RT 54</h2>
-        <p>
-          Arma el balance completo a partir del papel de trabajo del ejercicio: los cuatro
-          estados, los anexos, las notas y el informe del auditor, listos para imprimir o
-          guardar en PDF. Antes de emitir corre veinticinco controles que tienen que dar
-          cero.
-        </p>
-        <ul class="tool-meta">
-          <li>RT 54 (t.o. RT 59)</li>
-          <li>Carga desde Excel</li>
-          <li>Todo en el navegador</li>
-        </ul>
-        <!-- La dirección lleva /app/tablero a propósito, y la página de entrada no
-             se llama index: Vercel le sacaría el nombre y dejaría /estudio/balances/app,
-             sin barra final, donde las rutas relativas resuelven contra
-             /estudio/balances/ y no carga nada. Ver estudio/balances/LEEME.md. -->
-        <a class="btn btn-primary" href="/estudio/balances/app/tablero">Abrir los estados contables</a>
-      </div>
-    </article>
+      <article class="tool">
+        <div class="tool-head">
+          <span class="tool-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 9v11"/><path d="M12.5 13h4.5"/><path d="M12.5 16.5h4.5"/></svg>
+          </span>
+          <h2>Estados contables RT 54</h2>
+        </div>
+        <div class="tool-body">
+          <p>
+            Arma el balance completo a partir del papel de trabajo del ejercicio: los cuatro
+            estados, los anexos, las notas y el informe del auditor, listos para imprimir o
+            guardar en PDF. Antes de emitir corre veinticinco controles que tienen que dar
+            cero.
+          </p>
+          <ul class="tool-meta">
+            <li>RT 54 (t.o. RT 59)</li>
+            <li>Carga desde Excel</li>
+            <li>Todo en el navegador</li>
+          </ul>
+          <!-- La dirección lleva /app/tablero a propósito, y la página de entrada no
+               se llama index: Vercel le sacaría el nombre y dejaría /estudio/balances/app,
+               sin barra final, donde las rutas relativas resuelven contra
+               /estudio/balances/ y no carga nada. Ver estudio/balances/LEEME.md. -->
+          <a class="btn btn-primary" href="/estudio/balances/app/tablero">Abrir los estados contables</a>
+        </div>
+      </article>
 
-    <article class="tool">
-      <span class="tool-ico" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18l2.5-1.5L10 21l2-1.5L14 21l2.5-1.5L19 21V3H5Z"/><path d="M8.5 8h7"/><path d="M8.5 12h7"/><path d="M8.5 16h4"/></svg>
-      </span>
-      <div class="tool-body">
-        <h2>Honorarios</h2>
-        <p>
-          El padrón de clientes con sus abonos y los ajustes de cada uno, el devengamiento
-          mes a mes, la cuenta corriente y la emisión de facturas y notas de crédito, con
-          el PDF y el envío por mail. Nada se emite sin confirmarlo antes en pantalla.
-        </p>
-        <ul class="tool-meta">
-          <li>Facturación y cobranzas</li>
-          <li>Base propia</li>
-          <li>Acceso propio</li>
-        </ul>
-        <!-- Vive en Render, no acá: necesita Chromium para imprimir la factura en PDF.
-             Si se renombra el servicio en Render, cambia el subdominio y hay que
-             actualizar este link. En el plan gratis el servicio se apaga a los 15
-             minutos sin uso y la primera entrada tarda cerca de un minuto. -->
-        <a class="btn btn-primary" href="https://honorarios-l8q3.onrender.com" target="_blank" rel="noopener">Abrir Honorarios</a>
-      </div>
-    </article>
+      <article class="tool">
+        <div class="tool-head">
+          <span class="tool-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18l2.5-1.5L10 21l2-1.5L14 21l2.5-1.5L19 21V3H5Z"/><path d="M8.5 8h7"/><path d="M8.5 12h7"/><path d="M8.5 16h4"/></svg>
+          </span>
+          <h2>Honorarios</h2>
+        </div>
+        <div class="tool-body">
+          <p>
+            El padrón de clientes con sus abonos y los ajustes de cada uno, el devengamiento
+            mes a mes, la cuenta corriente y la emisión de facturas y notas de crédito, con
+            el PDF y el envío por mail. Nada se emite sin confirmarlo antes en pantalla.
+          </p>
+          <ul class="tool-meta">
+            <li>Facturación y cobranzas</li>
+            <li>Base propia</li>
+            <li>Acceso propio</li>
+          </ul>
+          <!-- Vive en Render, no acá: necesita Chromium para imprimir la factura en PDF.
+               Si se renombra el servicio en Render, cambia el subdominio y hay que
+               actualizar este link. En el plan gratis el servicio se apaga a los 15
+               minutos sin uso y la primera entrada tarda cerca de un minuto. -->
+          <a class="btn btn-primary" href="https://honorarios-l8q3.onrender.com" target="_blank" rel="noopener">Abrir Honorarios</a>
+        </div>
+      </article>
 
-    <article class="tool">
-      <span class="tool-ico" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13l3 3v13H4Z"/><path d="M8 9h8"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
-      </span>
-      <div class="tool-body">
-        <h2>Libro de Sueldos Digital</h2>
-        <p>
-          Convierte la planilla de liquidación en el archivo TXT que importa el servicio
-          de ARCA, y controla antes de subirlo lo mismo que controla el servicio: las
-          bases imponibles, los topes y los tres aportes que ARCA recalcula. Incluye el
-          liquidador de sueldos, con el piso del convenio.
-        </p>
-        <ul class="tool-meta">
-          <li>Sueldos y cargas sociales</li>
-          <li>Todo en el navegador</li>
-          <li>La planilla no se sube a ningún lado</li>
-        </ul>
-        <!-- La dirección termina en /armador, sin .html, y no es un detalle: el sitio
-             se publica con trailingSlash:false y en /estudio/lsd las rutas relativas
-             resolverían contra /estudio/. Está explicado en estudio/lsd/LEEME.md. -->
-        <a class="btn btn-primary" href="/estudio/lsd/armador">Abrir el armador</a>
-      </div>
-    </article>
+      <article class="tool">
+        <div class="tool-head">
+          <span class="tool-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13l3 3v13H4Z"/><path d="M8 9h8"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
+          </span>
+          <h2>Libro de Sueldos Digital</h2>
+        </div>
+        <div class="tool-body">
+          <p>
+            Convierte la planilla de liquidación en el archivo TXT que importa el servicio
+            de ARCA, y controla antes de subirlo lo mismo que controla el servicio: las
+            bases imponibles, los topes y los tres aportes que ARCA recalcula. Incluye el
+            liquidador de sueldos, con el piso del convenio.
+          </p>
+          <ul class="tool-meta">
+            <li>Sueldos y cargas sociales</li>
+            <li>Todo en el navegador</li>
+            <li>La planilla no se sube a ningún lado</li>
+          </ul>
+          <!-- La dirección termina en /armador, sin .html, y no es un detalle: el sitio
+               se publica con trailingSlash:false y en /estudio/lsd las rutas relativas
+               resolverían contra /estudio/. Está explicado en estudio/lsd/LEEME.md. -->
+          <a class="btn btn-primary" href="/estudio/lsd/armador">Abrir el armador</a>
+        </div>
+      </article>
+    </div>
 
     <div class="tools-notice">
       <span class="auth-notice-ico" aria-hidden="true">
