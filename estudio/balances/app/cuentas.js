@@ -105,6 +105,7 @@
         <td><input data-campo="concepto" value="${esc(m.concepto || "")}"></td>
         <td><select data-campo="columna">${opciones(COLUMNAS, m.columna || "")}</select></td>
         <td class="marca">${marca(c, "no_monetaria", m.no_monetaria)}</td>
+        <td class="marca">${marca(c, "equivalente_efectivo", m.equivalente_efectivo)}</td>
         <td class="marca">${marca(c, "se_asienta", m.se_asienta !== false)}</td>
       </tr>`;
     };
@@ -117,7 +118,7 @@
     });
     const filas = orden.filter((k) => porGrupo[k]).map((k) => {
       const g = porGrupo[k];
-      return `<tr class="grupo-plan"><td colspan="6">
+      return `<tr class="grupo-plan"><td colspan="7">
           <span class="sigla">${esc(g.grupo.sigla)}</span> ${esc(g.grupo.rotulo)}
           <small>${g.cuentas.length} cuenta${g.cuentas.length === 1 ? "" : "s"}</small>
         </td></tr>` + g.cuentas.map(fila).join("");
@@ -126,7 +127,8 @@
     $("#tabla").innerHTML = `<div class="envuelve"><table class="planilla cuentas">
       <thead><tr><th>Cuenta</th><th>Línea de exposición</th>
         <th>Concepto en la nota</th><th>Columna de gasto</th>
-        <th class="marca">Se ajusta</th><th class="marca">Se asienta</th></tr></thead>
+        <th class="marca">Se ajusta</th><th class="marca">Es efectivo</th>
+        <th class="marca">Se asienta</th></tr></thead>
       <tbody>${filas}</tbody></table></div>` +
       (visibles.length ? "" : "<p class='ayuda'>Ninguna cuenta coincide con el filtro.</p>");
 
@@ -143,9 +145,9 @@
         if (el.type === "checkbox") {
           /* «Se ajusta» se guarda cuando es verdadero y «se asienta» cuando es
              falso: en los dos casos se guarda lo que se aparta de lo normal. */
-          if (campo === "no_monetaria") {
-            if (el.checked) cuentas[c].no_monetaria = true;
-            else delete cuentas[c].no_monetaria;
+          if (campo === "no_monetaria" || campo === "equivalente_efectivo") {
+            if (el.checked) cuentas[c][campo] = true;
+            else delete cuentas[c][campo];
           } else {
             if (el.checked) delete cuentas[c].se_asienta;
             else cuentas[c].se_asienta = false;
@@ -254,14 +256,15 @@
     const cuentas = estado.mapeo.cuentas;
     const cab = ["Cuenta", "Suma en", "Rol", "Línea de exposición", "Concepto en la nota",
                  "Columna de gasto", "Rubro de anexo", "Campo de anexo",
-                 "No monetaria", "Se asienta"];
+                 "No monetaria", "Equivalente de efectivo", "Se asienta"];
     const q = (x) => `"${String(x === undefined || x === null ? "" : x).replace(/"/g, '""')}"`;
     const roles = estado.roles || {};
     const filas = Object.keys(cuentas).sort((a, b) => a.localeCompare(b, "es")).map((c) => {
       const m = cuentas[c];
       return [c, m.suma_en, roles[c], m.linea, m.concepto, m.columna,
               m.anexo_rubro, m.anexo_campo,
-              m.no_monetaria ? "sí" : "", m.se_asienta === false ? "no" : "sí"]
+              m.no_monetaria ? "sí" : "", m.equivalente_efectivo ? "sí" : "",
+              m.se_asienta === false ? "no" : "sí"]
         .map(q).join(";");
     });
     // el BOM es lo que hace que Excel abra el archivo en UTF-8

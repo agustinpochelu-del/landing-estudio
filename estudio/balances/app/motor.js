@@ -94,6 +94,7 @@
     this.importes = {};
     this.notas = {};
     this.gastos = {};
+    this.equivalentes = {};
     this.anexoBU = {};
     this.avisos = [];
     this.armar();
@@ -157,6 +158,18 @@
       const acc = this.importes[m.linea] || (this.importes[m.linea] = { actual: 0, anterior: 0 });
       acc.actual += actual;
       acc.anterior += anterior;
+
+      /* Los equivalentes de efectivo se exponen en su renglón —un fondo común
+         de inversión va en inversiones— pero **para el flujo de efectivo son
+         efectivo**: se rescatan en el día. Se los junta aparte, por renglón,
+         para poder sumarlos al efectivo y sacarlos de la variación del renglón
+         sin contarlos dos veces. */
+      if (m.equivalente_efectivo) {
+        const eq = this.equivalentes[m.linea] ||
+          (this.equivalentes[m.linea] = { actual: 0, anterior: 0 });
+        eq.actual += actual;
+        eq.anterior += anterior;
+      }
 
       /* Las subcuentas van al diario y al mayor una por una, pero a la nota van
          sumadas en su cuenta: el concepto es el que agrupa. */
@@ -373,6 +386,9 @@
        ejercicio, menos lo que se declaró como distribución. */
     const area = modificacion - distribuciones.reduce(
       (t, o) => t + o.resultados_no_asignados, 0);
+    /* El flujo de efectivo lo necesita: ahí también se separan el ajuste de
+       ejercicios anteriores y la distribución. */
+    this.area = area;
 
     const aportesInicio = {};
     columnas.forEach((x) => {
@@ -437,15 +453,36 @@
     const c = this.calc;
     const comp = Object.assign({}, this.d.saldos.comparativo_efe);
     delete comp.nota;
+    /* Los equivalentes salen de su renglón y entran al efectivo: si no, el
+       rescate de un fondo común aparecería como una inversión desarmada y como
+       efectivo que aparece de la nada, las dos veces. */
+    const eq = this.equivalentes;
+    const sinEq = (l, col) => this.v(l, col) - ((eq[l] || {})[col] || 0);
+
+    /* La distribución de resultados que se imputó contra una cuenta —el acta
+       que cancela los anticipos de los socios— **no movió efectivo**. Si su
+       importe se quedara adentro de la variación del renglón, el estado diría
+       que los socios pagaron. Se saca de la variación y se informa al pie, que
+       es donde van las operaciones que no afectaron el efectivo. */
+    const dist = this.d.saldos.eepn_distribucion || {};
+    const sinEfectivo = {};
+    Object.keys(dist).forEach((clase) => {
+      Object.keys(dist[clase]).forEach((l) => {
+        if (l.indexOf("eepn.") === 0) return;
+        sinEfectivo[l] = (sinEfectivo[l] || 0) + dist[clase][l] * this.signo(l);
+      });
+    });
+
     const dif = (lineas) => lineas.reduce(
-      (t, l) => t - ((this.v(l, "actual") - this.v(l, "anterior")) * (l.startsWith("esp.a") ? 1 : -1)), 0);
+      (t, l) => t - ((sinEq(l, "actual") - sinEq(l, "anterior") - (sinEfectivo[l] || 0)) *
+                     (l.startsWith("esp.a") ? 1 : -1)), 0);
 
     /* La columna comparativa necesita los saldos de **dos** cierres atrás: la
        variación del ejercicio anterior es su cierre contra el anterior a él. Si
        el ejercicio no los declara, la columna queda en cero y se avisa. */
     const previo = this.d.saldos.comparativo_esp_anterior;
     const difAnterior = !previo ? null : (lineas) => lineas.reduce(
-      (t, l) => t - ((this.v(l, "anterior") - (previo[l] || 0)) *
+      (t, l) => t - ((sinEq(l, "anterior") - (previo[l] || 0)) *
                      (l.startsWith("esp.a") ? 1 : -1)), 0);
     if (!previo) {
       this.avisos.push("A09 · el estado de flujo de efectivo sale sin columna comparativa: " +
@@ -453,9 +490,29 @@
         "`comparativo.esp_anterior` del ejercicio.");
     }
 
-    const efectivoActual = this.suma("esp.ac.caja_bancos", "actual");
-    const efectivoAnterior = this.suma("esp.ac.caja_bancos", "anterior");
-    const efectivoPrevio = previo ? (previo["esp.ac.caja_bancos"] || 0) : 0;
+    /* Qué renglones son efectivo lo dice el plan de exposición, con `efectivo`
+       en la línea; los equivalentes los dice el plan de cuentas, cuenta por
+       cuenta. Lo de dos cierres atrás viene por renglón y no por cuenta, así que
+       de ahí no se pueden separar los equivalentes: si el renglón existía, se
+       avisa en vez de suponer. */
+    const LINEAS_EFECTIVO = [];
+    (this.plan.estados.esp.bloques || []).forEach((b) => (b.lineas || []).forEach((l) => {
+      if (l.efectivo) LINEAS_EFECTIVO.push(l.id);
+    }));
+    const equivalentes = (col) =>
+      Object.keys(eq).reduce((t, l) => t + eq[l][col], 0);
+    const efectivoEn = (col) =>
+      LINEAS_EFECTIVO.reduce((t, l) => t + this.v(l, col), 0) + equivalentes(col);
+
+    const efectivoActual = efectivoEn("actual");
+    const efectivoAnterior = efectivoEn("anterior");
+    const efectivoPrevio = !previo ? 0
+      : LINEAS_EFECTIVO.reduce((t, l) => t + (previo[l] || 0), 0);
+    if (previo && Object.keys(eq).some((l) => Math.abs(previo[l] || 0) > TOL)) {
+      this.avisos.push("A10 · hay equivalentes de efectivo en un renglón que ya tenía saldo " +
+        "dos cierres atrás. El comparativo viene por renglón y no por cuenta, así que el " +
+        "efectivo al inicio del ejercicio anterior sale sin ellos.");
+    }
     /* La amortización del ejercicio anterior sale del anexo de gastos
        comparativo, que es donde está expuesta. */
     const gastosAnt = this.d.saldos.comparativo_gastos || {};
@@ -476,8 +533,11 @@
        c.actual["er.antes_impuesto"], c.anterior["er.antes_impuesto"]],
       ["efe.op.impuesto", "Impuesto a las ganancias devengado en el ejercicio",
        this.v("er.impuesto_ganancias", "actual"), this.v("er.impuesto_ganancias", "anterior")],
+      /* El ajuste de ejercicios anteriores y nada más: la distribución de
+         resultados, que también mueve los resultados no asignados, se neutraliza
+         arriba porque no es efectivo. */
       ["efe.op.modificacion", "Modificación de saldos de ejercicios anteriores",
-       c.actual["eepn.modificacion"], 0],
+       this.area || 0, 0],
       ["efe.op.ajustes.depreciaciones", "Depreciación de bienes de uso",
        this.totalBU("amort_ejercicio"), depreciacionAnterior],
       ["efe.op.var.clientes", "(Aumento) disminución en cuentas por cobrar a clientes",
@@ -508,7 +568,37 @@
     const operativas = arm(op), inversion = arm(inv);
     const tot = (filas, col) => filas.reduce((t, f) => t + f[col], 0);
 
+    /* Una distribución pagada con plata sí es un flujo, y de financiación: el
+       estado no tiene todavía esa sección, así que se avisa en vez de esconderla
+       adentro de otra. */
+    const enEfectivo = LINEAS_EFECTIVO.concat(Object.keys(eq))
+      .reduce((t, l) => t + (sinEfectivo[l] || 0), 0);
+    if (Math.abs(enEfectivo) > TOL) {
+      this.avisos.push("A11 · una distribución de resultados movió el efectivo por " +
+        pesos(-enEfectivo, 2) + ". Eso es un flujo de financiación y el estado todavía no " +
+        "tiene esa sección: por ahora queda fuera de las causas de la variación.");
+    }
+
+    /* De qué está hecho el efectivo del estado, y qué operaciones lo movieron
+       sin moverlo: las dos cosas se informan al pie. */
+    const nombreLinea = (id) => {
+      let t = id;
+      (this.plan.estados.esp.bloques || []).forEach((b) => (b.lineas || []).forEach((l) => {
+        if (l.id === id) t = l.concepto;
+      }));
+      return t;
+    };
+    const composicion = LINEAS_EFECTIVO.map((l) => ({
+      concepto: nombreLinea(l), actual: this.v(l, "actual"), anterior: this.v(l, "anterior"),
+    })).concat(Object.keys(eq).map((l) => ({
+      concepto: nombreLinea(l), actual: eq[l].actual, anterior: eq[l].anterior, equivalente: true,
+    })));
+
     this.efe = {
+      composicion: composicion.length > 1 ? composicion : [],
+      sin_efectivo: Object.keys(sinEfectivo)
+        .filter((l) => Math.abs(sinEfectivo[l]) > TOL)
+        .map((l) => ({ concepto: nombreLinea(l), importe: sinEfectivo[l] })),
       efectivo: { inicio_actual: efectivoAnterior, inicio_anterior: efectivoPrevio,
                   cierre_actual: efectivoActual, cierre_anterior: efectivoAnterior },
       secciones: [

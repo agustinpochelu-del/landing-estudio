@@ -1860,7 +1860,12 @@
       const coef = this.historico ? 1 : this.coef(a.fecha);
       a.lineas.forEach((l) => {
         const mm = this.d.mapeo.cuentas[l.cuenta];
-        if (!mm || mm.linea.indexOf("eepn.") !== 0) return;
+        if (!mm) return;
+        /* De los movimientos sólo interesa el patrimonio. De una distribución
+           interesan **todas** sus líneas: el flujo de efectivo necesita saber
+           contra qué se imputó, porque una distribución que cancela la cuenta
+           de un socio no movió un peso y no puede salir como una cobranza. */
+        if (!porRenglon && mm.linea.indexOf("eepn.") !== 0) return;
         donde[mm.linea] = (donde[mm.linea] || 0) + (l.debe - l.haber) * coef;
       });
     });

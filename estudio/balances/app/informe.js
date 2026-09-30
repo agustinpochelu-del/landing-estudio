@@ -77,7 +77,20 @@
 
   /* ---------- la hoja y su cierre ---------- */
 
-  const LEYENDA = `<p class="dictamen">Dictamen profesional por separado</p>`;
+  /* Las dos líneas que van al pie de cada estado, de cada anexo y de las notas
+     —no de la carátula ni del informe del auditor—. La fecha es la del informe
+     del ejercicio: es lo que identifica de qué informe se está hablando. Si el
+     ejercicio no la trae, la línea sale sin fecha y el motor lo avisa: poner una
+     fecha inventada al pie de un estado firmado no es una opción. */
+  function leyenda() {
+    const f = (m.d.saldos.informe_auditoria || {}).fecha;
+    const cuando = f ? ` de fecha ${window.Motor.fechaLarga(f)}` : "";
+    return `<p class="dictamen">
+      <span>*Las notas y anexos son parte integrante de los presentes estados
+        contables</span>
+      <span>*Firmado a los efectos de su identificación con mi informe${cuando}</span>
+    </p>`;
+  }
 
   /* o.dictamen: "cuadro" lo pega abajo a la izquierda del cuadro,
      "pie" lo lleva al pie de la hoja sobre las firmas, ausente no lo pone. */
@@ -86,7 +99,7 @@
     /* El papel a valores históricos no lleva la leyenda del dictamen: no es un
        estado que se emita ni sobre el que se dictamine. */
     const cuerpo = (o.dictamen === "cuadro" && !m.d.saldos.historico)
-      ? contenido + LEYENDA : contenido;
+      ? contenido + leyenda() : contenido;
     hojas.push(`<section class="hoja ${clase || ""}">
       <div class="contenido">${cuerpo}</div>
       ${cierreHoja(o)}
@@ -111,7 +124,7 @@
     const f = m.ente.datos[m.ente.datos.length - 1].firmantes[0];
     const solo = o && o.soloProfesional;
     return `<footer class="cierre-hoja">
-      ${o && o.dictamen === "pie" ? LEYENDA : ""}
+      ${o && o.dictamen === "pie" ? leyenda() : ""}
       <div class="sellos ${solo ? "uno" : ""}">
         ${sello(PROFESIONAL.nombre, PROFESIONAL.titulo, PROFESIONAL.matricula,
                 rubricas.estudio)}
@@ -472,9 +485,31 @@
     });
     filas += f3("Aumento (disminución) neto del efectivo", e.total_actual, e.total_anterior, "total");
 
+    /* De qué está hecho el efectivo de este estado. Hace falta cuando además de
+       la caja hay equivalentes: en el estado de situación patrimonial están en
+       otro renglón, y sin esto el lector no puede atar una cifra con la otra. */
+    if ((e.composicion || []).some((x) => x.equivalente)) {
+      filas += `<tr class="titulo"><td colspan="3">Integración del efectivo</td></tr>`;
+      filas += e.composicion.map((x) =>
+        f3(x.concepto + (x.equivalente ? " (equivalente de efectivo)" : ""),
+           x.actual, x.anterior, "sangria")).join("");
+      filas += f3("Efectivo y sus equivalentes",
+        e.efectivo.cierre_actual, e.efectivo.inicio_actual, "subtotal");
+    }
+
+    /* Lo que movió cuentas pero no movió un peso. Va acá y no entre las causas:
+       una distribución imputada a la cuenta de un socio no es una cobranza. El
+       renglón dice qué se movió y cuánto, sin ponerle nombre a la operación: el
+       mismo asiento puede estar haciendo más de una cosa. */
+    const sin = (e.sin_efectivo || []).length
+      ? `<p class="pie-estado">Variaciones que no afectaron el efectivo y por eso quedan
+          fuera de las causas: ${e.sin_efectivo.map((x) =>
+            `${esc(x.concepto)}, ${imp(x.importe)}`).join("; ")}.</p>`
+      : "";
+
     hoja("", encabezado("Estado de Flujo de Efectivo") +
       `<div class="cuadro"><table class="estado">${cabezaEstado("Método indirecto")}
-        <tbody>${filas}</tbody></table></div>`, { dictamen: "cuadro" });
+        <tbody>${filas}</tbody></table></div>${sin}`, { dictamen: "cuadro" });
   }
 
   /* ---------- anexos ---------- */

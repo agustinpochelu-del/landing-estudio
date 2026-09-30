@@ -467,6 +467,9 @@ table.composicion tr.total .pe { color: var(--oro-suave); }
   font-size: 8.2pt; color: var(--apagado); font-style: italic; letter-spacing: .04em;
   margin: 2.5mm 0 0; text-align: left;
 }
+/* Las dos líneas de la leyenda, una debajo de la otra: son dos aclaraciones
+   distintas y leídas de corrido se confunden en una sola. */
+.dictamen span { display: block; }
 
 /* --- sellos de cierre de hoja, sin recuadro --- */
 
@@ -725,6 +728,11 @@ table.determinacion tr.sangra td.concepto { padding-left: 1.8rem; color: var(--a
 table.determinacion td.concepto.vacio { color: var(--apagado); font-style: italic; }
 table.determinacion .nota-art {
   font-family: var(--sans); font-size: 7.2pt; color: var(--apagado); font-style: italic;
+}
+/* Una aclaración al pie de un estado, fuera del cuadro: las operaciones que no
+   movieron efectivo van ahí y no adentro de las causas de la variación. */
+.pie-estado {
+  font-size: 8.4pt; color: var(--apagado); margin: 2mm 0 0; text-align: left;
 }
 .pie-papel { font-size: 8pt; color: var(--apagado); font-style: italic; margin: 1.5mm 0 0; }
 .avisos-papel {
