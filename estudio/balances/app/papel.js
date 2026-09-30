@@ -399,6 +399,13 @@
         : (marcaAjuste ? "computable" : "no computable");
       const previsional = casilla(dame(f, iPrevisional)) === true ? "sí" : "";
       const seAsienta = casilla(f[10]);
+      /* Los tres estados se distinguen: «no», «sí» y vacío. Un «sí» escrito
+         manda sobre la deducción del importador, que marca sola como «no se
+         asienta» a la cuenta que se abre en subcuentas —«Resultados no
+         asignados» se abre en AREA y sigue recibiendo el acta—. Mandar el «sí»
+         como vacío era perderlo. */
+      const marcaAsienta = seAsienta === false ? "no"
+        : seAsienta === true ? "sí" : "";
       if (monetaria === null) sinMarcar.push(subcuenta || cuenta);
 
       const poner = (nombre, sumaEn) => {
@@ -407,7 +414,7 @@
         if (sumaEn) {
           filasPlan.push([nombre, sumaEn, "", "", "", "", "", "", tasa, "",
                           noMonetaria, ajusteImpositivo,
-                          seAsienta === false ? "no" : "",
+                          marcaAsienta,
                           naturaleza(r.rubro, r.subrubro), previsional]);
           return;
         }
@@ -415,8 +422,7 @@
            cuenta, no del rubro: las declara el plan de la empresa. Sin tasa no
            hay asiento de amortizaciones, y eso el importador lo tiene que decir
            en vez de emitir un balance sin amortizar. */
-        const marcas = [tasa, "", noMonetaria, ajusteImpositivo,
-                        seAsienta === false ? "no" : "",
+        const marcas = [tasa, "", noMonetaria, ajusteImpositivo, marcaAsienta,
                         naturaleza(r.rubro, r.subrubro), previsional];
         const c = deDonde(nombre);
         if (c) {
@@ -474,14 +480,20 @@
       }
     });
 
-    /* Una cuenta que tiene subcuentas es una sumarizadora: al diario y al mayor
-       van las subcuentas, una por una, y ella no recibe ningún movimiento. No
-       hace falta que la planilla lo diga —se sabe mirando quién suma en quién—
-       y si no se marcara, la cuenta quedaría abierta para recibir asientos que
-       después aparecen dos veces en el balance. */
+    /* Una cuenta que tiene subcuentas suele ser una sumarizadora: al diario y al
+       mayor van las subcuentas, una por una, y ella no recibe ningún movimiento.
+       No hace falta que la planilla lo diga —se sabe mirando quién suma en
+       quién— y si no se marcara, la cuenta quedaría abierta para recibir
+       asientos que después aparecen dos veces en el balance.
+
+       Pero es una deducción, no una regla: «Resultados no asignados» se abre en
+       AREA y **sigue recibiendo** el acta de distribución. Si la planilla dice
+       que sí se asienta, manda la planilla. */
     const conSubcuentas = {};
     filasPlan.slice(1).forEach((f) => { if (f[1]) conSubcuentas[f[1]] = true; });
-    filasPlan.slice(1).forEach((f) => { if (conSubcuentas[f[0]]) f[12] = "no"; });
+    filasPlan.slice(1).forEach((f) => {
+      if (conSubcuentas[f[0]] && f[12] !== "sí") f[12] = "no";
+    });
 
     return { filas: filasPlan, sinClasificar: sinClasificar, desdeRubro: desdeRubro,
              conceptos: conceptos, cuentas: vistas, sinMarcar: sinMarcar };

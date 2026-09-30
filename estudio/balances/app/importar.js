@@ -161,7 +161,7 @@
     /* -- plan de cuentas: el mapeo y los roles -- */
     const cuentas = {}, roles = {}, amortizacion = {};
     const ajusteImpositivo = { cuentas_activo: [], cuentas_pasivo: [] };
-    const repetidas = [], noSeAsientan = [];
+    const repetidas = [], noSeAsientan = [], asientaDeclarado = [];
 
     /* Una subcuenta dice en «Suma en» de qué cuenta forma parte, y hereda de
        ella la exposición: al diario y al mayor va sola, al balance y a las notas
@@ -216,9 +216,13 @@
       /* «Se asienta: no» marca una cuenta que existe en el plan pero no recibe
          movimientos: una sumarizadora, o una que quedó sin uso. Si igual le
          llega un asiento, es un error y hay que verlo. */
-      if (/^(no|falso|false|0)$/i.test(String(r["se asienta"] || "").trim())) {
+      const asienta = String(r["se asienta"] || "").trim();
+      if (/^(no|falso|false|0)$/i.test(asienta)) {
         m.se_asienta = false;
         noSeAsientan.push(cuenta);
+      } else if (/^(s[ií]|verdadero|true|1)$/i.test(asienta)) {
+        /* Dicho que sí, es que sí: la deducción de más abajo no lo pisa. */
+        asientaDeclarado.push(cuenta);
       }
       const ai = clave(r["ajuste impositivo"]);
       /* «activo» y «pasivo» son del criterio viejo, el del prototipo. El nuevo
@@ -277,14 +281,18 @@
     });
 
 
-    /* Una cuenta que se abre en subcuentas no recibe asientos: los reciben ellas.
-       No hace falta marcarlo, se ve solo. */
+    /* Una cuenta que se abre en subcuentas normalmente no recibe asientos: los
+       reciben ellas, y no hace falta marcarlo porque se ve solo. Pero es una
+       deducción, no una regla: «Resultados no asignados» se abre en AREA y
+       **sigue recibiendo** el acta de distribución. Si la planilla dice que sí,
+       manda la planilla. */
     Object.keys(cuentas).forEach((c) => {
       const padre = cuentas[c].suma_en;
-      if (padre && cuentas[padre] && cuentas[padre].se_asienta !== false) {
-        cuentas[padre].se_asienta = false;
-        if (noSeAsientan.indexOf(padre) < 0) noSeAsientan.push(padre);
-      }
+      if (!padre || !cuentas[padre]) return;
+      if (cuentas[padre].se_asienta === false) return;
+      if (asientaDeclarado.indexOf(padre) >= 0) return;
+      cuentas[padre].se_asienta = false;
+      if (noSeAsientan.indexOf(padre) < 0) noSeAsientan.push(padre);
     });
 
     if (repetidas.length) {
