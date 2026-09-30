@@ -729,11 +729,6 @@ table.determinacion td.concepto.vacio { color: var(--apagado); font-style: itali
 table.determinacion .nota-art {
   font-family: var(--sans); font-size: 7.2pt; color: var(--apagado); font-style: italic;
 }
-/* Una aclaración al pie de un estado, fuera del cuadro: las operaciones que no
-   movieron efectivo van ahí y no adentro de las causas de la variación. */
-.pie-estado {
-  font-size: 8.4pt; color: var(--apagado); margin: 2mm 0 0; text-align: left;
-}
 .pie-papel { font-size: 8pt; color: var(--apagado); font-style: italic; margin: 1.5mm 0 0; }
 .avisos-papel {
   margin: 3mm 0; padding: 2mm 3mm; border-left: 2px solid var(--oro);

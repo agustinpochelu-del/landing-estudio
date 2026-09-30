@@ -24,6 +24,9 @@
    "Los bienes de uso se amortizan por el método de línea recta, aplicando la tasa anual completa en el ejercicio de incorporación."
   ],
   "rt54/composicion": [],
+  "estudio/efectivo": [
+   "El efectivo considerado en el estado de flujo de efectivo comprende el efectivo en caja y en bancos y las inversiones de alta liquidez, de corto plazo y sujetas a riesgos insignificantes de cambios de valor, que se mantienen para atender compromisos de corto plazo y no con fines de inversión. Su composición es la siguiente:"
+  ],
   "rt54/impuesto": [
    "El cargo por impuesto a las ganancias del ejercicio se determinó aplicando la alícuota vigente sobre el resultado impositivo, computando el ajuste por inflación impositivo previsto en la Ley de Impuesto a las Ganancias."
   ],

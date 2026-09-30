@@ -1224,6 +1224,12 @@
    "modelo": "rt54/composicion"
   },
   {
+   "id": "efectivo_equivalentes",
+   "grupo": "efe",
+   "titulo": "Efectivo y sus equivalentes",
+   "modelo": "estudio/efectivo"
+  },
+  {
    "id": "ingresos",
    "grupo": "er",
    "titulo": "Ingresos",

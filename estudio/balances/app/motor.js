@@ -459,22 +459,14 @@
     const eq = this.equivalentes;
     const sinEq = (l, col) => this.v(l, col) - ((eq[l] || {})[col] || 0);
 
-    /* La distribución de resultados que se imputó contra una cuenta —el acta
-       que cancela los anticipos de los socios— **no movió efectivo**. Si su
-       importe se quedara adentro de la variación del renglón, el estado diría
-       que los socios pagaron. Se saca de la variación y se informa al pie, que
-       es donde van las operaciones que no afectaron el efectivo. */
-    const dist = this.d.saldos.eepn_distribucion || {};
-    const sinEfectivo = {};
-    Object.keys(dist).forEach((clase) => {
-      Object.keys(dist[clase]).forEach((l) => {
-        if (l.indexOf("eepn.") === 0) return;
-        sinEfectivo[l] = (sinEfectivo[l] || 0) + dist[clase][l] * this.signo(l);
-      });
-    });
-
+    /* El método es el indirecto: **todas** las variaciones se muestran, hayan
+       movido efectivo o no. La distribución de resultados que se imputó contra
+       la cuenta de un socio baja «otros créditos» y no movió un peso, pero el
+       renglón la tiene que mostrar igual, y su contrapartida sale en
+       financiación. Los dos lados se ven y el estado cierra: eso es lo que hace
+       legible un flujo armado desde las variaciones. */
     const dif = (lineas) => lineas.reduce(
-      (t, l) => t - ((sinEq(l, "actual") - sinEq(l, "anterior") - (sinEfectivo[l] || 0)) *
+      (t, l) => t - ((sinEq(l, "actual") - sinEq(l, "anterior")) *
                      (l.startsWith("esp.a") ? 1 : -1)), 0);
 
     /* La columna comparativa necesita los saldos de **dos** cierres atrás: la
@@ -568,22 +560,29 @@
         : (previo ? (f[3] || 0) : 0),
     }));
 
-    const operativas = arm(op), inversion = arm(inv);
+    /* La distribución de resultados es un flujo de **financiación**: el lado del
+       patrimonio de lo que abajo se ve como variación de los créditos o de la
+       caja. Sale acá tanto si se pagó con plata como si se imputó a la cuenta de
+       un socio, y en los dos casos el estado cierra, porque los dos lados están.
+       El concepto lo pone el plan, el mismo que usa la evolución. */
+    const dist = this.d.saldos.eepn_distribucion || {};
+    const filasEEPN = (this.plan.estados.eepn.filas || []);
+    const ordenDist = filasEEPN.map((f) => f.id)
+      .filter((id) => id.indexOf("eepn.distribucion.") === 0);
+    const fin = Object.keys(dist).sort((a, b) =>
+      ordenDist.indexOf("eepn.distribucion." + a) - ordenDist.indexOf("eepn.distribucion." + b)
+    ).map((k) => {
+      const f = filasEEPN.find((x) => x.id === "eepn.distribucion." + k);
+      return ["efe.fin.distribucion." + k, f ? f.concepto : "Distribución de utilidades",
+              (dist[k]["eepn.resultados_no_asignados"] || 0) *
+                this.signo("eepn.resultados_no_asignados"), 0];
+    });
+
+    const operativas = arm(op), inversion = arm(inv), financiacion = arm(fin);
     const tot = (filas, col) => filas.reduce((t, f) => t + f[col], 0);
 
-    /* Una distribución pagada con plata sí es un flujo, y de financiación: el
-       estado no tiene todavía esa sección, así que se avisa en vez de esconderla
-       adentro de otra. */
-    const enEfectivo = LINEAS_EFECTIVO.concat(EQ)
-      .reduce((t, l) => t + (sinEfectivo[l] || 0), 0);
-    if (Math.abs(enEfectivo) > TOL) {
-      this.avisos.push("A11 · una distribución de resultados movió el efectivo por " +
-        pesos(-enEfectivo, 2) + ". Eso es un flujo de financiación y el estado todavía no " +
-        "tiene esa sección: por ahora queda fuera de las causas de la variación.");
-    }
-
-    /* De qué está hecho el efectivo del estado, y qué operaciones lo movieron
-       sin moverlo: las dos cosas se informan al pie. */
+    /* De qué está hecho el efectivo del estado. Va en una nota, no al pie del
+       estado: es información sobre una cifra, no una causa de su variación. */
     const nombreLinea = (id) => {
       let t = id;
       (this.plan.estados.esp.bloques || []).forEach((b) => (b.lineas || []).forEach((l) => {
@@ -602,9 +601,6 @@
          se imprime arriba con lo que se imprime abajo, y para eso las dos cifras
          tienen que existir. Imprimirse, se imprime sólo si hay equivalentes. */
       composicion: composicion,
-      sin_efectivo: Object.keys(sinEfectivo)
-        .filter((l) => Math.abs(sinEfectivo[l]) > TOL)
-        .map((l) => ({ concepto: nombreLinea(l), importe: sinEfectivo[l] })),
       efectivo: { inicio_actual: efectivoAnterior, inicio_anterior: efectivoPrevio,
                   cierre_actual: efectivoActual, cierre_anterior: efectivoAnterior },
       secciones: [
@@ -614,10 +610,16 @@
         { titulo: "ACTIVIDADES DE INVERSIÓN", filas: inversion,
           total: "Flujo neto de efectivo generado por (aplicado en) actividades de inversión",
           total_actual: tot(inversion, "actual"), total_anterior: tot(inversion, "anterior") },
+        { titulo: "ACTIVIDADES DE FINANCIACIÓN", filas: financiacion,
+          total: "Flujo neto de efectivo generado por (aplicado en) actividades de financiación",
+          total_actual: tot(financiacion, "actual"),
+          total_anterior: tot(financiacion, "anterior") },
       ],
     };
-    this.efe.total_actual = tot(operativas, "actual") + tot(inversion, "actual");
-    this.efe.total_anterior = tot(operativas, "anterior") + tot(inversion, "anterior");
+    this.efe.total_actual = tot(operativas, "actual") + tot(inversion, "actual") +
+      tot(financiacion, "actual");
+    this.efe.total_anterior = tot(operativas, "anterior") + tot(inversion, "anterior") +
+      tot(financiacion, "anterior");
   };
 
   /* ---------- controles ---------- */

@@ -66,6 +66,13 @@
   function numerar() {
     m.plan.notas.forEach((n) => {
       if (n.siempre) { notasEmitidas.push(n); return; }
+      /* La del efectivo no cuelga de un renglón del balance: se emite cuando el
+         efectivo del flujo tiene algo más que la caja, que es cuando hace falta
+         explicar de qué está hecho. */
+      if (n.modelo === "estudio/efectivo") {
+        if ((m.efe.composicion || []).some((x) => x.equivalente)) notasEmitidas.push(n);
+        return;
+      }
       const l = rubroDeNota(n.id);
       if (l && vivo(valor(l, "actual"), valor(l, "anterior"))) notasEmitidas.push(n);
     });
@@ -467,10 +474,15 @@
       <td class="concepto">${esc(concepto)}</td>
       <td class="num">${imp(a)}</td><td class="num">${imp(b)}</td></tr>`;
 
+    const nota = numeroNota["efectivo_equivalentes"]
+      ? ` (Nota ${numeroNota["efectivo_equivalentes"]})` : "";
+
     let filas =
       `<tr class="titulo"><td colspan="3">Variación neta del efectivo</td></tr>` +
-      f3("Efectivo al inicio del ejercicio", e.efectivo.inicio_actual, e.efectivo.inicio_anterior) +
-      f3("Efectivo al cierre del ejercicio", e.efectivo.cierre_actual, e.efectivo.cierre_anterior) +
+      f3(`Efectivo al inicio del ejercicio${nota}`,
+         e.efectivo.inicio_actual, e.efectivo.inicio_anterior) +
+      f3(`Efectivo al cierre del ejercicio${nota}`,
+         e.efectivo.cierre_actual, e.efectivo.cierre_anterior) +
       f3("Aumento (disminución) neto del efectivo",
          e.efectivo.cierre_actual - e.efectivo.inicio_actual,
          e.efectivo.cierre_anterior - e.efectivo.inicio_anterior, "total") +
@@ -485,31 +497,12 @@
     });
     filas += f3("Aumento (disminución) neto del efectivo", e.total_actual, e.total_anterior, "total");
 
-    /* De qué está hecho el efectivo de este estado. Hace falta cuando además de
-       la caja hay equivalentes: en el estado de situación patrimonial están en
-       otro renglón, y sin esto el lector no puede atar una cifra con la otra. */
-    if ((e.composicion || []).some((x) => x.equivalente)) {
-      filas += `<tr class="titulo"><td colspan="3">Integración del efectivo</td></tr>`;
-      filas += e.composicion.map((x) =>
-        f3(x.concepto + (x.equivalente ? " (equivalente de efectivo)" : ""),
-           x.actual, x.anterior, "sangria")).join("");
-      filas += f3("Efectivo y sus equivalentes",
-        e.efectivo.cierre_actual, e.efectivo.inicio_actual, "subtotal");
-    }
-
-    /* Lo que movió cuentas pero no movió un peso. Va acá y no entre las causas:
-       una distribución imputada a la cuenta de un socio no es una cobranza. El
-       renglón dice qué se movió y cuánto, sin ponerle nombre a la operación: el
-       mismo asiento puede estar haciendo más de una cosa. */
-    const sin = (e.sin_efectivo || []).length
-      ? `<p class="pie-estado">Variaciones que no afectaron el efectivo y por eso quedan
-          fuera de las causas: ${e.sin_efectivo.map((x) =>
-            `${esc(x.concepto)}, ${imp(x.importe)}`).join("; ")}.</p>`
-      : "";
-
+    /* De qué está hecho el efectivo no va acá: va en su nota. El estado muestra
+       las causas de la variación; de qué se compone la cifra es información
+       sobre la cifra, y su lugar es la nota. */
     hoja("", encabezado("Estado de Flujo de Efectivo") +
       `<div class="cuadro"><table class="estado">${cabezaEstado("Método indirecto")}
-        <tbody>${filas}</tbody></table></div>${sin}`, { dictamen: "cuadro" });
+        <tbody>${filas}</tbody></table></div>`, { dictamen: "cuadro" });
   }
 
   /* ---------- anexos ---------- */
@@ -653,6 +646,26 @@
 
   function tablaComposicion(n) {
     if (n.remite) return "";   // la composición la muestra el anexo
+    const a0 = window.Motor.fechaCorta(m.ejercicio.cierre);
+    const b0 = window.Motor.fechaCorta(m.ejercicio.cierre_anterior);
+    /* La del efectivo no sale de un renglón del balance sino del estado de
+       flujo: la caja más los equivalentes, cada uno con el renglón donde está
+       expuesto, que es lo que permite atarlo con el balance. */
+    if (n.modelo === "estudio/efectivo") {
+      const c = m.efe.composicion || [];
+      if (!c.length) return "";
+      return `<div class="cuadro"><table class="composicion">
+        <thead><tr><th>Concepto</th><th class="num">${a0}</th><th class="num">${b0}</th></tr></thead>
+        <tbody>
+          ${c.map((x) => `<tr><td>${esc(x.concepto)}${
+            x.equivalente ? " <small>(equivalente de efectivo)</small>" : ""}</td>
+            <td class="num">${imp(x.actual)}</td>
+            <td class="num">${imp(x.anterior)}</td></tr>`).join("")}
+          <tr class="total"><td>Total</td>
+            <td class="num">${imp(m.efe.efectivo.cierre_actual)}</td>
+            <td class="num">${imp(m.efe.efectivo.inicio_actual)}</td></tr>
+        </tbody></table></div>`;
+    }
     const linea = rubroDeNota(n.id);
     if (!linea) return "";
     const items = m.notas[linea].filter((x) => vivo(x.actual, x.anterior));

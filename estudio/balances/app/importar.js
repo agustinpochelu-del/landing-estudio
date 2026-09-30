@@ -1778,6 +1778,14 @@
      lista: una alarma que no se apaga deja de mirarse. */
   const NO_SE_CONSERVAN = ["apertura", "faltan"];
 
+  /* Hay bloques que la planilla trae **enteros**, y mezclarlos renglón por
+     renglón resucita un concepto que se renombró: el comparativo de gastos de
+     Lima Sur decía «Impuestos y Tasas» y pasó a decir «Tasas». Quedaban los dos,
+     con el mismo importe, y el Anexo VIII comparativo no cerraba por esa
+     diferencia. Si el bloque viene, viene completo; si no viene, se conserva
+     entero, que para eso está. */
+  const ENTEROS = ["comparativo.gastos", "comparativo.resultados"];
+
   function conservar(previo, nuevo, camino, guardados) {
     if (!esObjeto(previo) || !esObjeto(nuevo)) return;
     Object.keys(previo).forEach((k) => {
@@ -1786,7 +1794,7 @@
       if (nuevo[k] === undefined || nuevo[k] === null) {
         nuevo[k] = previo[k];
         guardados.push(donde);
-      } else {
+      } else if (ENTEROS.indexOf(donde) < 0) {
         conservar(previo[k], nuevo[k], donde, guardados);
       }
     });
