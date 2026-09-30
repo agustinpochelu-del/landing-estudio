@@ -150,10 +150,7 @@
             if (el.checked) delete cuentas[c].se_asienta;
             else cuentas[c].se_asienta = false;
           }
-          estado.tocado = true;
-          $("#cambios").textContent = "Hay cambios sin guardar. Bajá el archivo y dejalo en " +
-            `datos/entes/${estado.slug}/`;
-          pintarDescargas();
+          hayCambios();
           return;
         }
         const v = el.value.trim();
@@ -168,13 +165,81 @@
             if (v) cuentas[x][campo] = v; else delete cuentas[x][campo];
           });
         }
-        estado.tocado = true;
-        $("#cambios").textContent = "Hay cambios sin guardar. Bajá el archivo y dejalo en " +
-          `datos/entes/${estado.slug}/`;
-        pintarDescargas();
+        hayCambios();
       };
     });
     pintarDescargas();
+  }
+
+  /* ---------- guardar ---------- */
+
+  /* Dónde se guarda depende de dónde está el ejercicio. Con el servidor local
+     corriendo, en la carpeta del ente, que es donde vive el plan. Sin él —la
+     aplicación publicada— en la bolsa, que es el único lugar que hay: el
+     ejercicio que se importó en este navegador. Bajar el archivo queda como
+     estaba, para el que quiera la copia. */
+  function dondeGuarda() {
+    if (estado.servidor) return "carpeta";
+    return window.Bolsa.lista().some((x) => x.slug === estado.slug) ? "bolsa" : null;
+  }
+
+  function hayCambios() {
+    estado.tocado = true;
+    const donde = dondeGuarda();
+    $("#cambios").textContent = donde
+      ? "Hay cambios sin guardar."
+      : "Hay cambios sin guardar. Bajá el archivo y dejalo en " +
+        `datos/entes/${estado.slug}/`;
+    $("#guardado").textContent = "";
+    pintarGuardar();
+    pintarDescargas();
+  }
+
+  function pintarGuardar() {
+    const b = $("#guardar");
+    const donde = dondeGuarda();
+    b.hidden = !donde || !estado.tocado;
+    b.textContent = donde === "carpeta"
+      ? "Guardar en la carpeta del ente" : "Guardar en el ejercicio importado";
+  }
+
+  async function guardar() {
+    const b = $("#guardar"), aviso = $("#guardado");
+    b.disabled = true;
+    aviso.textContent = "Guardando…";
+    const archivos = { "mapeo-cuentas.json": estado.mapeo };
+    try {
+      if (estado.servidor) {
+        const res = await fetch("/guardar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: estado.slug, archivos: archivos }),
+        });
+        const cuerpo = await res.json();
+        if (!res.ok) throw new Error(cuerpo.error || res.statusText);
+        /* Lo que quedó en la bolsa tapa al archivo recién escrito: el plan es
+           del ente, así que se actualiza en todos sus ejercicios guardados. */
+        window.Bolsa.actualizar(estado.slug, "mapeo-cuentas.json", estado.mapeo);
+        aviso.innerHTML = "<strong>Guardado.</strong> " +
+          cuerpo.escritos.map((x) => `<code>${esc(x)}</code>`).join(" · ") +
+          ((cuerpo.reemplazados || []).length
+            ? "<br>La versión anterior quedó en " +
+              cuerpo.reemplazados.map((x) => `<code>${esc(x)}</code>`).join(" · ")
+            : "");
+      } else {
+        const n = window.Bolsa.actualizar(estado.slug, "mapeo-cuentas.json", estado.mapeo);
+        if (!n) throw new Error("no encontré el ejercicio en este navegador");
+        aviso.innerHTML = "<strong>Guardado</strong> en el ejercicio importado. " +
+          "El balance ya sale con esta clasificación.";
+      }
+      estado.tocado = false;
+      $("#cambios").textContent = "Todavía no cambiaste nada.";
+    } catch (e) {
+      aviso.innerHTML = `<span class="mal">No pude guardar: ${esc(e.message)}.</span> ` +
+        "Bajá el archivo y dejalo en " + `<code>datos/entes/${esc(estado.slug)}/</code>.`;
+    }
+    b.disabled = false;
+    pintarGuardar();
   }
 
   /* ---------- bajar ---------- */
@@ -237,6 +302,8 @@
       }
 
       $("#cambios").textContent = "Todavía no cambiaste nada.";
+      $("#guardado").textContent = "";
+      pintarGuardar();
       pintar();
     } catch (err) {
       $("#tabla").innerHTML = `<div class="error">${esc(err.message)}</div>`;
@@ -244,6 +311,11 @@
   }
 
   async function arrancar() {
+    /* Guardar en la carpeta lo resuelve `herramientas/servidor.py`. Si no está
+       corriendo —la aplicación publicada— se guarda en la bolsa. */
+    estado.servidor = await window.Bolsa.hayServidor();
+    $("#guardar").onclick = guardar;
+
     /* El índice sale de la bolsa, no del disco: en la aplicación publicada no
        hay carpeta `datos/`, y leer el archivo directo dejaba la página en
        blanco —sin empresas en el selector y sin tabla— en vez de mostrar los

@@ -70,6 +70,22 @@
 
   const tiene = (slug, anio) => clave(slug, anio) in todo();
 
+  /* Cambia **un** archivo del ente adentro de lo que ya está en la bolsa, sin
+     tocar el resto. El plan de cuentas es del ente, así que vale para todos sus
+     ejercicios guardados: si se cambia una clasificación y la bolsa se queda con
+     la vieja, el balance sigue saliendo con la vieja y nadie se entera. */
+  function actualizar(slug, nombre, contenido) {
+    const bolsa = todo();
+    let tocados = 0;
+    Object.keys(bolsa).forEach((k) => {
+      if (bolsa[k].slug !== slug || !bolsa[k].archivos) return;
+      bolsa[k].archivos[nombre] = contenido;
+      tocados++;
+    });
+    if (tocados) escribir(bolsa);
+    return tocados;
+  }
+
   function olvidar(slug, anio) {
     const bolsa = todo();
     delete bolsa[clave(slug, anio)];
@@ -165,5 +181,6 @@
     return respuesta;
   }
 
-  window.Bolsa = { json, indice, guardar, lista, tiene, olvidar, vaciar, hayServidor };
+  window.Bolsa = { json, indice, guardar, actualizar, lista, tiene, olvidar, vaciar,
+                   hayServidor };
 })();

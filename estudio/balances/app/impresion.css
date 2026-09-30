@@ -359,8 +359,10 @@ table.anexo tr.total td.separa { border-left-color: rgba(255,255,255,.35); }
 .nota p { margin: 0 0 .5rem; text-align: justify; color: var(--tinta); }
 .nota p.vineta { padding-left: 1rem; }
 /* Los cuadros de las notas van centrados en la hoja: son el detalle de un
-   renglón, no una columna de texto. */
-.nota .cuadro { margin: .5rem auto 0; width: 74%; }
+   renglón, no una columna de texto. El ancho es el que hace que un concepto
+   largo —«Crédito por impuesto sobre débitos y créditos»— entre en un renglón:
+   con uno solo partido en dos, la tabla entera se lee desalineada. */
+.nota .cuadro { margin: .5rem auto 0; width: 86%; }
 table.composicion { width: 100%; border-collapse: collapse; font-size: 9.2pt; }
 table.composicion th, table.composicion td {
   padding: .22rem .5rem; border-right: 1px solid var(--divisor);
