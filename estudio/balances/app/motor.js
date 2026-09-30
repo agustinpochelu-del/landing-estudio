@@ -499,8 +499,11 @@
     (this.plan.estados.esp.bloques || []).forEach((b) => (b.lineas || []).forEach((l) => {
       if (l.efectivo) LINEAS_EFECTIVO.push(l.id);
     }));
-    const equivalentes = (col) =>
-      Object.keys(eq).reduce((t, l) => t + eq[l][col], 0);
+    /* Un equivalente en un renglón que **ya es** efectivo no suma nada: el saldo
+       de la cuenta está adentro del renglón. Marcar el banco como «es efectivo»
+       —que lo es— no puede hacer que el banco se cuente dos veces. */
+    const EQ = Object.keys(eq).filter((l) => LINEAS_EFECTIVO.indexOf(l) < 0);
+    const equivalentes = (col) => EQ.reduce((t, l) => t + eq[l][col], 0);
     const efectivoEn = (col) =>
       LINEAS_EFECTIVO.reduce((t, l) => t + this.v(l, col), 0) + equivalentes(col);
 
@@ -508,7 +511,7 @@
     const efectivoAnterior = efectivoEn("anterior");
     const efectivoPrevio = !previo ? 0
       : LINEAS_EFECTIVO.reduce((t, l) => t + (previo[l] || 0), 0);
-    if (previo && Object.keys(eq).some((l) => Math.abs(previo[l] || 0) > TOL)) {
+    if (previo && EQ.some((l) => Math.abs(previo[l] || 0) > TOL)) {
       this.avisos.push("A10 · hay equivalentes de efectivo en un renglón que ya tenía saldo " +
         "dos cierres atrás. El comparativo viene por renglón y no por cuenta, así que el " +
         "efectivo al inicio del ejercicio anterior sale sin ellos.");
@@ -571,7 +574,7 @@
     /* Una distribución pagada con plata sí es un flujo, y de financiación: el
        estado no tiene todavía esa sección, así que se avisa en vez de esconderla
        adentro de otra. */
-    const enEfectivo = LINEAS_EFECTIVO.concat(Object.keys(eq))
+    const enEfectivo = LINEAS_EFECTIVO.concat(EQ)
       .reduce((t, l) => t + (sinEfectivo[l] || 0), 0);
     if (Math.abs(enEfectivo) > TOL) {
       this.avisos.push("A11 · una distribución de resultados movió el efectivo por " +
@@ -590,12 +593,15 @@
     };
     const composicion = LINEAS_EFECTIVO.map((l) => ({
       concepto: nombreLinea(l), actual: this.v(l, "actual"), anterior: this.v(l, "anterior"),
-    })).concat(Object.keys(eq).map((l) => ({
+    })).concat(EQ.map((l) => ({
       concepto: nombreLinea(l), actual: eq[l].actual, anterior: eq[l].anterior, equivalente: true,
     })));
 
     this.efe = {
-      composicion: composicion.length > 1 ? composicion : [],
+      /* Se arma siempre, aunque no haya equivalentes: el control C06 ata lo que
+         se imprime arriba con lo que se imprime abajo, y para eso las dos cifras
+         tienen que existir. Imprimirse, se imprime sólo si hay equivalentes. */
+      composicion: composicion,
       sin_efectivo: Object.keys(sinEfectivo)
         .filter((l) => Math.abs(sinEfectivo[l]) > TOL)
         .map((l) => ({ concepto: nombreLinea(l), importe: sinEfectivo[l] })),
@@ -641,8 +647,12 @@
         c.actual["er.resultado_ejercicio"], delEEPN(null, "resultado_ejercicio"));
     add("C05", "Suma de saldos del ejercicio = 0",
         0, Object.values(this.d.saldos.cierre).reduce((a, b) => a + b, 0));
-    add("C06", "Efectivo al cierre del EFE = caja y bancos del ESP",
-        this.suma("esp.ac.caja_bancos", "actual"), this.efe.efectivo.cierre_actual);
+    /* Desde que el efectivo puede tener equivalentes, no alcanza con mirar caja
+       y bancos: el control ata **lo que se imprime arriba con lo que se imprime
+       abajo**, el efectivo al cierre contra la suma de su integración. */
+    add("C06", "Efectivo al cierre del EFE = suma de su integración",
+        (this.efe.composicion || []).reduce((t, x) => t + x.actual, 0),
+        this.efe.efectivo.cierre_actual);
     add("C07", "Variación neta del EFE = cierre menos inicio (actual)",
         this.efe.efectivo.cierre_actual - this.efe.efectivo.inicio_actual, this.efe.total_actual);
     /* La columna comparativa también tiene que cerrar: si no, el flujo del

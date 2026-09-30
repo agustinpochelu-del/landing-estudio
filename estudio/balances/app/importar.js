@@ -1806,8 +1806,27 @@
   const ORDEN_DE_CIERRE = ["valuacion", "credito_ley_25413", "amortizaciones",
                            "axi", "neteo_axi", "impuesto"];
 
+  /* El plan de cuentas se rehace de la planilla en cada importación, pero hay
+     marcas que la planilla no trae y que se ponen a mano en la pantalla del
+     plan. Si no se conservan, reimportar las borra sin decir nada, y el balance
+     sale distinto sin que nadie haya cambiado nada. */
+  const MARCAS_DEL_PLAN = ["equivalente_efectivo"];
+
   async function conservarLoQueNoViene(r) {
     const guardados = [];
+    const mapeoPrevio = await archivoDelEnte(r.slug, "mapeo-cuentas.json");
+    const mapeoNuevo = r.archivos["mapeo-cuentas.json"];
+    if (mapeoPrevio && mapeoNuevo) {
+      Object.keys(mapeoPrevio.cuentas || {}).forEach((c) => {
+        const antes = mapeoPrevio.cuentas[c], ahora = (mapeoNuevo.cuentas || {})[c];
+        if (!ahora) return;
+        MARCAS_DEL_PLAN.forEach((k) => {
+          if (antes[k] === undefined || ahora[k] !== undefined) return;
+          ahora[k] = antes[k];
+          guardados.push(`${c}.${k}`);
+        });
+      });
+    }
     const pares = [["ente.json", "ente.json"],
                    ["ejercicio.json", `${r.anio}/ejercicio.json`]];
     for (const [nombre, ruta] of pares) {
