@@ -823,6 +823,34 @@
     return Object.keys(rubricas).length;
   }
 
+  /* El alto de cada firma, por separado y con el balance a la vista.
+
+     Una firma ancha y baja al lado de una alta y angosta, las dos con el mismo
+     alto, se ven desparejas: la ancha se come el renglón y la angosta queda
+     perdida. Cuál es el alto que las empareja no se puede decidir mirando la
+     imagen suelta —depende de la otra firma—, así que se cambia acá, sobre la
+     hoja, y se ve el resultado al toque. El tope sigue siendo 20 mm, que es el
+     hueco que la hoja reserva: más que eso correría la paginación. */
+  const LLAVE_DE = (cual) =>
+    cual === "profesional" ? "estudio" : (m && m.ente ? m.ente.slug : "");
+
+  function altos() {
+    const r = {};
+    ["profesional", "representante"].forEach((cual) => {
+      const f = rubricas[LLAVE_DE(cual)];
+      if (f) r[cual] = Number(f.alto_mm) || 12;
+    });
+    return r;
+  }
+
+  function cambiarAlto(cual, mm) {
+    const f = rubricas[LLAVE_DE(cual)];
+    if (!f) return null;
+    f.alto_mm = Math.min(20, Math.max(4, Number(mm) || 12));
+    dibujar();
+    return f.alto_mm;
+  }
+
   /* Quiénes firman este balance, para poder ponerle nombre a cada casilla. */
   function firmantes() {
     if (!m || !m.ente) return null;
@@ -836,7 +864,7 @@
   }
 
   window.Informe = {
-    firmar, desfirmar, ponerFirmas, firmantes,
+    firmar, desfirmar, ponerFirmas, firmantes, altos, cambiarAlto,
     firmado: () => Object.keys(rubricas).length > 0,
   };
 

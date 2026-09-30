@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="impresion.css?v=58">
+<link rel="stylesheet" href="impresion.css?v=59">
 <script>
   /* La paleta se aplica antes de pintar, para que no haya un parpadeo del
      color anterior. Sale de `?paleta=` o de lo último que se eligió. */
@@ -39,6 +39,15 @@
       <input type="password" id="clave-firma" placeholder="clave" autocomplete="current-password">
       <button type="button" id="aplicar-firma">Aplicar</button>
     </span>
+    <!-- El alto de cada firma, con el balance a la vista: cuál es el alto que
+         empareja dos firmas de forma distinta se ve mirando la hoja. -->
+    <span class="altos" id="altos-firmas" hidden>
+      <label id="rot-alto-profesional">Mi firma
+        <input type="number" id="vivo-profesional" min="4" max="20" step="1"></label>
+      <label id="rot-alto-representante">Representante
+        <input type="number" id="vivo-representante" min="4" max="20" step="1"></label>
+      <button type="button" id="guardar-altos" hidden>Guardar el alto</button>
+    </span>
     <a href="tablero.html">Volver</a>
     <button type="button" onclick="window.print()">Imprimir o guardar en PDF</button>
   </span>
@@ -58,19 +67,23 @@
     <label class="una">
       <span class="quien" id="et-profesional">La firma del profesional</span>
       <input type="file" id="firma-profesional" accept="image/png,image/jpeg">
+      <span class="alto-una">Alto
+        <input type="number" id="alto-profesional" value="12" min="4" max="20" step="1"> mm</span>
       <span class="previa" id="previa-profesional"></span>
     </label>
 
     <label class="una">
       <span class="quien" id="et-representante">La firma del representante</span>
       <input type="file" id="firma-representante" accept="image/png,image/jpeg">
+      <span class="alto-una">Alto
+        <input type="number" id="alto-representante" value="12" min="4" max="20" step="1"> mm</span>
       <span class="previa" id="previa-representante"></span>
     </label>
 
     <p class="alto">
-      <label>Alto en la hoja
-        <input type="number" id="alto-firmas" value="12" min="4" max="20" step="1"> mm</label>
-      <span class="dice" id="dice-subir"></span>
+      <span class="dice" id="dice-subir">Cada firma lleva su alto: una firma ancha
+        y una angosta no se emparejan con el mismo número. Se puede corregir
+        después, con el balance a la vista.</span>
     </p>
 
     <p class="botones">
@@ -86,7 +99,7 @@
 <script src="rubrica.js?v=1"></script>
 <script src="motor.js?v=32"></script>
 <script src="diario.js?v=42"></script>
-<script src="informe.js?v=40"></script>
+<script src="informe.js?v=41"></script>
 <script>
   /* Firmar.
 
@@ -106,11 +119,73 @@
       dice.className = "dice-firma" + (mal ? " mal" : "");
     }
 
+    /* El alto de cada firma, ya aplicada, sobre la hoja. Aparece cuando hay
+       firmas y desaparece cuando se sacan: es un ajuste de lo que se está
+       viendo, no una preferencia que viva por su cuenta. */
+    var cajaAltos = document.getElementById("altos-firmas");
+    var guardarAltos = document.getElementById("guardar-altos");
+
+    function mostrarAltos() {
+      var hay = window.Informe && window.Informe.firmado();
+      cajaAltos.hidden = !hay;
+      guardarAltos.hidden = true;
+      if (!hay) return;
+      var a = window.Informe.altos();
+      var f = window.Informe.firmantes() || {};
+      var rotulos = { profesional: f.profesional || "Mi firma",
+                      representante: f.representante || "Representante" };
+      ["profesional", "representante"].forEach(function (cual) {
+        var rot = document.getElementById("rot-alto-" + cual);
+        var ent = document.getElementById("vivo-" + cual);
+        rot.hidden = a[cual] === undefined;
+        if (a[cual] !== undefined) {
+          ent.value = a[cual];
+          rot.childNodes[0].nodeValue = rotulos[cual] + " ";
+        }
+      });
+    }
+
+    ["profesional", "representante"].forEach(function (cual) {
+      document.getElementById("vivo-" + cual).oninput = function () {
+        var puesto = window.Informe.cambiarAlto(cual, this.value);
+        if (puesto !== null && conServidor) guardarAltos.hidden = false;
+      };
+    });
+
+    /* Con el reservorio, el alto que se acaba de encontrar se guarda con la
+       firma: la próxima vez sale así y no hay que volver a buscarlo. */
+    guardarAltos.onclick = async function () {
+      var c = window.prompt("Clave de las firmas, para guardar el alto:");
+      if (!c) return;
+      guardarAltos.disabled = true;
+      avisar("Guardando el alto…");
+      try {
+        var a = window.Informe.altos();
+        var f = window.Informe.firmantes() || {};
+        for (var cual in a) {
+          var res = await fetch("/firmas/cargar", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clave: c, alto_mm: a[cual],
+              de: cual === "profesional" ? "estudio" : (new URLSearchParams(
+                location.search)).get("ente") }),
+          });
+          var cuerpo = await res.json();
+          if (!res.ok) throw new Error(cuerpo.error || res.statusText);
+        }
+        avisar("Alto guardado con la firma");
+        guardarAltos.hidden = true;
+      } catch (e) {
+        avisar(e.message, true);
+      }
+      guardarAltos.disabled = false;
+    };
+
     pedir.onclick = function () {
       if (window.Informe && window.Informe.firmado()) {
         window.Informe.desfirmar();
         pedir.textContent = "Firmar";
         avisar("");
+        mostrarAltos();
         return;
       }
       if (!conServidor) return abrirDialogo();
@@ -130,6 +205,7 @@
         avisar(r.faltan.length
           ? "Firmado, pero falta cargar la firma de: " + r.faltan.join(", ")
           : "Firmado");
+        mostrarAltos();
       } catch (e) {
         avisar(e.message, true);
       }
@@ -148,39 +224,36 @@
     var dialogo = document.getElementById("dialogo-firmas");
     var subidas = {};
 
-    function previa(donde, imagen) {
-      var alto = Number(document.getElementById("alto-firmas").value) || 12;
+    function altoDe(cual) {
+      return Number(document.getElementById("alto-" + cual).value) || 12;
+    }
+
+    function previa(cual) {
+      var donde = document.getElementById("previa-" + cual);
+      var imagen = subidas[cual] && subidas[cual].imagen;
       donde.innerHTML = imagen
-        ? '<img src="' + imagen + '" style="height:' + (alto * 96 / 25.4) + 'px">'
+        ? '<img src="' + imagen + '" style="height:' + (altoDe(cual) * 96 / 25.4) + 'px">'
         : "";
     }
 
-    async function tomar(cual, entrada, donde) {
+    async function tomar(cual, entrada) {
       var d = document.getElementById("dice-subir");
-      d.textContent = "";
-      if (!entrada.files.length) { subidas[cual] = null; previa(donde, null); return; }
+      if (!entrada.files.length) { subidas[cual] = null; previa(cual); return; }
       try {
         subidas[cual] = { imagen: await window.Rubrica.deArchivo(entrada.files[0]) };
-        previa(donde, subidas[cual].imagen);
+        previa(cual);
       } catch (e) {
         subidas[cual] = null;
-        previa(donde, null);
+        previa(cual);
         d.innerHTML = '<span class="mal">' + e.message + "</span>";
       }
     }
 
     ["profesional", "representante"].forEach(function (cual) {
       var entrada = document.getElementById("firma-" + cual);
-      var donde = document.getElementById("previa-" + cual);
-      entrada.onchange = function () { tomar(cual, entrada, donde); };
+      entrada.onchange = function () { tomar(cual, entrada); };
+      document.getElementById("alto-" + cual).oninput = function () { previa(cual); };
     });
-
-    document.getElementById("alto-firmas").oninput = function () {
-      previa(document.getElementById("previa-profesional"),
-        subidas.profesional && subidas.profesional.imagen);
-      previa(document.getElementById("previa-representante"),
-        subidas.representante && subidas.representante.imagen);
-    };
 
     document.getElementById("aplicar-subidas").onclick = function () {
       var d = document.getElementById("dice-subir");
@@ -188,10 +261,11 @@
         d.innerHTML = '<span class="mal">No elegiste ninguna imagen.</span>';
         return;
       }
-      var alto = Number(document.getElementById("alto-firmas").value) || 12;
       var puestas = {};
       ["profesional", "representante"].forEach(function (cual) {
-        if (subidas[cual]) puestas[cual] = { imagen: subidas[cual].imagen, alto_mm: alto };
+        if (subidas[cual]) {
+          puestas[cual] = { imagen: subidas[cual].imagen, alto_mm: altoDe(cual) };
+        }
       });
       try {
         window.Informe.ponerFirmas(puestas);
@@ -203,6 +277,7 @@
       pedir.textContent = "Sacar las firmas";
       avisar(subidas.profesional && subidas.representante
         ? "Firmado" : "Firmado con una sola firma");
+      mostrarAltos();
     };
 
     function abrirDialogo() {

@@ -770,6 +770,22 @@ table.libro tr.grupo-jerarquia .sigla {
 }
 .barra .firma input::placeholder { color: rgba(255,255,255,.55); }
 .barra .firma[hidden] { display: none; }
+
+/* El alto de cada firma ya aplicada, en la barra: se mueve con el balance a la
+   vista, que es la única forma de ver si las dos firmas quedaron parejas. */
+.barra .altos { display: inline-flex; align-items: center; gap: .5rem; }
+.barra .altos[hidden], .barra .altos label[hidden], .barra .altos button[hidden] {
+  display: none;
+}
+.barra .altos label {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .78rem; color: rgba(255,255,255,.78);
+}
+.barra .altos input {
+  font: inherit; font-size: .82rem; width: 3.6rem; padding: .2rem .35rem;
+  border-radius: 6px; border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.1); color: #fff;
+}
 .barra .dice-firma { font-size: .78rem; opacity: .85; }
 .barra .dice-firma.mal { color: #ffd7cf; opacity: 1; }
 
@@ -798,6 +814,16 @@ table.libro tr.grupo-jerarquia .sigla {
   color: var(--apagado); margin-bottom: .45rem;
 }
 .firmas-subir input[type="file"] { font: inherit; font-size: .85rem; max-width: 100%; }
+/* El alto va adentro de cada firma, no abajo de las dos: son dos números
+   distintos, y ponerlos juntos invitaba a creer que era uno solo. */
+.firmas-subir .alto-una {
+  display: inline-flex; align-items: center; gap: .4rem; margin-left: .8rem;
+  font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--apagado);
+}
+.firmas-subir .alto-una input {
+  font: inherit; font-size: .9rem; width: 4rem; text-transform: none; letter-spacing: 0;
+  padding: .25rem .45rem; border: 1px solid var(--linea); border-radius: 8px;
+}
 .firmas-subir .previa {
   display: block; min-height: 0; margin-top: .6rem; text-align: center;
 }
