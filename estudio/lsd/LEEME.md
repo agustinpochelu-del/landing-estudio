@@ -79,9 +79,13 @@ solo**, sin dos versiones que puedan dejar de coincidir.
 grep -rhoE "\b(20|23|24|27|30|33)[0-9]{9}\b" estudio/lsd/ | sort | uniq -c | sort -rn
 ```
 
-Lo único esperable es `30123456789`, el ejemplo del campo CUIT, y el CUIT de
-Martín Prado en `empresa.js`, que está en su ficha de liquidación. Cualquier
-otro número de once dígitos hay que mirarlo antes de subir.
+Lo esperable son cuatro números, y nada más: `30123456789`, el ejemplo del
+campo CUIT, y los **CUIT de los tres empleadores** —Nautical `30644965593`,
+Martín Prado `20227823357`, Viviana Barbano `27134231780`—, que viven en
+`indice.json` porque es el índice el que nombra las empresas. El CUIT es un
+dato público y Agustín lo dio por bueno; el **CUIL** de un trabajador no, y por
+eso el padrón sube cifrado. Cualquier otro número de once dígitos hay que
+mirarlo antes de subir —empezando por si es un CUIL—.
 
 ## Por qué la dirección termina en `/armador`
 

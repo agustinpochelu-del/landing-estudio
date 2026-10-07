@@ -4,6 +4,7 @@
   "_excluidos": "Conceptos que esa empresa no pasa al libro. Son de la empresa, no del mes: entran solos y no hay que volver a escribirlos en cada liquidación.",
   "_recibos": "Solo para los origenes que no son una tabla sino un recibo dibujado por hoja. `alias` traduce la descripcion que imprime el recibo al codigo de concepto de la empresa, porque el recibo no trae el codigo y la descripcion no coincide con la del reservorio de conceptos. `excluidos` de aca va por descripcion, no por numero, por el mismo motivo. Un concepto sin alias no se inventa: sale sin codigo y el control del paso 5 lo marca.",
   "_provincia": "Donde trabaja la gente, cuando es una sola provincia para toda la empresa. Es el valor por defecto del credito fiscal del decreto 814/2001. La columna Provincia del reservorio de empleados manda sobre esta: se usa cuando el trabajador no la trae. Nautical no la tiene y no debe tenerla, porque su gente esta repartida entre Chubut y Rio Negro.",
+  "_agregados_a_mano": "El reservorio de conceptos es una exportación de lo que ARCA tiene parametrizado. Una fila agregada a mano no es un hecho sino una promesa: la aplicación la da por buena, arma el archivo y ARCA lo rechaza con «Código de concepto inexistente». Pasó el 07/10/2026 con el 125 y el 532 de Nautical. Nautical, 125 «Devolucion liq. ant. dif»: agregado a mano el 06/10/2026 como 110000 «Sueldo», remunerativo con los catorce subsistemas, por decisión de Agustín. Hay que darlo de alta en el servicio de ARCA, a mano, antes de que el libro entre: hasta entonces el archivo rebota por él. Borrar esta línea cuando esté dado de alta.",
   "_alicuotas": "Los aportes del trabajador, en por ciento. ARCA los recalcula sobre las bases y los cruza contra lo retenido en el recibo; sin estos números ese control no corre, y es el que encontró que a Nautical le faltaba retener $1.950.679,92 en 202609. Van acá por el mismo motivo que todo lo demás: no cambian mes a mes.",
   "empresas": {
     "30644965593": {
@@ -17,7 +18,8 @@
         "403",
         "513",
         "522",
-        "531"
+        "531",
+        "532"
       ],
       "alicuotas": {
         "sipa": 11,
@@ -32,7 +34,7 @@
       "aportesAlValorCalculado": true,
       "_por_que_aportes": "En 202609 el sistema de sueldos venía topeando con una tabla vieja —$3.505.701,36 contra los $4.691.748,47 de la Res. ANSeS 257/2026— y retuvo de menos $1.950.679,92 en once empleados. Decisión de Agustín el 27/09/2026: se informa lo que hay que informar y la diferencia es carga de la empresa. El libro definitivo sale con el número de ARCA de todos modos.",
       "_fuente_alicuotas": "Confirmadas contra la validación de ARCA del 27/09/2026: su recálculo da $516.092,33 de SIPA y $140.752,45 de PAMI y de obra social sobre una base de $4.691.748,47, que es exactamente el 11 % y el 3 %.",
-      "_por_que_excluidos": "209 y 210 «Expte. N 0071-16» y 403 «Dev. Imp. a las Gs Art 145 Dec 1344/98»: van a 550000 (no remunerativo) en débito y sin subsistemas, así que bajan la bruta y no bajan ninguna base, y ARCA rechaza con «Base imponible N es mayor a la remuneración bruta». 522 «ADICIONAL SITIO 3» y 531 «Viaticos»: no están en la parametrización y ARCA los rechaza con «Código de concepto inexistente». Los cinco los decidió Agustín el 27/09/2026: no se informan al libro. 513 «Adcional No remunerativo SAE»: está mapeado a 170005 «Viáticos sin comprobante», que en la planilla de ARCA es remunerativo, así que sus $298.610,40 del 202609 entraban a la remuneración y los remunerativos daban $89.813.187,07 contra los $89.514.576,67 del PDF de liquidación. Decisión de Agustín el 27/09/2026: se excluye, como el 522 y el 531, en vez de remapearlo a 550000. El importe no queda informado en el libro."
+      "_por_que_excluidos": "209 y 210 «Expte. N 0071-16» y 403 «Dev. Imp. a las Gs Art 145 Dec 1344/98»: van a 550000 (no remunerativo) en débito y sin subsistemas, así que bajan la bruta y no bajan ninguna base, y ARCA rechaza con «Base imponible N es mayor a la remuneración bruta». 522 «ADICIONAL SITIO 3» y 531 «Viaticos»: no están en la parametrización y ARCA los rechaza con «Código de concepto inexistente». Los cinco los decidió Agustín el 27/09/2026: no se informan al libro. 513 «Adcional No remunerativo SAE»: está mapeado a 170005 «Viáticos sin comprobante», que en la planilla de ARCA es remunerativo, así que sus $298.610,40 del 202609 entraban a la remuneración y los remunerativos daban $89.813.187,07 contra los $89.514.576,67 del PDF de liquidación. Decisión de Agustín el 27/09/2026: se excluye, como el 522 y el 531, en vez de remapearlo a 550000. El importe no queda informado en el libro. 532 «AMARRE/DESAM. SUPPLY»: concepto nuevo de 202609, no remunerativo, $10.650.000,00 en seis embarcados. ARCA lo rechazó con «Código de concepto inexistente 532» porque no está dado de alta en el servicio. Decisión de Agustín el 07/10/2026: no se informa al libro, como el resto de los no remunerativos de la lista, en vez de darlo de alta en ARCA. OJO: el 501 «Adcional No remunerativo» también va a 550000 y NO está acá a propósito — se sigue informando ($740.991,60 en 202609). La decisión del 07/10/2026 fue código por código y no una regla sobre el 550000: se preguntó y la respuesta fue «solo el 532»."
     },
     "20227823357": {
       "nombre": "Martín Prado",
