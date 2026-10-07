@@ -807,6 +807,44 @@ function pintarControl() {
     </div>`;
   }
 
+  /*
+   * El alta de un empleado nuevo se hace en el paso 2, pero el problema se
+   * descubre acá, en el paso 5. Y el paso 2 se pliega solo apenas los dos
+   * reservorios están cargados, así que el formulario queda adentro de un
+   * acordeón cerrado: se lee «1 de 20 trabajadores no están en el reservorio» y
+   * no hay por dónde agarrarlo.
+   *
+   * Decir dónde está no alcanza —ya pasó con los reservorios del paso 2—: hace
+   * falta el botón que abre y lleva hasta el formulario de esa persona.
+   */
+  const nuevosEmpleados = estado.padron && estado.padron.size
+    ? empleadosNuevos(estado.liquidacion, estado.padron)
+    : [];
+  const nuevosConceptos = !faltaConceptos
+    ? conceptosNuevos(estado.liquidacion, estado.parametrizacion).filter((c) => !aceptados.has(c.codigo))
+    : [];
+
+  if (nuevosEmpleados.length || nuevosConceptos.length) {
+    const partes = [];
+    if (nuevosEmpleados.length) {
+      partes.push(
+        `${nuevosEmpleados.length === 1 ? 'un empleado que no está' : `${nuevosEmpleados.length} empleados que no están`} ` +
+          `en el reservorio (${nuevosEmpleados.map((e) => `<strong>${escapar(e.nombre || e.cuil)}</strong>`).join(', ')})`
+      );
+    }
+    if (nuevosConceptos.length) {
+      partes.push(
+        `${nuevosConceptos.length === 1 ? 'un concepto que no está atado' : `${nuevosConceptos.length} conceptos que no están atados`} ` +
+          `a ninguno de ARCA (${nuevosConceptos.map((c) => `<code>${escapar(c.codigo)}</code>`).join(', ')})`
+      );
+    }
+    html += `<div class="aviso ojo">
+      Hay ${partes.join(' y ')}. Se cargan en el paso 2, que se pliega solo cuando los
+      reservorios ya están: el botón lo abre y lleva hasta ahí.
+      <button type="button" class="suave" id="ir-al-alta">Cargarlos ahora</button>
+    </div>`;
+  }
+
   const item = (h) =>
     `<li class="${h.nivel}">${h.cuil ? `<span class="quien">${escapar(h.cuil)}</span>` : ''}${escapar(h.mensaje)}</li>`;
 
@@ -857,12 +895,54 @@ function pintarControl() {
   /* El botón del aviso abre el paso 2 y lleva hasta ahí, porque nombrarlo no
      alcanzó: el acordeón venía cerrado y se pasaba de largo. */
   if ($('ir-al-paso2')) {
-    $('ir-al-paso2').addEventListener('click', () => {
-      const paso = $('paso-parametrizacion');
-      paso.open = true;
-      paso.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    $('ir-al-paso2').addEventListener('click', () => abrirPaso2YLlevarA('paso-parametrizacion'));
   }
+
+  /* Lleva derecho a la sección de altas y no al principio del paso: lo que hay
+     que cargar está al fondo, después de los dos reservorios y de los conceptos
+     que no se pasan al libro. */
+  if ($('ir-al-alta')) {
+    $('ir-al-alta').addEventListener('click', () => abrirPaso2YLlevarA('novedades'));
+  }
+}
+
+/**
+ * Abre el paso 2 y deja a la vista lo que haya que cargar.
+ *
+ * El `scrollIntoView` va en el cuadro siguiente, no en la misma línea que
+ * `open = true`. Adentro de un `<details>` cerrado el contenido no está
+ * dibujado, así que el navegador calcula el destino sobre una altura que
+ * todavía no existe y la página no se mueve: el paso se abre y el formulario
+ * queda dos mil píxeles más abajo, igual de inencontrable que antes.
+ *
+ * Y el foco va SIN `preventScroll`, para que si el desplazamiento no llega el
+ * navegador lo termine por su cuenta.
+ */
+function abrirPaso2YLlevarA(idDestino) {
+  const paso = $('paso-parametrizacion');
+  if (paso) paso.open = true;
+
+  /*
+   * El desplazamiento va en un `setTimeout` y NO en un `requestAnimationFrame`.
+   *
+   * Adentro de un `<details>` cerrado el contenido no está dibujado, así que
+   * hay que dejar pasar un turno para que el navegador sepa dónde quedó. Lo
+   * natural sería `requestAnimationFrame`, pero **no corre cuando la pestaña no
+   * está a la vista**: el botón abriría el paso y no llevaría a ningún lado,
+   * sin ningún error. Comprobado.
+   *
+   * Y se mueve la ventana a mano en vez de `scrollIntoView`, por lo mismo: el
+   * desplazamiento suave también depende de que la página se esté dibujando.
+   * Acá importa llegar, no cómo se llega.
+   */
+  setTimeout(() => {
+    const destino = $(idDestino) || paso;
+    if (!destino) return;
+    const arriba = destino.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(arriba - 12, 0), behavior: 'auto' });
+    const primero = destino.querySelector('input, select');
+    if (primero) primero.focus({ preventScroll: true });
+  }, 0);
 }
 
 /* ---------- Paso 6: el archivo ---------- */
