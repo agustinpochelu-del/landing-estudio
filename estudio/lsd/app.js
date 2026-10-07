@@ -1622,7 +1622,7 @@ function recalcular() {
   /* El aviso del tope se genera al calcular, no al controlar. */
   const avisosCalculo = [];
   for (const t of estado.liquidacion.trabajadores) {
-    calcularBases(t, estado.parametrizacion, parametros, avisosCalculo);
+    calcularBases(t, estado.parametrizacion, parametros, avisosCalculo, estado.liquidacion.consolidar);
   }
   for (const a of Array.from(new Set(avisosCalculo))) {
     estado.hallazgos.push({ nivel: 'aviso', cuil: '', mensaje: a });

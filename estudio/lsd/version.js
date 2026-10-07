@@ -15,7 +15,7 @@
  */
 
 /** La versión que este archivo declara. Sube junto con los `?v=` del HTML. */
-const VERSION_ESPERADA = '80';
+const VERSION_ESPERADA = '81';
 
 (function sellarVersion() {
   const caja = document.getElementById('sello-version');

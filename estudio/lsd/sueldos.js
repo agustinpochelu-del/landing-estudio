@@ -846,9 +846,14 @@ function consolidarConceptos(trabajador, parametrizacion, avisos) {
  *
  * El tope de SAC sale de la guía: tope del mes / 360 = tope diario; por los
  * días informados en el campo cantidad del concepto de SAC proporcional.
+ *
+ * `consolidar` es el mapa de la empresa —código absorbido → código que recibe—
+ * y hace falta para contar bien los días de vacaciones. Ver ahí abajo.
  */
-function calcularBases(trabajador, parametrizacion, parametros, avisos) {
+function calcularBases(trabajador, parametrizacion, parametros, avisos, consolidar) {
   const bases = { rem1: 0, rem2: 0, rem3: 0, rem4: 0, rem5: 0, rem6: 0, rem7: 0, rem8: 0, rem9: 0, rem10: 0 };
+  /* Cuánto de cada base viene del adelanto vacacional. Ver el tope, más abajo. */
+  const vacacional = { rem1: 0, rem2: 0, rem3: 0, rem4: 0, rem5: 0, rem6: 0, rem7: 0, rem8: 0, rem9: 0, rem10: 0 };
   let remBruta = 0;
   let diasSacProporcional = 0;
   let diasVacaciones = 0;
@@ -874,20 +879,44 @@ function calcularBases(trabajador, parametrizacion, parametros, avisos) {
     /* Los descuentos no forman base: se retienen sobre ella. */
     if (tipo === 'DESCUENTO') continue;
 
+    /*
+     * Lo que pone el adelanto vacacional se acumula APARTE, además de ir a la
+     * base. No es un detalle de contabilidad: el adelanto lleva tope propio y
+     * hay que poder separarlo de la remuneración del mes antes de topear.
+     */
+    const esAdelantoVacacional = String(par.codigoArca).trim() === ADELANTO_VACACIONAL;
+
     for (const base of Object.keys(BASE_POR_SUBSISTEMA)) {
       const alcanza = BASE_POR_SUBSISTEMA[base].some((s) => par.subsistemas[s]);
-      if (alcanza) bases[base] += signo * concepto.importe;
+      if (!alcanza) continue;
+      bases[base] += signo * concepto.importe;
+      if (esAdelantoVacacional) vacacional[base] += signo * concepto.importe;
     }
 
     if (esSacProporcional(par.codigoArca)) diasSacProporcional += signo * concepto.cantidad;
-    if (String(par.codigoArca).trim() === ADELANTO_VACACIONAL) diasVacaciones += signo * concepto.cantidad;
+    /*
+     * Los días NO son una cantidad con signo. Nautical liquida las vacaciones
+     * en dos renglones —«80 Vacaciones» en crédito y «100 Descuento
+     * p/vacaciones pagas» en débito— por los MISMOS 14 días, y los dos van al
+     * concepto ARCA 150000. Sumados con su signo dan cero días, que es
+     * justamente el error que ARCA devolvió por CAYO en 202609.
+     *
+     * Al archivo viajan consolidados en un renglón, y la cantidad es la del
+     * que recibe. Acá se cuenta igual: el absorbido no aporta días.
+     */
+    if (esAdelantoVacacional && !(consolidar && consolidar[String(concepto.codigo)])) {
+      diasVacaciones += signo * concepto.cantidad;
+    }
   }
 
   /* Los días viajan en el campo cantidad, que es decimal de dos posiciones. */
   diasSacProporcional = diasSacProporcional / 100;
   diasVacaciones = diasVacaciones / 100;
 
-  const topes = { topeMes: null, topeDiarioSac: null, topeSac: null, topeAplicar: null, recorto: false };
+  const topes = {
+    topeMes: null, topeDiarioSac: null, topeSac: null, topeAplicar: null,
+    topeVacaciones: null, recorto: false, recortoElAdelanto: false, adelantoSinDias: false,
+  };
   if (parametros && parametros.topeMes) {
     topes.topeMes = parametros.topeMes;
     /*
@@ -901,15 +930,56 @@ function calcularBases(trabajador, parametrizacion, parametros, avisos) {
     topes.topeSac = Math.round((parametros.topeMes * Math.max(0, diasSacProporcional)) / 360);
     topes.topeAplicar = topes.topeMes + topes.topeSac;
 
+    /*
+     * ── El tope del adelanto vacacional ───────────────────────────────────
+     *
+     * El adelanto NO se mete abajo del tope del mes: trae tope propio, que se
+     * SUMA. Esto no es una interpretación, es la cuenta de ARCA:
+     *
+     *   MATEO CURRUMIL, Nautical 202609. Remuneración del mes $5.019.623,78,
+     *   tope del mes $4.691.748,47, adelanto vacacional neto $340.492,69 por
+     *   14 días. Informábamos $4.691.748,47 —todo junto abajo del tope— y el
+     *   servicio rechazó las bases 1, 4 y 5 diciendo que determinó
+     *   $5.032.241,16, que es exactamente 4.691.748,47 + 340.492,69.
+     *
+     * Lo que ESA cuenta no prueba es el divisor, porque el adelanto quedó muy
+     * por debajo de cualquier tope plausible y nunca llegó a recortar. Sí
+     * descarta el /360 del SAC: con /360 el adelanto de 14 días se habría
+     * recortado a $182.401,33 y ARCA habría determinado $4.874.149,80, no lo
+     * que determinó.
+     *
+     * Se usa /30, que es el mes de 30 días con que ARCA cuenta todo lo demás.
+     * Mientras el adelanto no lo supere —el caso normal— el número sale
+     * exacto con cualquier divisor, así que la elección no decide nada. Si
+     * alguna vez recorta, decide, y ahí se avisa en vez de callarse.
+     */
+    topes.topeVacaciones = Math.round((parametros.topeMes * Math.max(0, diasVacaciones)) / 30);
+
     for (const base of BASES_IMPONIBLES) {
       if (!base.tope || bases[base.clave] === undefined) continue;
-      if (bases[base.clave] > topes.topeAplicar) {
-        bases[base.clave] = topes.topeAplicar;
-        /* Queda anotado si el tope llegó a recortar algo: con adelanto
-           vacacional, una base recortada puede estar mal recortada, porque
-           esos días suman un tope propio que la guía no explica. */
+
+      /* Un adelanto en negativo —sólo débito— no es un adelanto: baja la
+         base del mes y se deja donde está. */
+      const adelanto = Math.max(0, vacacional[base.clave] || 0);
+      const delMes = bases[base.clave] - adelanto;
+
+      let mesTopeado = delMes;
+      if (delMes > topes.topeAplicar) {
+        mesTopeado = topes.topeAplicar;
         topes.recorto = true;
       }
+
+      let adelantoTopeado = adelanto;
+      if (adelanto > 0 && diasVacaciones > 0 && adelanto > topes.topeVacaciones) {
+        adelantoTopeado = topes.topeVacaciones;
+        topes.recortoElAdelanto = true;
+      } else if (adelanto > 0 && diasVacaciones <= 0) {
+        /* Sin días no hay tope que calcular. Recortar a cero sería peor que
+           no recortar: se deja entero y el control lo reclama. */
+        topes.adelantoSinDias = true;
+      }
+
+      bases[base.clave] = mesTopeado + adelantoTopeado;
     }
   } else if (avisos) {
     avisos.push('No se cargó el tope mensual de ANSeS del período: las bases con tope se calculan sin topear.');
@@ -937,13 +1007,21 @@ function calcularBases(trabajador, parametrizacion, parametros, avisos) {
   }
 
   /*
-   * El adelanto vacacional lleva tope propio, separado del mensual y sin SAC.
-   * La guía dice que hay que informar los días para proporcionarlo, pero NO
-   * publica el divisor. Como no se inventa, se avisa y no se topea.
+   * El adelanto vacacional ya lleva su tope propio, arriba. Acá solo se avisa
+   * en los dos casos en que el número no está determinado por la cuenta de
+   * ARCA sino por el divisor que elegimos nosotros.
    */
-  if (diasVacaciones > 0 && avisos) {
+  if (avisos && topes.adelantoSinDias) {
     avisos.push(
-      `Hay ${diasVacaciones} días de adelanto vacacional: ese tope es independiente del mensual y la guía de ARCA no publica cómo se proporciona. Verificá la base contra el borrador del servicio.`
+      'Hay adelanto vacacional sin días informados en el campo cantidad: sin los días no hay tope ' +
+        'que calcular, así que entró entero a la base. Es el primero de los errores que devuelve ARCA.'
+    );
+  }
+  if (avisos && topes.recortoElAdelanto) {
+    avisos.push(
+      `El adelanto vacacional de ${diasVacaciones} días superó su propio tope y se recortó a ` +
+        `$ ${comoPesos(topes.topeVacaciones)}. Ese recorte sale de dividir el tope del mes por 30, que ` +
+        'es la convención de ARCA pero no un divisor publicado: verificá la base contra el borrador del servicio.'
     );
   }
 
@@ -1125,7 +1203,7 @@ function controlar(liquidacion, parametrizacion, parametros) {
     }
 
     /* --- Bases imponibles: el control que tiene que dar cero --- */
-    const calculo = calcularBases(t, parametrizacion, parametros, null);
+    const calculo = calcularBases(t, parametrizacion, parametros, null, liquidacion.consolidar);
     t.calculo = calculo;
 
     /*
@@ -1216,12 +1294,13 @@ function controlar(liquidacion, parametrizacion, parametros) {
       }
 
       /*
-       * Con adelanto vacacional la base lleva un tope propio que se suma al
-       * mensual, y la guía no publica cómo se proporciona. En esos casos la
-       * base puede ser legítimamente mayor que la topeada acá, así que el
-       * hallazgo baja a aviso en vez de darse por error.
+       * El adelanto vacacional ya lleva su tope propio sumado al mensual, así
+       * que con vacaciones la base vuelve a ser exacta y el control corre
+       * entero. Baja a aviso solo cuando el número depende de algo que no
+       * tenemos: el divisor —si el adelanto llegó a recortarse— o los días,
+       * si no vinieron.
        */
-      const conVacaciones = calculo.diasVacaciones > 0 && calculo.topes.recorto;
+      const conVacaciones = calculo.topes.recortoElAdelanto || calculo.topes.adelantoSinDias;
 
       /*
        * Régimen de Promoción del Empleo Registrado (Ley 27.802). Con una
