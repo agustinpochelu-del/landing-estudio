@@ -267,6 +267,9 @@ async function archivoDeReservorio(nombre, opciones) {
  * `excluidos` son los conceptos que esa empresa no pasa al libro. Es un dato
  * de la empresa, no del mes, así que vive acá y no en un campo que haya que
  * volver a tipear en cada liquidación.
+ *
+ * `sinAltaEnArca` son los que están en el reservorio y todavía no en el
+ * servicio de ARCA: el paso 5 los nombra antes de generar el archivo.
  */
 async function reservoriosDeLaCarpeta(cuit) {
   const indice = await indiceDeReservorios();
@@ -278,6 +281,13 @@ async function reservoriosDeLaCarpeta(cuit) {
     conceptos: null,
     empleados: null,
     excluidos: Array.isArray(empresa.excluidos) ? empresa.excluidos.map(String) : [],
+    /*
+     * Los conceptos que estan en el reservorio pero todavia no dados de alta
+     * en el servicio de ARCA. Es la marca que distingue una fila que vino de la
+     * exportacion de ARCA de una que escribimos nosotros: sin ella el armador
+     * las trata igual y el archivo sale confiado. Ver `conceptosSinAlta`.
+     */
+    sinAltaEnArca: Array.isArray(empresa.sinAltaEnArca) ? empresa.sinAltaEnArca.map(String) : [],
     alicuotas: empresa.alicuotas && typeof empresa.alicuotas === 'object' ? empresa.alicuotas : null,
     /* Las dos correcciones al archivo: ver `conceptosParaElArchivo`. */
     consolidar: empresa.consolidar && typeof empresa.consolidar === 'object' ? empresa.consolidar : null,

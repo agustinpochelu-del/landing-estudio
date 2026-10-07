@@ -114,14 +114,38 @@ Desde la raíz de la landing:
 
 ```bash
 for f in armador.html recibos.html credito.html cifrar.html estilos.css registros.js version.js tablas.js perfiles.js topes.js xlsx.js sueldos.js reservorios.js convenios.js empresa.js liquidador.js recibos.js recibo-origen.js credito.js credito-pagina.js cifrado.js cifrar-pagina.js app.js; do cp "F:/OneDrive/ESTUDIO/desarrollos/LSD/$f" "estudio/lsd/$f"; done
+cp "F:/OneDrive/ESTUDIO/desarrollos/LSD/reservorios/indice.json" estudio/lsd/reservorios/indice.json
 ```
 
 Después hay que **sacar el link a los controles**, que en el proyecto de origen
-apunta a `pruebas.html` y acá no existe:
+apunta a `pruebas.html` y acá no existe. El link y su `·` separador están en
+líneas distintas, así que `sed` —que trabaja línea por línea— deja el `·`
+colgando y el link adentro:
 
 ```bash
-sed -i -E 's/\s*·\s*<a href="pruebas\.html">Controles<\/a>//' estudio/lsd/*.html
+python "F:/OneDrive/ESTUDIO/desarrollos/LSD/herramientas/sacar-link-de-controles.py" estudio/lsd
 ```
+
+Y se comprueba que no quedó ninguno, que es el control que importa:
+
+```bash
+grep -rn "pruebas.html" estudio/lsd/*.html
+```
+
+No tiene que devolver nada.
+
+Va como script y no como una línea suelta por dos veces que ya salió mal el
+07/10/2026. El `sed -i -E 's/\s*·\s*<a href="pruebas\.html">Controles<\/a>//'`
+que había acá funcionó mientras los tres links iban en un renglón, y cuando el
+`·` quedó en la línea de arriba dejó el link publicado en las tres pantallas sin
+que nada se quejara. El `python -c` que lo reemplazó abría cada archivo con `'w'`
+**antes** de leerlo: lo truncaba y escribía el vacío que acababa de leer. Las
+cuatro pantallas quedaron en cero bytes y no avisó nadie.
+
+El `indice.json` va en la misma tanda y es fácil de olvidar porque no es código:
+lleva los conceptos que no se pasan al libro, las alícuotas de aportes y los que
+todavía no están dados de alta en ARCA. Si queda viejo, la copia publicada arma
+el archivo con otros criterios que la de acá.
 
 Y correr el conteo de identificadores de más arriba antes de commitear.
 

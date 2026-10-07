@@ -4,7 +4,7 @@
   "_excluidos": "Conceptos que esa empresa no pasa al libro. Son de la empresa, no del mes: entran solos y no hay que volver a escribirlos en cada liquidación.",
   "_recibos": "Solo para los origenes que no son una tabla sino un recibo dibujado por hoja. `alias` traduce la descripcion que imprime el recibo al codigo de concepto de la empresa, porque el recibo no trae el codigo y la descripcion no coincide con la del reservorio de conceptos. `excluidos` de aca va por descripcion, no por numero, por el mismo motivo. Un concepto sin alias no se inventa: sale sin codigo y el control del paso 5 lo marca.",
   "_provincia": "Donde trabaja la gente, cuando es una sola provincia para toda la empresa. Es el valor por defecto del credito fiscal del decreto 814/2001. La columna Provincia del reservorio de empleados manda sobre esta: se usa cuando el trabajador no la trae. Nautical no la tiene y no debe tenerla, porque su gente esta repartida entre Chubut y Rio Negro.",
-  "_agregados_a_mano": "El reservorio de conceptos es una exportación de lo que ARCA tiene parametrizado. Una fila agregada a mano no es un hecho sino una promesa: la aplicación la da por buena, arma el archivo y ARCA lo rechaza con «Código de concepto inexistente». Pasó el 07/10/2026 con el 125 y el 532 de Nautical. Nautical, 125 «Devolucion liq. ant. dif»: agregado a mano el 06/10/2026 como 110000 «Sueldo», remunerativo con los catorce subsistemas, por decisión de Agustín. Hay que darlo de alta en el servicio de ARCA, a mano, antes de que el libro entre: hasta entonces el archivo rebota por él. Borrar esta línea cuando esté dado de alta.",
+  "_sin_alta_en_arca": "`sinAltaEnArca` es la lista de conceptos que estan en el reservorio pero TODAVIA NO dados de alta en el servicio de ARCA. El reservorio de conceptos es una exportacion de lo que ARCA tiene parametrizado: una fila agregada a mano no es un hecho sino una promesa, y la aplicacion la daba por buena, armaba el archivo sin una sola advertencia y ARCA lo rechazaba con «Codigo de concepto inexistente». Paso el 07/10/2026 con el 125 y el 532 de Nautical. La marca va aca y no como una columna agregada al CSV por el mismo motivo que la provincia: si alguna vez se vuelve a exportar ese CSV desde el servicio, la columna agregada a mano desaparece sin aviso y el aviso se cae solo. Con el codigo en esta lista, el paso 5 lo nombra antes de generar el archivo. Un concepto que ademas este en `excluidos` NO se avisa: si no viaja en el archivo, ARCA nunca lo va a ver. PARA DESMARCARLO, una vez dado de alta en el servicio de ARCA: borrar su codigo de esta lista y recargar la pantalla. No hay que tocar codigo ni el CSV.",
   "_alicuotas": "Los aportes del trabajador, en por ciento. ARCA los recalcula sobre las bases y los cruza contra lo retenido en el recibo; sin estos números ese control no corre, y es el que encontró que a Nautical le faltaba retener $1.950.679,92 en 202609. Van acá por el mismo motivo que todo lo demás: no cambian mes a mes.",
   "empresas": {
     "30644965593": {
@@ -21,6 +21,11 @@
         "531",
         "532"
       ],
+      "sinAltaEnArca": [
+        "125",
+        "532"
+      ],
+      "_por_que_sin_alta": "125 «Devolucion liq. ant. dif»: agregado a mano al reservorio el 06/10/2026 como 110000 «Sueldo», remunerativo con los catorce subsistemas, por decision de Agustin. Se queda en el libro y hay que darlo de alta a mano en el servicio de ARCA; hasta entonces el archivo rebota por el, y el paso 5 lo avisa. 532 «AMARRE/DESAM. SUPPLY»: tampoco esta dado de alta, pero el 07/10/2026 se decidio excluirlo del libro en vez de crearlo, asi que esta tambien en `excluidos` y no se avisa. Queda marcado igual para que la marca diga la verdad sobre la parametrizacion de ARCA y no dependa de que siga excluido.",
       "alicuotas": {
         "sipa": 11,
         "inssjyp": 3,

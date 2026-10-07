@@ -29,6 +29,8 @@ const estado = {
   conversionRecibos: null,
   /* La provincia de toda la empresa, para el credito del decreto 814. */
   provinciaDeLaEmpresa: '',
+  /* Los conceptos que el reservorio tiene y ARCA todavia no: ver el paso 5. */
+  sinAltaEnArca: [],
 };
 
 const $ = (id) => document.getElementById(id);
@@ -305,6 +307,12 @@ async function traerReservoriosDeLaCarpeta(cuit) {
    */
   estado.recibos = dela.recibos;
   estado.provinciaDeLaEmpresa = dela.provincia;
+  /*
+   * Los conceptos que el reservorio tiene y el servicio de ARCA todavia no.
+   * Entran con el reservorio, como los excluidos: son de la empresa, no del
+   * mes, y no hay campo en pantalla que haya que volver a tipear.
+   */
+  estado.sinAltaEnArca = dela.sinAltaEnArca || [];
 
   const alic = dela.alicuotas;
   if (alic) {
@@ -769,12 +777,24 @@ function pintarControl() {
   const errores = estado.hallazgos.filter((h) => h.nivel === 'error');
   const avisos = estado.hallazgos.filter((h) => h.nivel === 'aviso');
 
-  $('resumen-control').textContent = errores.length
-    ? `${errores.length} ${errores.length === 1 ? 'error' : 'errores'}` +
-      (avisos.length ? ` · ${avisos.length} para mirar` : '')
-    : avisos.length
-    ? `Sin errores · ${avisos.length} para mirar`
-    : 'Sin observaciones';
+  /*
+   * El resumen se arma DESPUÉS de saber si hay conceptos sin alta en ARCA,
+   * porque el acordeón del paso 5 se abre solo cuando hay errores: un aviso que
+   * no se cuenta acá queda adentro de un panel cerrado y no se ve nunca.
+   */
+  const sellarResumen = (sinAltaCuantos) => {
+    const partes = [];
+    if (errores.length) partes.push(`${errores.length} ${errores.length === 1 ? 'error' : 'errores'}`);
+    else partes.push('Sin errores');
+    if (avisos.length) partes.push(`${avisos.length} para mirar`);
+    if (sinAltaCuantos) {
+      partes.push(
+        sinAltaCuantos === 1 ? '1 concepto sin alta en ARCA' : `${sinAltaCuantos} conceptos sin alta en ARCA`
+      );
+    }
+    $('resumen-control').textContent =
+      !errores.length && !avisos.length && !sinAltaCuantos ? 'Sin observaciones' : partes.join(' · ');
+  };
 
   let html = errores.length
     ? `<div class="aviso mal">Hay <strong>${errores.length}</strong> ${
@@ -845,6 +865,55 @@ function pintarControl() {
     </div>`;
   }
 
+  /*
+   * Los conceptos que el reservorio tiene y el servicio de ARCA todavía no.
+   *
+   * El reservorio de conceptos es una EXPORTACIÓN de lo que ARCA tiene
+   * parametrizado, y una fila agregada a mano no es un hecho sino una promesa.
+   * La aplicación la daba por buena —está en el reservorio, así que para ella
+   * está parametrizada—, armaba el archivo sin una sola advertencia y el
+   * rechazo aparecía recién del otro lado, en la pantalla de ARCA. Pasó el
+   * 07/10/2026 con el 125 y el 532 de Nautical.
+   *
+   * No es un error bloqueante: el concepto puede viajar igual y el archivo está
+   * bien armado. Es información —lo que falta está en el servicio de ARCA, no
+   * acá—, así que va como «ojo» y no como «mal».
+   *
+   * Los excluidos se leen de la pantalla y no del reservorio a propósito: si se
+   * agrega uno a mano en el campo del paso 2, el aviso tiene que irse con él.
+   */
+  const sinAlta = !estado.liquidacion
+    ? []
+    : conceptosSinAlta(estado.liquidacion, estado.parametrizacion, estado.sinAltaEnArca, leerExcluidos());
+
+  if (sinAlta.length) {
+    const detalle = sinAlta
+      .map(
+        (c) =>
+          `<p><code>${escapar(c.codigo)}</code> ${
+            c.descripcion ? `«${escapar(c.descripcion)}»` : 'sin descripción en el reservorio'
+          }${c.codigoArca ? ` — el reservorio lo manda al ${escapar(c.codigoArca)} de ARCA` : ' — ni siquiera está mapeado'},
+           en ${c.cuiles} ${c.cuiles === 1 ? 'trabajador' : 'trabajadores'} por
+           <strong>$ ${comoPesos(Math.abs(c.total))}</strong>.</p>`
+      )
+      .join('');
+
+    html += `<div class="aviso ojo">
+      <strong>${
+        sinAlta.length === 1
+          ? 'Un concepto de esta liquidación está'
+          : `${sinAlta.length} conceptos de esta liquidación están`
+      } en el reservorio pero no dado${sinAlta.length === 1 ? '' : 's'} de alta en ARCA.</strong>
+      <div class="detalle">${detalle}</div>
+      Mientras no ${sinAlta.length === 1 ? 'esté creado' : 'estén creados'} en el servicio, ARCA va a
+      rechazar el archivo con <strong>«Código de concepto inexistente»</strong>. El alta se hace a mano
+      en el servicio de ARCA; la otra salida es no pasar${sinAlta.length === 1 ? 'lo' : 'los'} al libro.
+      Una vez dado${sinAlta.length === 1 ? '' : 's'} de alta, se borra el código de
+      <code>sinAltaEnArca</code> en <code>reservorios/indice.json</code> y este aviso se va solo.
+      <button type="button" class="suave" id="ir-a-excluidos">Ver los que no se pasan</button>
+    </div>`;
+  }
+
   const item = (h) =>
     `<li class="${h.nivel}">${h.cuil ? `<span class="quien">${escapar(h.cuil)}</span>` : ''}${escapar(h.mensaje)}</li>`;
 
@@ -890,7 +959,10 @@ function pintarControl() {
   }
 
   caja.innerHTML = html;
-  $('paso-control').open = errores.length > 0;
+  sellarResumen(sinAlta.length);
+  /* Un concepto sin alta en ARCA abre el paso igual que un error: es lo que va
+     a hacer rebotar el archivo, aunque el archivo esté bien armado. */
+  $('paso-control').open = errores.length > 0 || sinAlta.length > 0;
 
   /* El botón del aviso abre el paso 2 y lleva hasta ahí, porque nombrarlo no
      alcanzó: el acordeón venía cerrado y se pasaba de largo. */
@@ -901,6 +973,13 @@ function pintarControl() {
   /* Lleva derecho a la sección de altas y no al principio del paso: lo que hay
      que cargar está al fondo, después de los dos reservorios y de los conceptos
      que no se pasan al libro. */
+  /* La otra salida para un concepto sin alta en ARCA es no pasarlo al libro, y
+     eso se escribe en el campo del paso 2. El botón lleva hasta ahí; la
+     decisión la toma Agustín, no el botón. */
+  if ($('ir-a-excluidos')) {
+    $('ir-a-excluidos').addEventListener('click', () => abrirPaso2YLlevarA('excluidos'));
+  }
+
   if ($('ir-al-alta')) {
     $('ir-al-alta').addEventListener('click', () => abrirPaso2YLlevarA('novedades'));
   }
@@ -940,7 +1019,10 @@ function abrirPaso2YLlevarA(idDestino) {
     if (!destino) return;
     const arriba = destino.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top: Math.max(arriba - 12, 0), behavior: 'auto' });
-    const primero = destino.querySelector('input, select');
+    /* El destino puede ser un contenedor o el campo mismo —el de los conceptos
+       que no se pasan es un `<input>` suelto—, así que se prueban los dos. */
+    const primero = destino.querySelector('input, select') ||
+      (destino.matches && destino.matches('input, select') ? destino : null);
     if (primero) primero.focus({ preventScroll: true });
   }, 0);
 }

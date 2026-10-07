@@ -206,6 +206,72 @@ function conceptosNuevos(liquidacion, parametrizacion) {
     .sort((a, b) => Math.abs(b.total) - Math.abs(a.total));
 }
 
+/**
+ * Conceptos de ESTA liquidación que están en el reservorio pero todavía no
+ * dados de alta en el servicio de ARCA.
+ *
+ * El reservorio de conceptos es una EXPORTACIÓN de lo que ARCA tiene
+ * parametrizado. Una fila agregada a mano no es un hecho sino una promesa: la
+ * aplicación la daba por buena —está en el reservorio, así que para ella está
+ * parametrizada—, armaba el archivo sin una sola advertencia y el rechazo
+ * «Código de concepto inexistente» aparecía recién en la pantalla de ARCA.
+ * Pasó el 07/10/2026 con el 125 y el 532 de Nautical.
+ *
+ * La marca vive en `reservorios/indice.json`, en `sinAltaEnArca` de la empresa,
+ * y no como una columna agregada al CSV: si alguna vez se vuelve a exportar ese
+ * archivo desde el servicio, la columna agregada a mano desaparece sin aviso y
+ * el aviso se cae solo. Es el mismo motivo por el que la provincia está en el
+ * índice y no en el reservorio de empleados.
+ *
+ * `excluidos` manda sobre la marca: si el concepto no viaja en el archivo, ARCA
+ * nunca lo va a ver y no hay nada que avisar.
+ *
+ * Devuelve solo los que aparecen en la liquidación —no toda la lista—, porque
+ * lo que importa es si ESTE archivo va a rebotar.
+ */
+function conceptosSinAlta(liquidacion, parametrizacion, sinAlta, excluidos) {
+  if (!liquidacion || !Array.isArray(liquidacion.trabajadores)) return [];
+
+  /* Se comparan contra el código de la planilla, que llega como texto ya
+     recortado: un número, o un texto con espacios, nunca daría igual. */
+  const marcados = new Set((sinAlta || []).map((c) => String(c).trim()).filter(Boolean));
+  if (!marcados.size) return [];
+  const fuera = new Set((excluidos || []).map((c) => String(c).trim()).filter(Boolean));
+
+  const encontrados = new Map();
+  for (const t of liquidacion.trabajadores) {
+    for (const c of t.conceptos || []) {
+      const codigo = String(c.codigo === undefined ? '' : c.codigo).trim();
+      if (!marcados.has(codigo) || fuera.has(codigo)) continue;
+      if (!encontrados.has(codigo)) {
+        /*
+         * La descripción sale del reservorio, que es la que se ve al mirar la
+         * parametrización. Si el concepto ni siquiera está mapeado, se usa la
+         * de la planilla: algo hay que poder nombrar.
+         */
+        const enReservorio = parametrizacion && parametrizacion.get ? parametrizacion.get(codigo) : null;
+        encontrados.set(codigo, {
+          codigo,
+          descripcion: (enReservorio && enReservorio.descripcion) || c.descripcion || '',
+          codigoArca: (enReservorio && enReservorio.codigoArca) || '',
+          enElReservorio: Boolean(enReservorio),
+          veces: 0,
+          total: 0,
+          cuiles: new Set(),
+        });
+      }
+      const e = encontrados.get(codigo);
+      e.veces += 1;
+      e.total += (c.debitoCredito === 'D' ? -1 : 1) * c.importe;
+      e.cuiles.add(t.cuil);
+    }
+  }
+
+  return Array.from(encontrados.values())
+    .map((e) => Object.assign(e, { cuiles: e.cuiles.size }))
+    .sort((a, b) => Math.abs(b.total) - Math.abs(a.total));
+}
+
 /** Empleados que aparecen en la liquidación y no están en el reservorio. */
 function empleadosNuevos(liquidacion, padron) {
   return liquidacion.trabajadores
@@ -423,6 +489,7 @@ if (typeof module !== 'undefined' && module.exports) {
     bandasDeConceptos,
     sugerirConcepto,
     conceptosNuevos,
+    conceptosSinAlta,
     empleadosNuevos,
     valoresDelReservorio,
     empleadosSinLiquidacion,
