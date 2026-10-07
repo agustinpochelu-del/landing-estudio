@@ -891,6 +891,29 @@ function pintarArchivo() {
 
   let html = `<div class="aviso bien">El archivo tiene ${lineas.length} registros: ${detalle}.</div>`;
 
+  /*
+   * El recordatorio de bajar el reservorio va TAMBIÉN acá.
+   *
+   * Está en el paso 2, que es donde se dio el alta, pero ese paso se pliega
+   * solo en cuanto los dos reservorios están cargados. Entonces pasa esto: se
+   * da el alta, el control dice «sin errores», se baja el TXT y el aviso queda
+   * arriba, adentro de un paso cerrado que nadie vuelve a abrir. El alta vive
+   * solo en la memoria del navegador y el mes siguiente no está.
+   *
+   * Un aviso que hay que ir a buscar no es un aviso. Va donde termina el
+   * trabajo, que es este paso.
+   */
+  if (altasDeEmpleados.size) {
+    const cuantos = altasDeEmpleados.size;
+    html += `<div class="aviso ojo">
+      Diste de alta ${cuantos === 1 ? 'un empleado' : `${cuantos} empleados`} en esta sesión
+      (${Array.from(altasDeEmpleados.values()).map(escapar).join(', ')}).
+      Ese dato está en este archivo, pero <strong>todavía no está en el reservorio de la
+      empresa</strong>: bajalo y guardalo, o el mes que viene hay que cargarlo otra vez.
+      <button type="button" class="suave" id="ir-a-bajar-padron">Bajar el reservorio de empleados</button>
+    </div>`;
+  }
+
   /* El crédito fiscal se guardó al recalcular. Se avisa acá porque es plata que
      se toma, y tiene que constar que quedó registrada y dónde se consulta. */
   if (estado.credito && (estado.credito.filas.length || estado.credito.faltantes.length)) {
@@ -1008,6 +1031,7 @@ function pintarArchivo() {
   caja.innerHTML = html;
 
   $('bajar').addEventListener('click', bajarArchivo);
+  if ($('ir-a-bajar-padron')) $('ir-a-bajar-padron').addEventListener('click', bajarPadron);
   $('copiar').addEventListener('click', async () => {
     await navigator.clipboard.writeText(estado.archivo.texto);
     $('copiar').textContent = 'Copiado';
@@ -1085,7 +1109,16 @@ function pintarNovedades() {
   const empleados = empleadosNuevos(estado.liquidacion, estado.padron);
   const ausentes = empleadosSinLiquidacion(estado.liquidacion, estado.padron);
 
-  if (!conceptos.length && !empleados.length && !aceptados.size) {
+  /*
+   * `altasDeEmpleados` entra en la condición a propósito.
+   *
+   * Sin eso, apenas se daba de alta al último empleado que faltaba la sección
+   * se reemplazaba por «Ningún empleado ni concepto nuevo» y desaparecían el
+   * aviso Y los botones para bajar el reservorio. El alta quedaba solo en la
+   * memoria del navegador, sin nada que recordara bajarla, y el mes siguiente
+   * no estaba. Se ve usando la pantalla, no leyendo el código.
+   */
+  if (!conceptos.length && !empleados.length && !aceptados.size && !altasDeEmpleados.size) {
     caja.innerHTML = `<div class="aviso bien">
       Ningún empleado ni concepto nuevo: los reservorios ya cubren todo lo que
       trae la liquidación.${

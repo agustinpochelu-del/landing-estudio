@@ -343,6 +343,10 @@ const ENCABEZADOS_PADRON = {
    */
   grupo: 'Grupo salarial',
   dependencia: 'Dependencia de revista',
+  /* No va al registro 04: es para el crédito fiscal del decreto 814, que
+     depende de dónde trabaja la persona. Lleva nombre igual porque se carga
+     en el alta como todo lo demás. */
+  provincia: 'Provincia',
   cbu: 'CBU',
   formaPago: 'Forma de pago',
   diasLiquidados: 'Días liquidados',
