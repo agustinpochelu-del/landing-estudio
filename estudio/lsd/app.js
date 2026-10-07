@@ -1042,6 +1042,9 @@ function bajarArchivo() {
 /** Los conceptos nuevos que ya se aceptaron en esta sesión. */
 const aceptados = new Map();
 
+/** Los empleados que se dieron de alta en esta sesión. */
+const altasDeEmpleados = new Map();
+
 function pintarNovedades() {
   const caja = $('novedades');
   if (!caja) return;
@@ -1099,21 +1102,7 @@ function pintarNovedades() {
   let html = '';
 
   if (empleados.length) {
-    html += `<h3 class="subtitulo">Empleados que no están en el reservorio</h3>
-      <p class="nota">
-        Se pueden sumar con lo que trae la liquidación, pero el registro 04 les
-        va a quedar incompleto: la obra social, la modalidad, la condición y la
-        localidad salen del alta, no de la liquidación. Conviene completarlos en
-        el reservorio antes de subir el archivo.
-      </p>
-      <div class="tabla-envoltorio"><table>
-        <thead><tr><th>CUIL</th><th>Nombre</th><th>Legajo</th></tr></thead>
-        <tbody>${empleados
-          .map(
-            (e) => `<tr><td><code>${escapar(e.cuil)}</code></td>
-              <td>${escapar(e.nombre)}</td><td>${escapar(e.legajo)}</td></tr>`
-          )
-          .join('')}</tbody></table></div>`;
+    html += pintarAltaDeEmpleados(empleados);
   }
 
   if (conceptos.length) {
@@ -1164,6 +1153,18 @@ function pintarNovedades() {
     }
   }
 
+  if (altasDeEmpleados.size) {
+    html += `<div class="aviso ojo">
+      Dados de alta en esta sesión:
+      ${Array.from(altasDeEmpleados.entries())
+        .map(([cuil, nombre]) => `<code>${escapar(cuil)}</code> ${escapar(nombre)}`)
+        .join(' · ')}.
+      <strong>Bajá el reservorio de empleados</strong> y guardalo en la carpeta de la
+      empresa: si no, el alta vive solo en este navegador y el mes que viene no está.
+      ${estado.correcciones ? 'Si esta empresa está publicada, el archivo hay que volver a cifrarlo.' : ''}
+    </div>`;
+  }
+
   if (aceptados.size) {
     html += `<div class="aviso ojo">
       Sumados al reservorio en esta sesión:
@@ -1171,6 +1172,9 @@ function pintarNovedades() {
         .map(([cod, arca]) => `<code>${escapar(cod)}</code> → <code>${escapar(arca)}</code>`)
         .join(' · ')}.
       <strong>Bajá el reservorio actualizado</strong> para no perderlos.
+      Ojo: sumarlo acá no lo crea en ARCA. El concepto también hay que darlo de
+      alta en el módulo <strong>CONCEPTOS</strong> del servicio, o el archivo
+      vuelve con «Código de concepto inexistente».
     </div>`;
   }
 
@@ -1184,8 +1188,154 @@ function pintarNovedades() {
   caja.querySelectorAll('[data-aceptar]').forEach((boton) =>
     boton.addEventListener('click', () => aceptarConcepto(boton.dataset.aceptar))
   );
+  caja.querySelectorAll('[data-alta]').forEach((boton) =>
+    boton.addEventListener('click', () => altaDeEmpleado(boton.dataset.alta))
+  );
   if ($('bajar-conceptos')) $('bajar-conceptos').addEventListener('click', bajarConceptos);
   if ($('bajar-padron')) $('bajar-padron').addEventListener('click', bajarPadron);
+}
+
+/* ---------- El alta de un empleado ---------- */
+
+/*
+ * Qué se pregunta y qué se hereda.
+ *
+ * La planilla del mes trae CUIL, nombre, legajo e importes. Todo lo que pide el
+ * registro 04 —obra social, modalidad, condición, localidad, CBU, forma de
+ * pago— sale del alta en Simplificación Registral, no de la liquidación. Por eso
+ * un empleado nuevo entra con el registro 04 en ceros y ARCA rechaza el archivo.
+ *
+ * Pero la mayoría de esos campos es de la EMPRESA, no de la persona: en
+ * Nautical, dieciocho de veintiocho son idénticos en los diecinueve empleados.
+ * Esos se heredan sin preguntar. De los que varían, casi todos tienen dos o
+ * tres valores en uso y se eligen de una lista.
+ *
+ * Así un alta son seis o siete datos, no veintiocho. Y los que se eligen de la
+ * lista no se pueden tipear mal.
+ */
+const ORDEN_DEL_ALTA = [
+  'legajo', 'cbu', 'formaPago', 'obraSocial', 'dependencia', 'provincia',
+  'localidad', 'conyuge', 'hijos', 'adherentes', 'marcaCCT',
+  'fechaIngreso', 'basico', 'grupo',
+];
+
+/** Un campo con pocos valores distintos se elige; el resto se escribe. */
+const TOPE_DE_LISTA = 6;
+
+function pintarAltaDeEmpleados(empleados) {
+  const visto = valoresDelReservorio(estado.padron);
+  const heredados = Object.keys(visto).filter((k) => visto[k].igualEnTodos);
+
+  let html = `<h3 class="subtitulo">Empleados que no están en el reservorio</h3>
+    <p class="nota">
+      Sin estos datos el registro 04 sale en ceros y ARCA rechaza el archivo:
+      la obra social, la modalidad, la condición y la localidad salen del alta,
+      no de la liquidación.
+    </p>`;
+
+  if (heredados.length) {
+    html += `<p class="nota">
+      No hace falta cargarlos todos. <strong>${heredados.length} campos</strong> son
+      iguales en los ${estado.padron.size} empleados de esta empresa y se heredan solos:
+      ${heredados.map((k) => `<code>${escapar(ENCABEZADOS_PADRON[k] || k)}</code>`).join(' · ')}.
+    </p>`;
+  }
+
+  for (const e of empleados) {
+    html += `<div class="novedad">
+      <div class="novedad-titulo">
+        <code>${escapar(e.cuil)}</code> ${escapar(e.nombre || 'sin nombre')}
+        ${e.legajo ? `<span class="marca bien">legajo ${escapar(e.legajo)}</span>` : ''}
+      </div>
+      <div class="campos">`;
+
+    for (const clave of ORDEN_DEL_ALTA) {
+      const datos = visto[clave];
+      if (datos && datos.igualEnTodos) continue;        /* se hereda */
+      const etiqueta = ENCABEZADOS_PADRON[clave] || clave;
+      const id = `alta-${e.cuil}-${clave}`;
+      /* El legajo ya lo trae la planilla: se propone y se puede corregir. */
+      const propuesto = clave === 'legajo' ? e.legajo || '' : '';
+
+      if (datos && datos.valores.length <= TOPE_DE_LISTA) {
+        const opciones = datos.valores
+          .map(
+            (v) =>
+              `<option value="${escapar(v.valor)}"${v.valor === datos.predominante ? ' selected' : ''}>${
+                escapar(v.valor)} — ${v.n} de ${estado.padron.size}</option>`
+          )
+          .join('');
+        html += `<div>
+          <label for="${id}">${escapar(etiqueta)}
+            <span class="ayuda">lo que usan los demás</span>
+          </label>
+          <select id="${id}">${opciones}<option value="">(otro, a mano)</option></select>
+        </div>`;
+      } else {
+        html += `<div>
+          <label for="${id}">${escapar(etiqueta)}${
+            clave === 'cbu' ? ' <span class="ayuda">22 dígitos, o vacío si cobra en efectivo</span>' : ''
+          }</label>
+          <input type="text" id="${id}" value="${escapar(propuesto)}">
+        </div>`;
+      }
+    }
+
+    html += `<div style="align-self:end">
+          <button class="suave" data-alta="${escapar(e.cuil)}">Dar de alta en el reservorio</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+/**
+ * Da de alta al empleado: lo que se eligió en pantalla, más lo que es igual
+ * para toda la empresa.
+ *
+ * Queda guardado en esta computadora, pero **el reservorio de verdad es el
+ * archivo**: por eso abajo insiste con bajarlo. Si no se baja, el alta vive
+ * solo en este navegador y el mes que viene no está.
+ */
+function altaDeEmpleado(cuil) {
+  const nuevo = empleadosNuevos(estado.liquidacion, estado.padron).find((e) => e.cuil === cuil);
+  if (!nuevo) return;
+
+  const visto = valoresDelReservorio(estado.padron);
+  const datos = {};
+
+  /* Primero lo que es de la empresa. */
+  for (const [clave, d] of Object.entries(visto)) {
+    if (d.igualEnTodos) datos[clave] = d.predominante;
+  }
+  /* Después lo que se cargó, que manda sobre lo heredado. */
+  for (const clave of ORDEN_DEL_ALTA) {
+    const campo = $(`alta-${cuil}-${clave}`);
+    if (!campo) continue;
+    const valor = String(campo.value || '').trim();
+    if (valor) datos[clave] = valor;
+  }
+  if (nuevo.nombre) datos.apellidoNombre = nuevo.nombre;
+
+  const formaPago = soloDigitos(datos.formaPago || '');
+  if (!formaPago || !FORMAS_DE_PAGO[formaPago]) {
+    alert('La forma de pago tiene que ser 1 efectivo, 2 cheque, 3 acreditación o 4 pago externo.');
+    return;
+  }
+  if (formaPago === '3' && soloDigitos(datos.cbu || '').length !== 22) {
+    alert('Cobra por acreditación, así que el CBU es obligatorio y tiene que tener 22 dígitos.');
+    return;
+  }
+
+  if (!estado.padron) estado.padron = new Map();
+  estado.padron.set(cuil, datos);
+  guardarPadron(cuitDeLaPantalla(), estado.padron);
+  altasDeEmpleados.set(cuil, nuevo.nombre || cuil);
+
+  pintarResumenPaso2();
+  recalcular();
 }
 
 /**

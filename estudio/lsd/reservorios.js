@@ -213,6 +213,51 @@ function empleadosNuevos(liquidacion, padron) {
     .map((t) => ({ cuil: t.cuil, nombre: t.apellidoNombre || '', legajo: t.legajo || '' }));
 }
 
+/**
+ * Qué valor tiene cada campo del reservorio en los empleados que ya están.
+ *
+ * Sirve para dar de alta a uno nuevo sin escribir veintiocho datos. En Nautical
+ * **dieciocho de los veintiocho campos son idénticos en los diecinueve
+ * empleados** —situación, condición, actividad, modalidad, siniestrado,
+ * revista, días, horas, importe a detraer, las marcas—: esos no se preguntan,
+ * se heredan. De los que varían, casi todos tienen dos o tres valores en uso,
+ * así que se eligen de una lista en vez de tipearse.
+ *
+ * Lo que de verdad es propio de cada persona son el legajo y el CBU.
+ *
+ * Devuelve, por campo: los valores vistos con cuántas veces, cuál predomina, y
+ * si es igual en todos.
+ */
+function valoresDelReservorio(padron) {
+  const salida = {};
+  if (!padron || !padron.size) return salida;
+
+  for (const datos of padron.values()) {
+    for (const [clave, valor] of Object.entries(datos)) {
+      const texto = String(valor === null || valor === undefined ? '' : valor);
+      if (!texto) continue;
+      const cuenta = (salida[clave] = salida[clave] || new Map());
+      cuenta.set(texto, (cuenta.get(texto) || 0) + 1);
+    }
+  }
+
+  const final = {};
+  for (const [clave, cuenta] of Object.entries(salida)) {
+    const valores = Array.from(cuenta.entries())
+      .map(([valor, n]) => ({ valor, n }))
+      .sort((a, b) => b.n - a.n);
+    final[clave] = {
+      valores,
+      predominante: valores[0].valor,
+      /* Igual en todos solo si además lo trae TODO el padrón: un campo que
+         está en cinco de diecinueve con el mismo valor no es un valor de la
+         empresa, es un campo que casi nadie tiene cargado. */
+      igualEnTodos: valores.length === 1 && valores[0].n === padron.size,
+    };
+  }
+  return final;
+}
+
 /** Empleados del reservorio que no trabajaron en el período. Es normal. */
 function empleadosSinLiquidacion(liquidacion, padron) {
   if (!padron) return [];
@@ -375,6 +420,7 @@ if (typeof module !== 'undefined' && module.exports) {
     sugerirConcepto,
     conceptosNuevos,
     empleadosNuevos,
+    valoresDelReservorio,
     empleadosSinLiquidacion,
     csvDeConceptos,
     csvDePadron,
