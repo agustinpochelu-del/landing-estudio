@@ -22,7 +22,6 @@
         "532"
       ],
       "sinAltaEnArca": [
-        "125",
         "532"
       ],
       "_por_que_sin_alta": "125 «Devolucion liq. ant. dif»: agregado a mano al reservorio el 06/10/2026 como 110000 «Sueldo», remunerativo con los catorce subsistemas, por decision de Agustin. Se queda en el libro y hay que darlo de alta a mano en el servicio de ARCA; hasta entonces el archivo rebota por el, y el paso 5 lo avisa. 532 «AMARRE/DESAM. SUPPLY»: tampoco esta dado de alta, pero el 07/10/2026 se decidio excluirlo del libro en vez de crearlo, asi que esta tambien en `excluidos` y no se avisa. Queda marcado igual para que la marca diga la verdad sobre la parametrizacion de ARCA y no dependa de que siga excluido.",

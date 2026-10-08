@@ -86,6 +86,11 @@ const PERFILES = [
       /* 'apellido' primero: la planilla de Nautical trae las dos columnas y la
          que corresponde es "Apellido". La de Martín Prado solo trae "nombre". */
       apellidoNombre: ['apellido', 'nombre'],
+      /* Y la columna «Nombre», que queda para el nombre de pila. En la
+         planilla de Martín Prado no hay «Apellido», así que la gana
+         `apellidoNombre` y esta no engancha nada: una columna va a un solo
+         campo. */
+      nombreDePila: ['nombre'],
       /* No hay fecha de pago: la del recibo es la de liquidación. */
       fechaPago: ['fecha de liquidacion'],
       tipoOrigen: ['tipo de concepto'],

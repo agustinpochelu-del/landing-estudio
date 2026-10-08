@@ -204,6 +204,20 @@ function normalizarEncabezado(texto) {
 const SINONIMOS = {
   cuil: ['cuil', 'cuil empleado', 'cuil trabajador', 'cuil del trabajador', 'nro cuil'],
   apellidoNombre: ['apellido y nombre', 'apellido nombre', 'nombre', 'empleado', 'trabajador'],
+  /*
+   * El nombre de pila, cuando la planilla lo trae en una columna aparte.
+   *
+   * Nautical tiene dos NAVARRETE —JAVIER BERNARDINO, legajo 66, y CRISTIAN
+   * JAVIER, legajo 139— y la pantalla mostraba «NAVARRETE» a secas, porque
+   * «Apellido» ganaba la columna y «Nombre» quedaba sin asignar. El nombre no
+   * viaja en el archivo —ARCA identifica por CUIL—, pero el alta de un
+   * empleado es justo donde confundirse de persona cuesta caro.
+   *
+   * Va DESPUÉS de `apellidoNombre` a propósito: una columna se engancha a un
+   * solo campo, y en una planilla con una sola columna de nombre —la de
+   * Martín Prado— tiene que ganarla `apellidoNombre`, no esta.
+   */
+  nombreDePila: ['nombre de pila', 'nombres'],
   legajo: ['legajo', 'nro legajo', 'numero de legajo'],
   /* Las dos columnas que el reservorio de empleados lleva para el liquidador y
      el armador no usa: desde cuándo trabaja y cuánto cobra de básico. */
@@ -371,7 +385,7 @@ function armarLiquidacion(filas, columnas, cabecera, avisos, perfil, opciones) {
     'situacion', 'condicion', 'actividad', 'modalidad', 'siniestrado', 'localidad',
     'revista1', 'diaRevista1', 'revista2', 'diaRevista2', 'revista3', 'diaRevista3',
     'diasTrabajados', 'horasTrabajadas', 'obraSocial', 'adherentes', 'observaciones',
-    'apellidoNombre',
+    'apellidoNombre', 'nombreDePila',
   ];
   const camposBase = ['remBruta', 'rem1', 'rem2', 'rem3', 'rem4', 'rem5', 'rem6', 'rem7', 'rem8', 'rem9', 'rem10', 'importeDetraer'];
 
@@ -395,6 +409,12 @@ function armarLiquidacion(filas, columnas, cabecera, avisos, perfil, opciones) {
     if (!trabajadores.has(cuil)) {
       const t = { cuil, filaOrigen: nroFila, conceptos: [], declarado: {} };
       for (const campo of camposTrabajador) t[campo] = valorDeCampo(campo);
+      /* Apellido y nombre, juntos, cuando la planilla los trae separados. Se
+         comparan los valores y no solo las columnas: si las dos cayeran en la
+         misma, el nombre saldría repetido. */
+      if (t.nombreDePila && t.nombreDePila !== t.apellidoNombre) {
+        t.apellidoNombre = `${t.apellidoNombre} ${t.nombreDePila}`.trim();
+      }
       for (const campo of camposBase) {
         const bruto = celda(fila, columnas, campo);
         t.declarado[campo] = bruto === '' ? null : aCentavos(bruto);
