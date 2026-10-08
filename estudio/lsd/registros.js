@@ -149,6 +149,21 @@ const REGISTRO_04 = [
   { clave: 'importeDetraer', largo: 15, formato: 'D', nombre: 'Importe a detraer' },
 ];
 
+/*
+ * El 05 es para el trabajador que viene de una EMPRESA DE SERVICIOS
+ * EVENTUALES: por eso lleva el CUIT de esa empresa además de la categoría, el
+ * puesto y las fechas de ingreso y egreso.
+ *
+ * **La aplicación no lo emite, y es a propósito.** Ninguno de los tres
+ * empleadores tiene trabajadores de agencia. Confirmado por Agustín el
+ * 07/10/2026: cuando en Nautical se habla de un contrato «eventual» se trata de
+ * un contrato a PLAZO FIJO con la propia empresa, que no es este registro. Los
+ * archivos que ARCA viene aceptando no lo traen.
+ *
+ * El diseño queda escrito y con su largo controlado para el día que haga falta,
+ * que no es hoy. Si aparece un empleador con personal de agencia, acá está la
+ * mitad del trabajo hecha.
+ */
 const REGISTRO_05 = [
   { clave: 'tipo', largo: 2, formato: 'K', valor: '05', nombre: 'Identificador de registro' },
   { clave: 'cuil', largo: 11, formato: 'N', nombre: 'CUIL' },
